@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks/useScrollReveal'
+import { useInView } from 'react-intersection-observer'
+import { useCountUp } from '../hooks/useCountUp'
 import Footer from '../components/Footer'
 
 // ─── FRAMER VARIANTS ───────────────────────────────────────────
@@ -50,10 +52,10 @@ const SERVICES_DATA = [
 ]
 
 const STATS = [
-  { num: '5+', label: 'Years Experience' },
-  { num: '30+', label: 'Projects Delivered' },
-  { num: '15+', label: 'Happy Clients' },
-  { num: '99%', label: 'Uptime SLA' },
+  { num: 5,  suffix: '+', label: 'Years Experience' },
+  { num: 30, suffix: '+', label: 'Projects Delivered' },
+  { num: 15, suffix: '+', label: 'Happy Clients' },
+  { num: 99, suffix: '%', label: 'Uptime SLA' },
 ]
 
 // ─── REVEAL WRAPPER ─────────────────────────────────────────────
@@ -111,6 +113,29 @@ function ServiceCard({ item, delay }) {
   )
 }
 
+function StatCounter({ target, suffix, label, delay }) {
+  const { ref: inViewRef, inView } = useInView({ threshold: 0.5, triggerOnce: true })
+  const numRef = useCountUp(target, 1800, inView)
+
+  return (
+    <motion.div
+      ref={inViewRef}
+      initial={{ opacity: 0, y: 20 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay }}
+      className="pr-8 mr-8 border-r last:border-r-0 last:mr-0 last:pr-0"
+      style={{ borderColor: 'var(--border)' }}
+    >
+      <div className="font-display text-5xl leading-none" style={{ color: 'var(--text)' }}>
+        <span ref={numRef}>0</span>
+        <span style={{ color: 'var(--accent)' }}>{suffix}</span>
+      </div>
+      <div className="font-mono text-[0.62rem] tracking-[0.15em] uppercase mt-1" style={{ color: 'var(--text-muted)' }}>
+        {label}
+      </div>
+    </motion.div>
+  )
+}
 // ═══════════════════════════════════════════════════════════════
 export default function Home() {
   return (
@@ -160,6 +185,7 @@ export default function Home() {
               &amp; Developer<span className="typed-cursor" />
             </div>
           </motion.div>
+</div>
 
           {/* Sub */}
           <motion.p {...fadeUp(0.35)} className="text-lg leading-relaxed mb-10 max-w-md" style={{ color: 'var(--text-muted)' }}>
@@ -177,27 +203,18 @@ export default function Home() {
           </motion.div>
 
           {/* Stats */}
-          <motion.div
-            {...fadeUp(0.55)}
-            className="flex flex-wrap gap-0 border-t pt-8"
-            style={{ borderColor: 'var(--border)' }}
-          >
+          {/* Stats */}
+          <div className="flex flex-wrap gap-0 border-t pt-8" style={{ borderColor: 'var(--border)' }}>
             {STATS.map((s, i) => (
-              <div
+              <StatCounter
                 key={s.label}
-                className="pr-8 mr-8 border-r last:border-r-0 last:mr-0 last:pr-0"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                <div className="font-display text-5xl leading-none" style={{ color: 'var(--text)' }}>
-                  {s.num.replace('+', '')}<span style={{ color: 'var(--accent)' }}>{s.num.includes('+') ? '+' : ''}</span>
-                </div>
-                <div className="font-mono text-[0.62rem] tracking-[0.15em] uppercase mt-1" style={{ color: 'var(--text-muted)' }}>
-                  {s.label}
-                </div>
-              </div>
+                target={s.num}
+                suffix={s.suffix}
+                label={s.label}
+                delay={i * 0.1}
+              />
             ))}
-          </motion.div>
-        </div>
+          </div>
 
         {/* Scroll hint */}
         <motion.div
