@@ -8,6 +8,7 @@ import About from './pages/About'
 import Services from './pages/Services'
 import Portfolio from './pages/Portfolio'
 import Contact from './pages/Contact'
+import Demo from './pages/Demo'
 
 // Page transition wrapper
 function PageTransition({ children }) {
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="/services" element={<PageTransition><Services /></PageTransition>} />
             <Route path="/portfolio" element={<PageTransition><Portfolio /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+            <Route path="/demo" element={<PageTransition><Demo /></PageTransition>} />
             {/* 404 */}
             <Route path="*" element={
               <PageTransition>

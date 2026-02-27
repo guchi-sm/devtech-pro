@@ -8,9 +8,9 @@ const NAV_LINKS = [
   { to: '/about',     label: 'About' },
   { to: '/services',  label: 'Services' },
   { to: '/portfolio', label: 'Portfolio' },
+  { to: '/demo',      label: 'Demo ⬡' },
   { to: '/contact',   label: 'Contact' },
 ]
-
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
