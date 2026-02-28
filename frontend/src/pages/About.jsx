@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks/useScrollReveal'
@@ -25,20 +26,46 @@ function Reveal({ children, delay = 0, className = '' }) {
 }
 
 // ─── SKILL BAR ─────────────────────────────────────────────────
-function SkillBar({ name, pct, delay = 0 }) {
+function SkillBar({ name, pct, icon = '⚙️', color = 'var(--accent)', delay = 0 }) {
   const [ref, visible] = useScrollReveal(0.2)
+  const [hovered, setHovered] = useState(false)
+
   return (
-    <div className="mb-4" ref={ref}>
-      <div className="flex justify-between mb-1.5">
-        <span className="text-sm font-medium" style={{ color: 'var(--text)' }}>{name}</span>
-        <span className="font-mono text-[0.68rem]" style={{ color: 'var(--text-muted)' }}>{pct}%</span>
+    <div
+      className="mb-3 rounded-lg px-4 py-3 transition-all duration-300"
+      ref={ref}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: hovered ? 'var(--bg-card)' : 'transparent',
+        border: `1px solid ${hovered ? color : 'transparent'}`,
+        boxShadow: hovered ? `0 0 16px ${color}22` : 'none',
+      }}
+    >
+      <div className="flex justify-between items-center mb-2">
+        <span className="flex items-center gap-2 text-sm font-medium" style={{ color: 'var(--text)' }}>
+          <span>{icon}</span>
+          {name}
+        </span>
+        <span
+          className="font-mono text-[0.68rem] font-bold transition-colors duration-300"
+          style={{ color: hovered ? color : 'var(--text-muted)' }}
+        >
+          {pct}%
+        </span>
       </div>
-      <div className="skill-bar-track">
+      <div className="skill-bar-track" style={{ background: 'var(--border)', borderRadius: 4, height: 5 }}>
         <motion.div
-          className="skill-bar-fill"
           initial={{ width: 0 }}
           animate={visible ? { width: `${pct}%` } : {}}
           transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay }}
+          style={{
+            height: '100%',
+            borderRadius: 4,
+            background: `linear-gradient(to right, ${color}88, ${color})`,
+            boxShadow: hovered ? `0 0 8px ${color}` : 'none',
+            transition: 'box-shadow 0.3s ease',
+          }}
         />
       </div>
     </div>
@@ -46,27 +73,36 @@ function SkillBar({ name, pct, delay = 0 }) {
 }
 
 const SKILLS = {
-  development: [
-    { name: 'HTML / CSS',   pct: 92 },
-    { name: 'JavaScript',   pct: 80 },
-    { name: 'Python',       pct: 75 },
-    { name: 'PHP / MySQL',  pct: 70 },
-    { name: 'React',        pct: 68 },
-  ],
-  networking: [
-    { name: 'Router Config',  pct: 88 },
-    { name: 'LAN / WAN Setup',pct: 85 },
-    { name: 'Network Security',pct:78 },
-    { name: 'WiFi Planning',  pct: 90 },
-    { name: 'VLANs',          pct: 74 },
-  ],
-  support: [
-    { name: 'Windows / Linux', pct: 95 },
-    { name: 'Hardware Repair', pct: 82 },
-    { name: 'System Maint.',   pct: 88 },
-    { name: 'Troubleshooting', pct: 93 },
-    { name: 'Cloud (Basic)',   pct: 65 },
-  ],
+  development: {
+    color: '#0055ff',
+    items: [
+      { name: 'HTML / CSS',  pct: 92, icon: '🎨' },
+      { name: 'JavaScript',  pct: 80, icon: '🟨' },
+      { name: 'Python',      pct: 75, icon: '🐍' },
+      { name: 'PHP / MySQL', pct: 70, icon: '🐘' },
+      { name: 'React',       pct: 68, icon: '⚛️' },
+    ],
+  },
+  networking: {
+    color: '#00c896',
+    items: [
+      { name: 'Router Config',   pct: 88, icon: '📡' },
+      { name: 'LAN / WAN Setup', pct: 85, icon: '🔌' },
+      { name: 'Network Security',pct: 78, icon: '🔒' },
+      { name: 'WiFi Planning',   pct: 90, icon: '📶' },
+      { name: 'VLANs',           pct: 74, icon: '🗂️' },
+    ],
+  },
+  support: {
+    color: '#ff6b35',
+    items: [
+      { name: 'Windows / Linux', pct: 95, icon: '🖥️' },
+      { name: 'Hardware Repair', pct: 82, icon: '🔧' },
+      { name: 'System Maint.',   pct: 88, icon: '⚙️' },
+      { name: 'Troubleshooting', pct: 93, icon: '🛠️' },
+      { name: 'Cloud (Basic)',   pct: 65, icon: '☁️' },
+    ],
+  },
 }
 
 const TIMELINE = [
@@ -187,25 +223,25 @@ export default function About() {
               <Reveal>
                 <h3 className="font-display text-2xl tracking-wide mb-6" style={{ color: 'var(--text)' }}>Development</h3>
               </Reveal>
-              {SKILLS.development.map((s, i) => (
-                <SkillBar key={s.name} {...s} delay={i * 0.1} />
-              ))}
+              {SKILLS.development.items.map((s, i) => (
+                <SkillBar key={s.name} {...s} color={SKILLS.development.color} delay={i * 0.1} />
+                ))}
             </div>
             <div>
               <Reveal>
                 <h3 className="font-display text-2xl tracking-wide mb-6" style={{ color: 'var(--text)' }}>Networking</h3>
               </Reveal>
-              {SKILLS.networking.map((s, i) => (
-                <SkillBar key={s.name} {...s} delay={i * 0.1} />
-              ))}
+              {SKILLS.networking.items.map((s, i) => (
+               <SkillBar key={s.name} {...s} color={SKILLS.networking.color} delay={i * 0.1} />
+                ))}
             </div>
             <div>
               <Reveal>
                 <h3 className="font-display text-2xl tracking-wide mb-6" style={{ color: 'var(--text)' }}>IT Support</h3>
               </Reveal>
-              {SKILLS.support.map((s, i) => (
-                <SkillBar key={s.name} {...s} delay={i * 0.1} />
-              ))}
+              {SKILLS.support.items.map((s, i) => (
+                  <SkillBar key={s.name} {...s} color={SKILLS.support.color} delay={i * 0.1} />
+                ))}
             </div>
           </div>
         </div>
