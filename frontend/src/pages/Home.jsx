@@ -4,6 +4,7 @@ import { useScrollReveal } from '../hooks/useScrollReveal'
 import { useInView } from 'react-intersection-observer'
 import { useCountUp } from '../hooks/useCountUp'
 import Footer from '../components/Footer'
+import { useTypewriter } from '../hooks/useAnimations'
 
 // ─── FRAMER VARIANTS ───────────────────────────────────────────
 const fadeUp = (delay = 0) => ({
@@ -138,6 +139,14 @@ function StatCounter({ target, suffix, label, delay }) {
 }
 // ═══════════════════════════════════════════════════════════════
 export default function Home() {
+  const role = useTypewriter([
+    'ICT Technician',
+    'Software Developer',
+    'Network Specialist',
+    'Full-Stack Engineer',
+    'Problem Solver',
+  ])
+
   return (
     <>
       {/* ─── HERO ─────────────────────────────────────────────── */}
@@ -179,12 +188,10 @@ export default function Home() {
 
           {/* Headline */}
           <motion.div {...fadeUp(0.2)} className="mb-7">
-            <div className="text-display-xl font-display" style={{ color: 'var(--text)' }}>ICT</div>
-            <div className="text-display-xl font-display" style={{ color: 'var(--accent)' }}>Technician</div>
-            <div className="text-display-xl font-display" style={{ color: 'var(--text)' }}>
-              &amp; Developer<span className="typed-cursor" />
-            </div>
-          </motion.div>
+  <div className="text-display-xl font-display" style={{ color: 'var(--text)' }}>
+    {role}<span className="tw-cursor">_</span>
+  </div>
+</motion.div>
 </div>
 
           {/* Sub */}
@@ -268,6 +275,7 @@ export default function Home() {
                 src="https://images.unsplash.com/photo-1607705703571-c5a8695f18f6?w=800&q=80&fit=crop"
                 alt="Developer workspace"
                 className="w-full h-full object-cover"
+                
                 loading="lazy"
               />
               <div

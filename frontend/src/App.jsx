@@ -9,8 +9,10 @@ import Services from './pages/Services'
 import Portfolio from './pages/Portfolio'
 import Contact from './pages/Contact'
 import Demo from './pages/Demo'
+import ScrollToTop from './components/ScrollToTop'        // ← NEW
+import { useReveal } from './hooks/useAnimations'         // ← NEW
+import './styles/animations.css'                          // ← NEW
 
-// Page transition wrapper
 function PageTransition({ children }) {
   return (
     <motion.div
@@ -26,13 +28,13 @@ function PageTransition({ children }) {
 
 export default function App() {
   const location = useLocation()
+  useReveal()                                             // ← NEW
 
   return (
     <div className="noise-overlay min-h-screen" style={{ background: 'var(--bg)' }}>
       <CustomCursor />
       <ScrollProgress />
       <Navbar />
-
       <main className="relative z-10">
         <AnimatePresence mode="wait" initial={false}>
           <Routes location={location} key={location.pathname}>
@@ -42,7 +44,6 @@ export default function App() {
             <Route path="/portfolio" element={<PageTransition><Portfolio /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
             <Route path="/demo" element={<PageTransition><Demo /></PageTransition>} />
-            {/* 404 */}
             <Route path="*" element={
               <PageTransition>
                 <div className="min-h-screen pt-[68px] flex items-center justify-center" style={{ background: 'var(--bg)' }}>
@@ -59,6 +60,7 @@ export default function App() {
           </Routes>
         </AnimatePresence>
       </main>
+      <ScrollToTop />                                     {/* ← NEW */}
     </div>
   )
 }

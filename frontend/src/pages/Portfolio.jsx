@@ -104,10 +104,17 @@ const CATEGORIES = ['All', 'Software Dev', 'Web Dev', 'Networking', 'IT Support'
 
 export default function Portfolio() {
   const [activeFilter, setActiveFilter] = useState('All')
+const [query, setQuery] = useState('')
 
-  const filtered = activeFilter === 'All'
-    ? PROJECTS
-    : PROJECTS.filter(p => p.category === activeFilter)
+  const filtered = PROJECTS.filter(p => {
+  const matchCat = activeFilter === 'All' || p.category === activeFilter
+  const q = query.toLowerCase()
+  const matchQuery = !q ||
+    p.title.toLowerCase().includes(q) ||
+    p.desc.toLowerCase().includes(q) ||
+    p.tags.some(t => t.toLowerCase().includes(q))
+  return matchCat && matchQuery
+})
 
   return (
     <>
@@ -127,8 +134,35 @@ export default function Portfolio() {
       {/* ─── FILTER TABS ──────────────────────────────────────── */}
       <section style={{ background: 'var(--bg)', borderBottom: '1px solid var(--border)' }}>
         <div className="max-w-[1280px] mx-auto px-8 md:px-10">
-          <div className="flex flex-wrap gap-1 py-5">
-            {CATEGORIES.map(cat => (
+         <div className="flex flex-col gap-3 py-5">
+  {/* Search input */}
+  <div className="relative max-w-sm">
+    <svg
+      className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none"
+      style={{ color: 'var(--text-muted)' }}
+      fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+    </svg>
+    <input
+      type="text"
+      placeholder="Search projects, tags, tech..."
+      value={query}
+      onChange={e => { setQuery(e.target.value); setActiveFilter('All') }}
+      className="w-full font-mono text-[0.68rem] tracking-wide pl-9 pr-4 py-2 rounded outline-none transition-all duration-200"
+      style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
+        color: 'var(--text)',
+      }}
+      onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
+      onBlur={e => (e.target.style.borderColor = 'var(--border)')}
+    />
+  </div>
+
+  {/* Category filters */}
+  <div className="flex flex-wrap gap-1">
+    {CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setActiveFilter(cat)}
@@ -142,6 +176,7 @@ export default function Portfolio() {
                 {cat}
               </button>
             ))}
+            </div>
           </div>
         </div>
       </section>
@@ -154,6 +189,12 @@ export default function Portfolio() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px"
             style={{ background: 'var(--border)' }}
           >
+            {filtered.length === 0 && (
+  <div className="col-span-3 py-24 text-center font-mono text-[0.72rem] tracking-widest uppercase"
+    style={{ color: 'var(--text-muted)', background: 'var(--bg-card)' }}>
+    No projects found for "{query}" — try a different search.
+       </div>
+         )}
             {filtered.map((proj, i) => (
               <Reveal key={proj.id} delay={i * 0.08}>
                 <div
