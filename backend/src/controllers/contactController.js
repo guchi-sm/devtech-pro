@@ -1,4 +1,5 @@
-const { Resend } = require('resend')
+const { Resend  } = require('resend')
+const Message     = require('../models/Message')
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -6,7 +7,11 @@ async function sendContactEmail(req, res, next) {
   const { name, email, subject, message } = req.body
 
   try {
-    // ── Email to YOU (site owner) ──────────────────────────────
+    // ── 1. Save to MongoDB ─────────────────────────────────────
+    const saved = await Message.create({ name, email, subject, message })
+    console.log(`💾 Message saved to DB: ${saved._id}`)
+
+    // ── 2. Email to YOU ────────────────────────────────────────
     await resend.emails.send({
       from:    'DevTech Pro <onboarding@resend.dev>',
       to:      process.env.OWNER_EMAIL || 'guchibrownz@gmail.com',
@@ -14,12 +19,10 @@ async function sendContactEmail(req, res, next) {
       subject: `[DevTech Pro] ${subject || `New message from ${name}`}`,
       html: `
         <div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
-          <!-- Header -->
           <div style="background:#1c2d3f;padding:24px 28px;border-top:4px solid #f5a623">
             <h2 style="color:#fff;margin:0;font-size:1.3rem">📬 New Contact Message</h2>
-            <p style="color:rgba(255,255,255,.55);margin:4px 0 0;font-size:.82rem">DevTech Pro Portfolio — devtech-pro.vercel.app</p>
+            <p style="color:rgba(255,255,255,.55);margin:4px 0 0;font-size:.82rem">DevTech Pro · ID: ${saved._id}</p>
           </div>
-          <!-- Details -->
           <div style="padding:24px 28px;background:#f9fafb">
             <table style="width:100%;border-collapse:collapse">
               <tr>
@@ -37,14 +40,10 @@ async function sendContactEmail(req, res, next) {
                 <td style="padding:10px 0;color:#1c2d3f">${subject || '—'}</td>
               </tr>
             </table>
-
-            <!-- Message body -->
             <div style="margin-top:20px;padding:18px 20px;background:#fff;border-left:4px solid #f5a623;border-radius:0 6px 6px 0;border:1px solid #e2e8f0">
               <p style="color:#6b7a8d;font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;margin:0 0 10px">Message</p>
               <p style="color:#1c2d3f;line-height:1.75;margin:0;font-size:.95rem">${message.replace(/\n/g, '<br/>')}</p>
             </div>
-
-            <!-- Reply button -->
             <div style="text-align:center;margin-top:24px">
               <a href="mailto:${email}?subject=Re: ${subject || 'Your message'}"
                 style="background:#f5a623;color:#1c2d3f;padding:12px 28px;border-radius:4px;text-decoration:none;font-weight:700;font-size:.9rem;display:inline-block">
@@ -59,23 +58,17 @@ async function sendContactEmail(req, res, next) {
       `,
     })
 
-    // ── Auto-reply to the SENDER ───────────────────────────────
+    // ── 3. Auto-reply to SENDER ────────────────────────────────
     await resend.emails.send({
       from:    'DevTech Pro <onboarding@resend.dev>',
       to:      email,
       subject: `Thanks for reaching out, ${name} — DevTech Pro`,
       html: `
         <div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
-          <!-- Header -->
           <div style="background:#1c2d3f;padding:24px 28px;border-top:4px solid #f5a623">
-            <h2 style="color:#fff;margin:0;font-size:1.4rem;letter-spacing:.06em">
-              DEV<span style="color:#f5a623">.</span>TECH
-            </h2>
-            <p style="color:rgba(255,255,255,.5);margin:4px 0 0;font-size:.75rem;text-transform:uppercase;letter-spacing:.14em">
-              ICT Technician & Software Developer
-            </p>
+            <h2 style="color:#fff;margin:0;font-size:1.4rem;letter-spacing:.06em">DEV<span style="color:#f5a623">.</span>TECH</h2>
+            <p style="color:rgba(255,255,255,.5);margin:4px 0 0;font-size:.75rem;text-transform:uppercase;letter-spacing:.14em">ICT Technician & Software Developer</p>
           </div>
-          <!-- Body -->
           <div style="padding:28px;background:#fff">
             <p style="font-size:1rem;color:#1c2d3f;margin:0 0 16px">Hi <strong>${name}</strong>,</p>
             <p style="font-size:.95rem;color:#6b7a8d;line-height:1.8;margin:0 0 16px">
@@ -83,16 +76,13 @@ async function sendContactEmail(req, res, next) {
               <strong style="color:#1c2d3f">12 hours</strong>.
             </p>
             <p style="font-size:.95rem;color:#6b7a8d;line-height:1.8;margin:0 0 24px">
-              For urgent matters, reach me directly on
+              For urgent matters, reach me on
               <a href="https://wa.me/254790078363" style="color:#f5a623;font-weight:600">WhatsApp +254 790 078 363</a>.
             </p>
-
-            <!-- Message recap -->
             <div style="background:#f4f6f9;border-left:4px solid #f5a623;padding:16px 18px;border-radius:0 6px 6px 0;margin-bottom:24px">
               <p style="font-size:.7rem;color:#6b7a8d;text-transform:uppercase;letter-spacing:.12em;margin:0 0 8px">Your message</p>
               <p style="font-size:.88rem;color:#1c2d3f;line-height:1.7;margin:0">${message.replace(/\n/g, '<br/>')}</p>
             </div>
-
             <p style="font-size:.9rem;color:#1c2d3f;margin:0">
               Best regards,<br/>
               <strong style="color:#f5a623">Guchi Brown</strong><br/>
@@ -114,7 +104,7 @@ async function sendContactEmail(req, res, next) {
     })
 
   } catch (err) {
-    console.error('❌ Resend error:', err)
+    console.error('❌ Contact error:', err)
     next(err)
   }
 }
