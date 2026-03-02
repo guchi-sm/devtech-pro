@@ -1,0 +1,561 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DevTech Pro — Admin</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:    #1c2d3f;
+    --navy2:   #2a3f57;
+    --orange:  #f5a623;
+    --bg:      #f4f6f9;
+    --white:   #ffffff;
+    --muted:   #6b7a8d;
+    --border:  #e2e8f0;
+    --red:     #ef4444;
+    --green:   #22c55e;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--navy); min-height: 100vh; }
+
+  /* ── LOGIN ── */
+  #login-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0a1628 0%, var(--navy) 100%);
+  }
+  .login-card {
+    background: var(--white); border-radius: 8px; padding: 2.5rem;
+    width: 100%; max-width: 400px; border-top: 4px solid var(--orange);
+    box-shadow: 0 25px 60px rgba(0,0,0,.35);
+  }
+  .login-logo { text-align: center; margin-bottom: 2rem; }
+  .login-logo h1 { font-size: 2rem; font-weight: 900; color: var(--navy); letter-spacing: .06em; }
+  .login-logo h1 span { color: var(--orange); }
+  .login-logo p { font-size: .7rem; color: var(--muted); letter-spacing: .2em; text-transform: uppercase; margin-top: .3rem; }
+  .form-group { margin-bottom: 1.2rem; }
+  .form-group label { display: block; font-size: .65rem; font-family: monospace; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
+  .form-group input {
+    width: 100%; padding: .75rem 1rem; border: 1px solid var(--border); border-radius: 4px;
+    font-size: .9rem; color: var(--navy); outline: none; transition: border-color .2s, box-shadow .2s;
+  }
+  .form-group input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(245,166,35,.15); }
+  .btn-login {
+    width: 100%; padding: .85rem; background: var(--orange); color: var(--navy);
+    border: 2px solid var(--orange); border-radius: 4px; font-weight: 700;
+    font-size: .95rem; cursor: pointer; transition: all .25s; margin-top: .5rem;
+  }
+  .btn-login:hover { background: transparent; color: var(--orange); }
+  .btn-login:disabled { opacity: .6; cursor: not-allowed; }
+  .login-error { background: #fef2f2; border: 1px solid #fecaca; color: var(--red); padding: .75rem 1rem; border-radius: 4px; font-size: .85rem; margin-top: 1rem; display: none; }
+
+  /* ── DASHBOARD ── */
+  #dashboard-screen { display: none; }
+  .topbar {
+    background: var(--navy); color: var(--white); padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px; border-bottom: 3px solid var(--orange); position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,.3);
+  }
+  .topbar-logo { font-size: 1.3rem; font-weight: 900; letter-spacing: .06em; }
+  .topbar-logo span { color: var(--orange); }
+  .topbar-right { display: flex; align-items: center; gap: 1.5rem; }
+  .unread-badge {
+    background: var(--orange); color: var(--navy); font-size: .7rem;
+    font-weight: 800; padding: .2rem .6rem; border-radius: 20px; min-width: 24px; text-align: center;
+  }
+  .btn-logout {
+    background: transparent; color: rgba(255,255,255,.65); border: 1px solid rgba(255,255,255,.2);
+    padding: .4rem 1rem; border-radius: 4px; cursor: pointer; font-size: .82rem;
+    transition: all .2s;
+  }
+  .btn-logout:hover { background: rgba(255,255,255,.1); color: var(--white); }
+
+  .main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+  /* ── STATS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .stat-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 6px;
+    padding: 1.25rem 1.5rem; border-left: 4px solid var(--orange);
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .stat-label { font-size: .65rem; font-family: monospace; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
+  .stat-value { font-size: 2rem; font-weight: 900; color: var(--navy); line-height: 1; }
+  .stat-card.orange { border-left-color: var(--orange); }
+  .stat-card.orange .stat-value { color: var(--orange); }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    background: var(--white); border: 1px solid var(--border); border-radius: 6px;
+    padding: 1rem 1.25rem; margin-bottom: 1rem;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .filter-tabs { display: flex; gap: .4rem; }
+  .filter-tab {
+    padding: .4rem .9rem; border-radius: 4px; border: 1px solid var(--border);
+    font-size: .8rem; font-weight: 600; cursor: pointer; transition: all .2s;
+    background: transparent; color: var(--muted);
+  }
+  .filter-tab.active { background: var(--orange); color: var(--navy); border-color: var(--orange); }
+  .filter-tab:hover:not(.active) { border-color: var(--navy); color: var(--navy); }
+  .search-input {
+    padding: .4rem .9rem; border: 1px solid var(--border); border-radius: 4px;
+    font-size: .85rem; outline: none; width: 220px; transition: border-color .2s;
+  }
+  .search-input:focus { border-color: var(--orange); }
+
+  /* ── MESSAGES ── */
+  .messages-list { display: flex; flex-direction: column; gap: .6rem; }
+  .msg-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 6px;
+    overflow: hidden; cursor: pointer; transition: all .2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .msg-card:hover { border-color: var(--orange); box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+  .msg-card.unread { border-left: 4px solid var(--orange); }
+  .msg-card.unread .msg-name { font-weight: 800; }
+  .msg-header {
+    padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  }
+  .msg-avatar {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--navy);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .9rem; font-weight: 700; color: var(--orange); flex-shrink: 0;
+  }
+  .msg-avatar.read { background: var(--bg); color: var(--muted); }
+  .msg-meta { flex: 1; min-width: 0; }
+  .msg-name { font-size: .95rem; color: var(--navy); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .msg-email { font-size: .78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .msg-subject { font-size: .82rem; color: var(--navy); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 1rem; }
+  .msg-time { font-size: .72rem; color: var(--muted); white-space: nowrap; font-family: monospace; }
+  .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
+
+  /* ── EXPANDED MESSAGE ── */
+  .msg-body { display: none; padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--border); }
+  .msg-body.open { display: block; }
+  .msg-content {
+    background: var(--bg); border-left: 3px solid var(--orange);
+    padding: 1rem 1.25rem; border-radius: 0 4px 4px 0;
+    font-size: .9rem; line-height: 1.8; color: var(--navy);
+    white-space: pre-wrap; margin: 1rem 0;
+  }
+  .msg-actions { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: 1rem; }
+  .btn-action {
+    padding: .45rem 1rem; border-radius: 4px; font-size: .8rem; font-weight: 600;
+    cursor: pointer; transition: all .2s; border: 1px solid;
+  }
+  .btn-reply    { background: var(--orange); color: var(--navy); border-color: var(--orange); text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; }
+  .btn-reply:hover { background: transparent; color: var(--orange); }
+  .btn-read     { background: transparent; color: var(--navy2); border-color: var(--navy2); }
+  .btn-read:hover { background: var(--navy2); color: var(--white); }
+  .btn-delete   { background: transparent; color: var(--red); border-color: #fecaca; }
+  .btn-delete:hover { background: var(--red); color: var(--white); border-color: var(--red); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty-state h3 { font-size: 1.1rem; color: var(--navy); margin-bottom: .5rem; }
+
+  /* ── LOADING ── */
+  .loading { text-align: center; padding: 3rem; color: var(--muted); }
+  .spinner {
+    width: 32px; height: 32px; border: 3px solid var(--border);
+    border-top-color: var(--orange); border-radius: 50%;
+    animation: spin .8s linear infinite; margin: 0 auto 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── TOAST ── */
+  .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999; display: flex; flex-direction: column; gap: .5rem; }
+  .toast {
+    background: var(--navy); color: var(--white); padding: .75rem 1.25rem;
+    border-radius: 6px; font-size: .85rem; border-left: 4px solid var(--orange);
+    box-shadow: 0 8px 25px rgba(0,0,0,.3); animation: slideIn .3s ease;
+    max-width: 300px;
+  }
+  .toast.error { border-left-color: var(--red); }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .main { padding: 1rem; }
+    .msg-subject { display: none; }
+    .topbar { padding: 0 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── LOGIN SCREEN ─────────────────────────────────────── -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <h1>DEV<span>.</span>TECH</h1>
+      <p>Admin Dashboard</p>
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="admin@example.com" autocomplete="email"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+    <button class="btn-login" id="btn-login">Sign In →</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ─── DASHBOARD SCREEN ──────────────────────────────────── -->
+<div id="dashboard-screen">
+  <nav class="topbar">
+    <div class="topbar-logo">DEV<span>.</span>TECH <span style="font-size:.75rem;font-weight:400;color:rgba(255,255,255,.4);margin-left:.5rem">Admin</span></div>
+    <div class="topbar-right">
+      <span style="font-size:.8rem;color:rgba(255,255,255,.5)">Unread</span>
+      <span class="unread-badge" id="unread-badge">0</span>
+      <button class="btn-logout" id="btn-logout">Logout</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Messages</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-label">Unread</div>
+        <div class="stat-value" id="stat-unread">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Today</div>
+        <div class="stat-value" id="stat-today">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">This Week</div>
+        <div class="stat-value" id="stat-week">—</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="unread">Unread</button>
+        <button class="filter-tab" data-filter="read">Read</button>
+      </div>
+      <input class="search-input" id="search-input" placeholder="🔍  Search messages..." type="text"/>
+    </div>
+
+    <!-- Messages -->
+    <div id="messages-container">
+      <div class="loading">
+        <div class="spinner"></div>
+        Loading messages…
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+  const API = window.location.origin + '/api/admin'
+  let token     = localStorage.getItem('admin_token')
+  let allMsgs   = []
+  let curFilter = 'all'
+  let curSearch = ''
+  let openId    = null
+
+  // ── INIT ───────────────────────────────────────────────────
+  if (token) showDashboard()
+
+  // ── LOGIN ──────────────────────────────────────────────────
+  document.getElementById('btn-login').addEventListener('click', doLogin)
+  document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
+
+  async function doLogin() {
+    const email    = document.getElementById('login-email').value.trim()
+    const password = document.getElementById('login-password').value
+    const btn      = document.getElementById('btn-login')
+    const errEl    = document.getElementById('login-error')
+
+    if (!email || !password) { showError('Please enter email and password.'); return }
+
+    btn.disabled = true
+    btn.textContent = 'Signing in…'
+    errEl.style.display = 'none'
+
+    try {
+      const res  = await fetch(`${API}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
+
+      if (res.ok && data.token) {
+        token = data.token
+        localStorage.setItem('admin_token', token)
+        showDashboard()
+      } else {
+        showError(data.message || 'Invalid credentials.')
+      }
+    } catch (err) {
+      showError('Connection failed. Check your network.')
+    } finally {
+      btn.disabled = false
+      btn.textContent = 'Sign In →'
+    }
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('login-error')
+    el.textContent = msg
+    el.style.display = 'block'
+  }
+
+  // ── DASHBOARD ──────────────────────────────────────────────
+  function showDashboard() {
+    document.getElementById('login-screen').style.display    = 'none'
+    document.getElementById('dashboard-screen').style.display = 'block'
+    loadStats()
+    loadMessages()
+  }
+
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    localStorage.removeItem('admin_token')
+    token = null
+    document.getElementById('login-screen').style.display    = 'flex'
+    document.getElementById('dashboard-screen').style.display = 'none'
+    document.getElementById('login-email').value    = ''
+    document.getElementById('login-password').value = ''
+  })
+
+  // ── STATS ──────────────────────────────────────────────────
+  async function loadStats() {
+    try {
+      const res  = await authFetch('/stats')
+      const data = await res.json()
+      if (data.success) {
+        document.getElementById('stat-total').textContent  = data.stats.total
+        document.getElementById('stat-unread').textContent = data.stats.unread
+        document.getElementById('stat-today').textContent  = data.stats.today
+        document.getElementById('stat-week').textContent   = data.stats.thisWeek
+        document.getElementById('unread-badge').textContent = data.stats.unread
+      }
+    } catch (err) { console.error('Stats error:', err) }
+  }
+
+  // ── MESSAGES ───────────────────────────────────────────────
+  async function loadMessages() {
+    document.getElementById('messages-container').innerHTML = `
+      <div class="loading"><div class="spinner"></div>Loading messages…</div>`
+
+    try {
+      const res  = await authFetch('/messages?limit=100')
+      if (res.status === 403 || res.status === 401) { handleUnauth(); return }
+      const data = await res.json()
+      if (data.success) { allMsgs = data.messages; renderMessages() }
+    } catch (err) {
+      document.getElementById('messages-container').innerHTML =
+        `<div class="empty-state"><div class="icon">⚠️</div><h3>Failed to load messages</h3><p>${err.message}</p></div>`
+    }
+  }
+
+  function renderMessages() {
+    let msgs = [...allMsgs]
+
+    // Filter
+    if (curFilter === 'unread') msgs = msgs.filter(m => !m.read)
+    if (curFilter === 'read')   msgs = msgs.filter(m => m.read)
+
+    // Search
+    if (curSearch) {
+      const q = curSearch.toLowerCase()
+      msgs = msgs.filter(m =>
+        m.name.toLowerCase().includes(q) ||
+        m.email.toLowerCase().includes(q) ||
+        (m.subject || '').toLowerCase().includes(q) ||
+        m.message.toLowerCase().includes(q)
+      )
+    }
+
+    const container = document.getElementById('messages-container')
+
+    if (msgs.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">📭</div>
+          <h3>No messages found</h3>
+          <p>${curSearch ? 'Try a different search term.' : 'Nothing here yet.'}</p>
+        </div>`
+      return
+    }
+
+    container.innerHTML = `<div class="messages-list">${msgs.map(msgCard).join('')}</div>`
+
+    // Attach events
+    msgs.forEach(m => {
+      document.getElementById(`msg-${m._id}`).addEventListener('click', (e) => {
+        if (e.target.closest('.btn-action')) return
+        toggleMessage(m._id)
+      })
+    })
+  }
+
+  function msgCard(m) {
+    const initials = m.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase()
+    const date     = new Date(m.createdAt)
+    const now      = new Date()
+    const isToday  = date.toDateString() === now.toDateString()
+    const timeStr  = isToday
+      ? date.toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' })
+      : date.toLocaleDateString('en-KE', { day: 'numeric', month: 'short' })
+
+    const isOpen = openId === m._id
+
+    return `
+      <div class="msg-card ${m.read ? '' : 'unread'}" id="msg-${m._id}">
+        <div class="msg-header">
+          ${!m.read ? '<div class="unread-dot"></div>' : '<div style="width:8px"></div>'}
+          <div class="msg-avatar ${m.read ? 'read' : ''}">${initials}</div>
+          <div class="msg-meta">
+            <div class="msg-name">${escHtml(m.name)}</div>
+            <div class="msg-email">${escHtml(m.email)}</div>
+          </div>
+          <div class="msg-subject">${escHtml(m.subject || '(no subject)')}</div>
+          <div class="msg-time">${timeStr}</div>
+          <div style="color:var(--muted);font-size:.8rem;transition:transform .2s;${isOpen?'transform:rotate(180deg)':''}">▾</div>
+        </div>
+        <div class="msg-body ${isOpen ? 'open' : ''}">
+          <div style="font-size:.7rem;font-family:monospace;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-top:1rem">
+            From: ${escHtml(m.name)} &lt;${escHtml(m.email)}&gt; · ${new Date(m.createdAt).toLocaleString('en-KE')}
+          </div>
+          <div class="msg-content">${escHtml(m.message)}</div>
+          <div class="msg-actions">
+            <a class="btn-action btn-reply" href="mailto:${escHtml(m.email)}?subject=Re: ${escHtml(m.subject || 'Your message')}">
+              ✉️ Reply
+            </a>
+            <button class="btn-action btn-read" onclick="toggleRead('${m._id}', ${m.read})">
+              ${m.read ? '📩 Mark Unread' : '✅ Mark Read'}
+            </button>
+            <button class="btn-action btn-delete" onclick="confirmDelete('${m._id}')">
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
+      </div>`
+  }
+
+  function toggleMessage(id) {
+    openId = openId === id ? null : id
+    // Auto mark as read when opened
+    const msg = allMsgs.find(m => m._id === id)
+    if (msg && !msg.read && openId === id) doMarkRead(id, false)
+    else renderMessages()
+  }
+
+  // ── ACTIONS ────────────────────────────────────────────────
+  async function doMarkRead(id, unread) {
+    try {
+      const endpoint = unread ? `/messages/${id}/unread` : `/messages/${id}/read`
+      const res  = await authFetch(endpoint, { method: 'PATCH' })
+      const data = await res.json()
+      if (data.success) {
+        const idx = allMsgs.findIndex(m => m._id === id)
+        if (idx !== -1) allMsgs[idx] = data.message
+        loadStats()
+        renderMessages()
+        toast(unread ? 'Marked as unread' : 'Marked as read')
+      }
+    } catch (err) { toast('Action failed', true) }
+  }
+
+  function toggleRead(id, isRead) {
+    event.stopPropagation()
+    doMarkRead(id, isRead)
+  }
+
+  function confirmDelete(id) {
+    event.stopPropagation()
+    if (!confirm('Delete this message? This cannot be undone.')) return
+    doDelete(id)
+  }
+
+  async function doDelete(id) {
+    try {
+      const res = await authFetch(`/messages/${id}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (data.success) {
+        allMsgs = allMsgs.filter(m => m._id !== id)
+        if (openId === id) openId = null
+        loadStats()
+        renderMessages()
+        toast('Message deleted')
+      }
+    } catch (err) { toast('Delete failed', true) }
+  }
+
+  // ── FILTERS ────────────────────────────────────────────────
+  document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+      curFilter = btn.dataset.filter
+      openId = null
+      renderMessages()
+    })
+  })
+
+  document.getElementById('search-input').addEventListener('input', e => {
+    curSearch = e.target.value.trim()
+    openId = null
+    renderMessages()
+  })
+
+  // ── HELPERS ────────────────────────────────────────────────
+  function authFetch(path, opts = {}) {
+    return fetch(`${API}${path}`, {
+      ...opts,
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers || {}) },
+    })
+  }
+
+  function handleUnauth() {
+    localStorage.removeItem('admin_token')
+    token = null
+    document.getElementById('login-screen').style.display    = 'flex'
+    document.getElementById('dashboard-screen').style.display = 'none'
+    toast('Session expired. Please login again.', true)
+  }
+
+  function escHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+  }
+
+  function toast(msg, isError = false) {
+    const el = document.createElement('div')
+    el.className = `toast${isError ? ' error' : ''}`
+    el.textContent = msg
+    document.getElementById('toast-container').appendChild(el)
+    setTimeout(() => el.remove(), 3500)
+  }
+
+  // Auto-refresh every 60 seconds
+  setInterval(() => {
+    if (token && document.getElementById('dashboard-screen').style.display !== 'none') {
+      loadStats()
+      loadMessages()
+    }
+  }, 60000)
+</script>
+</body>
+</html>
