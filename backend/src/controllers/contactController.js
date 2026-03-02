@@ -1,115 +1,120 @@
-const nodemailer = require('nodemailer')
+const { Resend } = require('resend')
 
-/**
- * Create the Nodemailer transporter once.
- * Falls back to Ethereal (fake SMTP) if env vars are missing — useful for dev.
- */
-let transporter = null
+const resend = new Resend(process.env.RESEND_API_KEY)
 
-async function getTransporter() {
-  if (transporter) return transporter
-
-  if (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-    // Production / configured SMTP
-    transporter = nodemailer.createTransport({
-      host:   process.env.EMAIL_HOST,
-      port:   Number(process.env.EMAIL_PORT) || 587,
-      secure: Number(process.env.EMAIL_PORT) === 465,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    })
-  } else {
-    // Dev: use Ethereal fake SMTP — preview URL printed in console
-    const testAccount = await nodemailer.createTestAccount()
-    transporter = nodemailer.createTransport({
-      host:   'smtp.ethereal.email',
-      port:   587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    })
-    console.log('⚠️  Using Ethereal test SMTP. Set EMAIL_* vars in .env for real email.')
-  }
-
-  return transporter
-}
-
-/**
- * POST /api/contact
- */
 async function sendContactEmail(req, res, next) {
   const { name, email, subject, message } = req.body
 
   try {
-    const t = await getTransporter()
-
-    // ── Email TO the site owner ──────────────────────────────────
-    const ownerInfo = await t.sendMail({
-      from:    `"DevTech Pro Website" <${process.env.EMAIL_USER || 'no-reply@devtechpro.com'}>`,
-      to:      process.env.OWNER_EMAIL || process.env.EMAIL_USER || 'hello@devtechpro.com',
+    // ── Email to YOU (site owner) ──────────────────────────────
+    await resend.emails.send({
+      from:    'DevTech Pro <onboarding@resend.dev>',
+      to:      process.env.OWNER_EMAIL || 'guchibrownz@gmail.com',
       replyTo: email,
-      subject: `[DevTech Pro] ${subject || 'New Contact Form Submission'}`,
+      subject: `[DevTech Pro] ${subject || `New message from ${name}`}`,
       html: `
-        <div style="font-family:'DM Sans',Arial,sans-serif;max-width:560px;margin:0 auto;background:#070808;color:#F0EDE6;padding:40px;border-radius:8px;">
-          <h2 style="font-family:Impact,sans-serif;font-size:2rem;color:#0055FF;letter-spacing:0.05em;margin:0 0 24px;">
-            NEW MESSAGE
-          </h2>
-          <table style="width:100%;border-collapse:collapse;">
-            <tr><td style="padding:10px 0;border-bottom:1px solid #1a1a1a;color:#7A7A7A;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;width:30%;">Name</td><td style="padding:10px 0;border-bottom:1px solid #1a1a1a;font-size:14px;">${name}</td></tr>
-            <tr><td style="padding:10px 0;border-bottom:1px solid #1a1a1a;color:#7A7A7A;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;">Email</td><td style="padding:10px 0;border-bottom:1px solid #1a1a1a;font-size:14px;"><a href="mailto:${email}" style="color:#0055FF;">${email}</a></td></tr>
-            <tr><td style="padding:10px 0;border-bottom:1px solid #1a1a1a;color:#7A7A7A;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;">Subject</td><td style="padding:10px 0;border-bottom:1px solid #1a1a1a;font-size:14px;">${subject || '—'}</td></tr>
-          </table>
-          <div style="margin-top:28px;">
-            <div style="color:#7A7A7A;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;">Message</div>
-            <div style="font-size:14px;line-height:1.75;background:#0E0F10;padding:20px;border-radius:6px;border-left:3px solid #0055FF;">${message.replace(/\n/g, '<br>')}</div>
+        <div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
+          <!-- Header -->
+          <div style="background:#1c2d3f;padding:24px 28px;border-top:4px solid #f5a623">
+            <h2 style="color:#fff;margin:0;font-size:1.3rem">📬 New Contact Message</h2>
+            <p style="color:rgba(255,255,255,.55);margin:4px 0 0;font-size:.82rem">DevTech Pro Portfolio — devtech-pro.vercel.app</p>
           </div>
-          <p style="margin-top:32px;font-size:11px;color:#444;text-align:center;">Sent via DevTech Pro website · ${new Date().toLocaleString()}</p>
+          <!-- Details -->
+          <div style="padding:24px 28px;background:#f9fafb">
+            <table style="width:100%;border-collapse:collapse">
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#6b7a8d;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;width:90px">Name</td>
+                <td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#1c2d3f;font-weight:600">${name}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #e2e8f0;color:#6b7a8d;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em">Email</td>
+                <td style="padding:10px 0;border-bottom:1px solid #e2e8f0">
+                  <a href="mailto:${email}" style="color:#f5a623;font-weight:600">${email}</a>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;color:#6b7a8d;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em">Subject</td>
+                <td style="padding:10px 0;color:#1c2d3f">${subject || '—'}</td>
+              </tr>
+            </table>
+
+            <!-- Message body -->
+            <div style="margin-top:20px;padding:18px 20px;background:#fff;border-left:4px solid #f5a623;border-radius:0 6px 6px 0;border:1px solid #e2e8f0">
+              <p style="color:#6b7a8d;font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;margin:0 0 10px">Message</p>
+              <p style="color:#1c2d3f;line-height:1.75;margin:0;font-size:.95rem">${message.replace(/\n/g, '<br/>')}</p>
+            </div>
+
+            <!-- Reply button -->
+            <div style="text-align:center;margin-top:24px">
+              <a href="mailto:${email}?subject=Re: ${subject || 'Your message'}"
+                style="background:#f5a623;color:#1c2d3f;padding:12px 28px;border-radius:4px;text-decoration:none;font-weight:700;font-size:.9rem;display:inline-block">
+                Reply to ${name} →
+              </a>
+            </div>
+          </div>
+          <p style="text-align:center;color:#9eaab8;font-size:.68rem;padding:12px">
+            Received ${new Date().toLocaleString('en-KE', { timeZone: 'Africa/Nairobi' })} EAT
+          </p>
         </div>
       `,
     })
 
-    // ── Auto-reply TO the sender ─────────────────────────────────
-    await t.sendMail({
-      from:    `"DevTech Pro" <${process.env.EMAIL_USER || 'no-reply@devtechpro.com'}>`,
+    // ── Auto-reply to the SENDER ───────────────────────────────
+    await resend.emails.send({
+      from:    'DevTech Pro <onboarding@resend.dev>',
       to:      email,
-      subject: 'Thanks for reaching out — DevTech Pro',
+      subject: `Thanks for reaching out, ${name} — DevTech Pro`,
       html: `
-        <div style="font-family:'DM Sans',Arial,sans-serif;max-width:560px;margin:0 auto;background:#070808;color:#F0EDE6;padding:40px;border-radius:8px;">
-          <h2 style="font-family:Impact,sans-serif;font-size:2rem;color:#0055FF;letter-spacing:0.05em;margin:0 0 8px;">
-            DEV.TECH
-          </h2>
-          <p style="font-size:11px;color:#7A7A7A;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 28px;">ICT Technician & Software Developer</p>
-          <p style="font-size:15px;line-height:1.7;">Hi <strong>${name}</strong>,</p>
-          <p style="font-size:14px;line-height:1.75;color:#ccc;margin:16px 0;">
-            Thank you for your message! I've received it and will get back to you within <strong style="color:#F0EDE6;">24 hours</strong>.
-          </p>
-          <p style="font-size:14px;line-height:1.75;color:#ccc;">
-            In the meantime, feel free to reach me directly via WhatsApp at <a href="https://wa.me/254700000000" style="color:#0055FF;">+254 700 000 000</a>.
-          </p>
-          <div style="margin:32px 0;padding:20px;background:#0E0F10;border-radius:6px;border-left:3px solid #0055FF;">
-            <p style="font-size:11px;color:#7A7A7A;letter-spacing:0.12em;text-transform:uppercase;margin:0 0 8px;">Your message</p>
-            <p style="font-size:13px;color:#aaa;line-height:1.65;margin:0;">${message.replace(/\n/g, '<br>')}</p>
+        <div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
+          <!-- Header -->
+          <div style="background:#1c2d3f;padding:24px 28px;border-top:4px solid #f5a623">
+            <h2 style="color:#fff;margin:0;font-size:1.4rem;letter-spacing:.06em">
+              DEV<span style="color:#f5a623">.</span>TECH
+            </h2>
+            <p style="color:rgba(255,255,255,.5);margin:4px 0 0;font-size:.75rem;text-transform:uppercase;letter-spacing:.14em">
+              ICT Technician & Software Developer
+            </p>
           </div>
-          <p style="font-size:14px;margin-top:24px;">Best regards,<br/><strong style="color:#0055FF;">DevTech Pro</strong><br/><span style="font-size:12px;color:#7A7A7A;">Nairobi, Kenya</span></p>
+          <!-- Body -->
+          <div style="padding:28px;background:#fff">
+            <p style="font-size:1rem;color:#1c2d3f;margin:0 0 16px">Hi <strong>${name}</strong>,</p>
+            <p style="font-size:.95rem;color:#6b7a8d;line-height:1.8;margin:0 0 16px">
+              Thank you for getting in touch! I've received your message and will get back to you within
+              <strong style="color:#1c2d3f">12 hours</strong>.
+            </p>
+            <p style="font-size:.95rem;color:#6b7a8d;line-height:1.8;margin:0 0 24px">
+              For urgent matters, reach me directly on
+              <a href="https://wa.me/254790078363" style="color:#f5a623;font-weight:600">WhatsApp +254 790 078 363</a>.
+            </p>
+
+            <!-- Message recap -->
+            <div style="background:#f4f6f9;border-left:4px solid #f5a623;padding:16px 18px;border-radius:0 6px 6px 0;margin-bottom:24px">
+              <p style="font-size:.7rem;color:#6b7a8d;text-transform:uppercase;letter-spacing:.12em;margin:0 0 8px">Your message</p>
+              <p style="font-size:.88rem;color:#1c2d3f;line-height:1.7;margin:0">${message.replace(/\n/g, '<br/>')}</p>
+            </div>
+
+            <p style="font-size:.9rem;color:#1c2d3f;margin:0">
+              Best regards,<br/>
+              <strong style="color:#f5a623">Guchi Brown</strong><br/>
+              <span style="font-size:.8rem;color:#6b7a8d">Meru, Kenya · devtech-pro.vercel.app</span>
+            </p>
+          </div>
+          <p style="text-align:center;color:#9eaab8;font-size:.68rem;padding:12px;background:#f9fafb">
+            This is an automated reply — please do not reply to this email directly.
+          </p>
         </div>
       `,
     })
 
-    // Log preview URL for Ethereal dev SMTP
-    if (!process.env.EMAIL_HOST) {
-      console.log('📬 Preview URL:', nodemailer.getTestMessageUrl(ownerInfo))
-    }
+    console.log(`✅ Contact email sent from ${name} <${email}>`)
 
     return res.status(200).json({
       success: true,
-      message: 'Your message has been sent successfully! I will respond within 24 hours.',
+      message: 'Your message has been sent successfully! I will respond within 12 hours.',
     })
 
   } catch (err) {
+    console.error('❌ Resend error:', err)
     next(err)
   }
 }
