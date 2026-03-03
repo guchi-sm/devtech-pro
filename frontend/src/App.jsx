@@ -1,3 +1,4 @@
+import AIChatbox from './components/AIChatbox'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import Navbar from './components/Navbar'
@@ -60,7 +61,8 @@ export default function App() {
           </Routes>
         </AnimatePresence>
       </main>
-      <ScrollToTop />                                     {/* ← NEW */}
+      <ScrollToTop />  
+      <AIChatbox />                                          {/* ← NEW */}
     </div>
   )
 }
