@@ -32,7 +32,8 @@ export default function App() {
   useReveal()                                             // ← NEW
 
   return (
-    <div className="noise-overlay min-h-screen" style={{ background: 'var(--bg)' }}>
+    
+    <div className="noise-overlay min-h-screen" style={{ background: 'var(--bg)', overflow: 'visible' }}>
       <CustomCursor />
       <ScrollProgress />
       <Navbar />
