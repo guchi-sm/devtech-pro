@@ -1,3 +1,4 @@
+import DevTechLogo from './DevTechLogo'
 import { useState, useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -43,9 +44,9 @@ export default function Navbar() {
         <div className="max-w-[1400px] mx-auto px-8 md:px-10 h-full flex items-center justify-between">
 
           {/* Logo */}
-          <NavLink to="/" className="font-display text-2xl tracking-wider" style={{ color: 'var(--text)' }}>
-            Dev<span style={{ color: 'var(--accent)' }}>.</span>Tech
-          </NavLink>
+          <NavLink to="/" aria-label="DevTech Home">
+  <DevTechLogo height={34} />
+</NavLink>
 
           {/* Desktop Links */}
           <ul className="hidden md:flex items-center gap-1 list-none">
