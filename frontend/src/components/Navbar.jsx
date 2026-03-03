@@ -79,7 +79,7 @@ export default function Navbar() {
           </ul>
 
           {/* Desktop Right */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             <ThemeToggle />
             <NavLink to="/contact" className="btn btn-primary text-[0.68rem] !py-2.5 !px-5">
               Hire Me →
@@ -87,7 +87,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Controls */}
-          <div className="flex md:hidden items-center gap-3">
+          <div className="flex lg:hidden items-center gap-3">
             <ThemeToggle showLabel={false} />
             <button
               onClick={() => setMenuOpen(p => !p)}
@@ -114,7 +114,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed left-0 right-0 z-[999] flex flex-col py-4 px-6 border-b md:hidden"
+            className="fixed left-0 right-0 z-[999] flex flex-col py-4 px-6 border-b lg:hidden"
             style={{
               top: scrolled ? '58px' : '68px',
               background: 'var(--bg-nav)',
