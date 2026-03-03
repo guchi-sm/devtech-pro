@@ -91,7 +91,7 @@ export default function AIChatbox() {
     <>
       {/* ── CHAT WINDOW ── */}
       <div style={{
-        position: 'fixed', bottom: '90px', right: '24px', zIndex: 9999,
+        position: 'fixed', bottom: '150px', right: '24px', zIndex: 9999,
         width: '360px', maxWidth: 'calc(100vw - 48px)',
         background: '#fff', borderRadius: '16px',
         boxShadow: '0 25px 60px rgba(0,0,0,.18), 0 8px 24px rgba(0,0,0,.12)',
@@ -264,7 +264,7 @@ export default function AIChatbox() {
       <button
         onClick={() => setOpen(o => !o)}
         style={{
-          position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999,
+          position: 'fixed', bottom: '80px', right: '24px', zIndex: 9999,
           width: '60px', height: '60px', borderRadius: '50%',
           background: open ? '#1c2d3f' : 'linear-gradient(135deg, #f5a623, #e8960f)',
           border: '3px solid ' + (open ? '#f5a623' : '#fff'),
