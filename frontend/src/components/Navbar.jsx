@@ -53,7 +53,6 @@ export default function Navbar() {
   height: '100px',           // force large, ignore scroll
   width: 'auto',
   objectFit: 'contain',
-  border: '2px solid red',   // so you can see the actual box size
   transition: 'height 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
 }}
             />
