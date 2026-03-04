@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { to: '/demo',      label: 'Demo ⬡' },
   { to: '/contact',   label: 'Contact' },
 ]
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -36,39 +37,37 @@ export default function Navbar() {
           backdropFilter: 'blur(20px) saturate(180%)',
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
           borderColor: 'var(--border)',
-          height: scrolled ? '58px' : '68px',
+          height: scrolled ? '54px' : '64px',
         }}
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="max-w-[1400px] mx-auto px-8 md:px-10 h-full flex items-center justify-between">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-6 h-full flex items-center justify-between">
 
           {/* Logo */}
-         
-<NavLink to="/" aria-label="DevTech Home">
-  <img
-    src={logo}
-    alt="DevTech"
-    style={{
-  height: scrolled ? '36px' : '44px',  // was 48px / 58px
-  width: 'auto',
-  objectFit: 'contain',
-  marginLeft: '-4px',                   // was -10px
-  transition: 'height 0.3s ease',
-}}
-  />
-</NavLink>
+          <NavLink to="/" aria-label="DevTech Home" className="flex-shrink-0">
+            <img
+              src={logo}
+              alt="DevTech"
+              style={{
+                height: scrolled ? '34px' : '42px',
+                width: 'auto',
+                objectFit: 'contain',
+                transition: 'height 0.3s ease',
+              }}
+            />
+          </NavLink>
 
           {/* Desktop Links */}
-          <ul className="hidden md:flex items-center gap-1 list-none">
+          <ul className="hidden lg:flex items-center list-none">
             {NAV_LINKS.map(({ to, label }) => (
               <li key={to}>
                 <NavLink
                   to={to}
                   end={to === '/'}
                   className={({ isActive }) =>
-                    `font-mono text-[0.68rem] tracking-[0.14em] uppercase px-3.5 py-2 rounded relative transition-colors duration-200 ` +
-                    (isActive ? 'text-accent' : 'text-muted-custom hover:text-custom')
+                    `relative font-mono text-[0.68rem] tracking-[0.10em] uppercase px-3 py-2 rounded transition-colors duration-200 ` +
+                    (isActive ? '' : 'text-muted-custom hover:text-white')
                   }
                   style={({ isActive }) => isActive ? { color: 'var(--accent)' } : {}}
                 >
@@ -78,7 +77,7 @@ export default function Navbar() {
                       {isActive && (
                         <motion.span
                           layoutId="nav-underline"
-                          className="absolute bottom-0 left-3.5 right-3.5 h-px"
+                          className="absolute bottom-0 left-3 right-3 h-px"
                           style={{ background: 'var(--accent)' }}
                           transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                         />
@@ -91,9 +90,12 @@ export default function Navbar() {
           </ul>
 
           {/* Desktop Right */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-3">
             <ThemeToggle />
-            <NavLink to="/contact" className="btn btn-primary text-[0.68rem] !py-2.5 !px-5">
+            <NavLink
+              to="/contact"
+              className="btn btn-primary text-[0.65rem] !py-2 !px-4"
+            >
               Hire Me →
             </NavLink>
           </div>
@@ -107,14 +109,21 @@ export default function Navbar() {
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={menuOpen}
             >
-              <span className={`block w-6 h-px transition-transform duration-300 ${menuOpen ? 'translate-y-[7px] rotate-45' : ''}`}
-                    style={{ background: 'var(--text)' }} />
-              <span className={`block w-6 h-px transition-opacity duration-300 ${menuOpen ? 'opacity-0' : ''}`}
-                    style={{ background: 'var(--text)' }} />
-              <span className={`block w-6 h-px transition-transform duration-300 ${menuOpen ? '-translate-y-[7px] -rotate-45' : ''}`}
-                    style={{ background: 'var(--text)' }} />
+              <span
+                className={`block w-6 h-px transition-transform duration-300 ${menuOpen ? 'translate-y-[7px] rotate-45' : ''}`}
+                style={{ background: 'var(--text)' }}
+              />
+              <span
+                className={`block w-6 h-px transition-opacity duration-300 ${menuOpen ? 'opacity-0' : ''}`}
+                style={{ background: 'var(--text)' }}
+              />
+              <span
+                className={`block w-6 h-px transition-transform duration-300 ${menuOpen ? '-translate-y-[7px] -rotate-45' : ''}`}
+                style={{ background: 'var(--text)' }}
+              />
             </button>
           </div>
+
         </div>
       </nav>
 
@@ -128,7 +137,7 @@ export default function Navbar() {
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="fixed left-0 right-0 z-[999] flex flex-col py-4 px-6 border-b lg:hidden"
             style={{
-              top: scrolled ? '58px' : '68px',
+              top: scrolled ? '54px' : '64px',
               background: '#0a1128',
               backdropFilter: 'blur(20px)',
               borderColor: 'var(--border)',
@@ -146,9 +155,13 @@ export default function Navbar() {
                   end={to === '/'}
                   className={({ isActive }) =>
                     `block font-mono text-[0.72rem] tracking-[0.14em] uppercase py-3 border-b transition-colors ` +
-                    (isActive ? 'text-accent' : 'text-muted-custom')
+                    (isActive ? '' : 'text-muted-custom hover:text-white')
                   }
-                  style={{ borderColor: 'var(--border)', color: undefined }}
+                  style={({ isActive }) =>
+                    isActive
+                      ? { color: 'var(--accent)', borderColor: 'var(--border)' }
+                      : { borderColor: 'var(--border)' }
+                  }
                 >
                   {label}
                 </NavLink>
@@ -160,7 +173,10 @@ export default function Navbar() {
               transition={{ delay: 0.35 }}
               className="pt-4"
             >
-              <NavLink to="/contact" className="btn btn-primary w-full justify-center text-[0.7rem]">
+              <NavLink
+                to="/contact"
+                className="btn btn-primary w-full justify-center text-[0.7rem]"
+              >
                 Hire Me →
               </NavLink>
             </motion.div>
