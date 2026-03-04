@@ -251,7 +251,7 @@
     @apply fixed left-0 h-0.5 z-[1001];
     background: var(--accent);
     box-shadow: 0 0 8px var(--accent);
-    top: 66px;
+    top: 72px;   /* was 66px */
     transition: width 0.1s linear;
   }
 

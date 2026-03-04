@@ -26,7 +26,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const navHeight = scrolled ? '54px' : '66px'
+  const navHeight = scrolled ? '60px' : '72px'  // was 54px / 66px
 
   return (
     <>
@@ -50,11 +50,11 @@ export default function Navbar() {
               src={logo}
               alt="DevTech"
               style={{
-                height: scrolled ? '36px' : '44px',
-                width: 'auto',
-                objectFit: 'contain',
-                transition: 'height 0.3s ease',
-              }}
+  height: scrolled ? '48px' : '56px',   // was 36px / 44px
+  width: 'auto',
+  objectFit: 'contain',
+  transition: 'height 0.3s ease',
+}}
             />
           </NavLink>
 
