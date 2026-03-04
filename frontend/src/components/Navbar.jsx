@@ -26,7 +26,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const navHeight = scrolled ? '64px' : '80px'
+  const navHeight = scrolled ? '54px' : '66px'
 
   return (
     <>
@@ -50,7 +50,7 @@ export default function Navbar() {
               src={logo}
               alt="DevTech"
               style={{
-                height: scrolled ? '52px' : '68px',
+                height: scrolled ? '36px' : '44px',
                 width: 'auto',
                 objectFit: 'contain',
                 transition: 'height 0.3s ease',
@@ -66,7 +66,7 @@ export default function Navbar() {
                   to={to}
                   end={to === '/'}
                   className={({ isActive }) =>
-                    `relative font-mono text-[0.8rem] tracking-[0.12em] uppercase px-4 py-2 rounded transition-colors duration-200 whitespace-nowrap ` +
+                    `relative font-mono text-[0.75rem] tracking-[0.12em] uppercase px-3.5 py-2 rounded transition-colors duration-200 whitespace-nowrap ` +
                     (isActive ? '' : 'text-muted-custom hover:text-custom')
                   }
                   style={({ isActive }) =>
@@ -79,7 +79,7 @@ export default function Navbar() {
                       {isActive && (
                         <motion.span
                           layoutId="nav-underline"
-                          className="absolute bottom-0 left-4 right-4 h-px"
+                          className="absolute bottom-0 left-3.5 right-3.5 h-px"
                           style={{ background: 'var(--accent)' }}
                           transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                         />
@@ -96,7 +96,7 @@ export default function Navbar() {
             <ThemeToggle />
             <NavLink
               to="/contact"
-              className="btn btn-primary !text-[0.72rem] !py-2.5 !px-5"
+              className="btn btn-primary !text-[0.68rem] !py-2 !px-4"
             >
               Hire Me →
             </NavLink>
@@ -156,7 +156,7 @@ export default function Navbar() {
                   to={to}
                   end={to === '/'}
                   className={({ isActive }) =>
-                    `block font-mono text-[0.8rem] tracking-[0.14em] uppercase py-3 border-b transition-colors ` +
+                    `block font-mono text-[0.75rem] tracking-[0.14em] uppercase py-3 border-b transition-colors ` +
                     (isActive ? '' : 'text-muted-custom hover:text-custom')
                   }
                   style={({ isActive }) =>
@@ -178,7 +178,7 @@ export default function Navbar() {
             >
               <NavLink
                 to="/contact"
-                className="btn btn-primary w-full justify-center !text-[0.75rem]"
+                className="btn btn-primary w-full justify-center !text-[0.72rem]"
               >
                 Hire Me →
               </NavLink>
