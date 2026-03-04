@@ -50,12 +50,12 @@ export default function Navbar() {
     src={logo}
     alt="DevTech"
     style={{
-      height: scrolled ? '48px' : '58px',
-      width: 'auto',
-      objectFit: 'contain',
-      marginLeft: '-10px',
-      transition: 'height 0.3s ease',
-    }}
+  height: scrolled ? '36px' : '44px',  // was 48px / 58px
+  width: 'auto',
+  objectFit: 'contain',
+  marginLeft: '-4px',                   // was -10px
+  transition: 'height 0.3s ease',
+}}
   />
 </NavLink>
 
