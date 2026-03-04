@@ -49,12 +49,13 @@ export default function Navbar() {
             <img
               src={logo}
               alt="DevTech"
-              style={{
-                height: scrolled ? '36px' : '44px',
-                width: 'auto',
-                objectFit: 'contain',
-                transition: 'height 0.3s ease',
-              }}
+             style={{
+  height: '100px',           // force large, ignore scroll
+  width: 'auto',
+  objectFit: 'contain',
+  border: '2px solid red',   // so you can see the actual box size
+  transition: 'height 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+}}
             />
           </NavLink>
 
