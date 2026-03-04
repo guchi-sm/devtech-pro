@@ -32,7 +32,7 @@ export default function Navbar() {
       <nav
         className="fixed top-0 left-0 right-0 z-[1000] border-b transition-all duration-300"
         style={{
-          background: 'var(--bg-nav)',
+          background: '#0a1128',
           backdropFilter: 'blur(20px) saturate(180%)',
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
           borderColor: 'var(--border)',
@@ -119,7 +119,7 @@ export default function Navbar() {
             className="fixed left-0 right-0 z-[999] flex flex-col py-4 px-6 border-b lg:hidden"
             style={{
               top: scrolled ? '58px' : '68px',
-              background: 'var(--bg-nav)',
+              background: '#0a1128',
               backdropFilter: 'blur(20px)',
               borderColor: 'var(--border)',
             }}
