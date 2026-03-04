@@ -44,10 +44,20 @@ export default function Navbar() {
         <div className="max-w-[1400px] mx-auto px-8 md:px-10 h-full flex items-center justify-between">
 
           {/* Logo */}
-         <NavLink to="/" aria-label="DevTech Home">
-  <img src={logo} alt="DevTech" style={{ height: '42px', objectFit: 'contain' }} />
+         
+<NavLink to="/" aria-label="DevTech Home">
+  <img
+    src={logo}
+    alt="DevTech"
+    style={{
+      height: scrolled ? '48px' : '58px',
+      width: 'auto',
+      objectFit: 'contain',
+      marginLeft: '-10px',
+      transition: 'height 0.3s ease',
+    }}
+  />
 </NavLink>
-
 
           {/* Desktop Links */}
           <ul className="hidden md:flex items-center gap-1 list-none">
