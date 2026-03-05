@@ -1,9 +1,11 @@
 import AIChatbox from './components/AIChatbox'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 import Navbar from './components/Navbar'
 import CustomCursor from './components/CustomCursor'
 import ScrollProgress from './components/ScrollProgress'
+import Preloader from './components/Preloader'
 import Home from './pages/Home'
 import About from './pages/About'
 import Services from './pages/Services'
@@ -13,9 +15,6 @@ import Demo from './pages/Demo'
 import ScrollToTop from './components/ScrollToTop'
 import { useReveal } from './hooks/useAnimations'
 import './styles/animations.css'
-
-// ── Keep this in sync with Navbar navHeight (non-scrolled) ──
-export const NAV_HEIGHT = '90px'
 
 function PageTransition({ children }) {
   return (
@@ -32,40 +31,59 @@ function PageTransition({ children }) {
 
 export default function App() {
   const location = useLocation()
+  const [loading, setLoading] = useState(true)
   useReveal()
 
   return (
-    <div className="noise-overlay min-h-screen" style={{ background: 'var(--bg)', overflow: 'visible' }}>
-      <CustomCursor />
-      <ScrollProgress />
-      <Navbar />
-      <main className="relative z-10">
-        <AnimatePresence mode="wait" initial={false}>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/"          element={<PageTransition><Home /></PageTransition>} />
-            <Route path="/about"     element={<PageTransition><About /></PageTransition>} />
-            <Route path="/services"  element={<PageTransition><Services /></PageTransition>} />
-            <Route path="/portfolio" element={<PageTransition><Portfolio /></PageTransition>} />
-            <Route path="/contact"   element={<PageTransition><Contact /></PageTransition>} />
-            <Route path="/demo"      element={<PageTransition><Demo /></PageTransition>} />
-            <Route path="*" element={
-              <PageTransition>
-                <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)', paddingTop: NAV_HEIGHT }}>
-                  <div className="text-center">
-                    <div className="font-display text-[12rem] leading-none" style={{ color: 'var(--border)' }}>404</div>
-                    <p className="font-mono text-xs tracking-[0.2em] uppercase mb-8" style={{ color: 'var(--text-muted)' }}>
-                      Page not found
-                    </p>
-                    <a href="/" className="btn btn-primary">Back Home →</a>
+    <>
+      {/* ── Preloader: shows on first site load ── */}
+      <AnimatePresence>
+        {loading && (
+          <Preloader onComplete={() => setLoading(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* ── Main App (renders behind preloader, shows after) ── */}
+      <div
+        className="noise-overlay min-h-screen"
+        style={{
+          background: 'var(--bg)',
+          overflow: 'visible',
+          opacity: loading ? 0 : 1,
+          transition: 'opacity 0.4s ease',
+        }}
+      >
+        <CustomCursor />
+        <ScrollProgress />
+        <Navbar />
+        <main className="relative z-10">
+          <AnimatePresence mode="wait" initial={false}>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/"          element={<PageTransition><Home /></PageTransition>} />
+              <Route path="/about"     element={<PageTransition><About /></PageTransition>} />
+              <Route path="/services"  element={<PageTransition><Services /></PageTransition>} />
+              <Route path="/portfolio" element={<PageTransition><Portfolio /></PageTransition>} />
+              <Route path="/contact"   element={<PageTransition><Contact /></PageTransition>} />
+              <Route path="/demo"      element={<PageTransition><Demo /></PageTransition>} />
+              <Route path="*" element={
+                <PageTransition>
+                  <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)', paddingTop: '72px' }}>
+                    <div className="text-center">
+                      <div className="font-display text-[12rem] leading-none" style={{ color: 'var(--border)' }}>404</div>
+                      <p className="font-mono text-xs tracking-[0.2em] uppercase mb-8" style={{ color: 'var(--text-muted)' }}>
+                        Page not found
+                      </p>
+                      <a href="/" className="btn btn-primary">Back Home →</a>
+                    </div>
                   </div>
-                </div>
-              </PageTransition>
-            } />
-          </Routes>
-        </AnimatePresence>
-      </main>
-      <ScrollToTop />
-      <AIChatbox />
-    </div>
+                </PageTransition>
+              } />
+            </Routes>
+          </AnimatePresence>
+        </main>
+        <ScrollToTop />
+        <AIChatbox />
+      </div>
+    </>
   )
 }
