@@ -4,7 +4,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import Footer from '../components/Footer'
 
-const API_URL = 'https://devtech-pro-api-production.up.railway.app/api/contact'
+const API_URL = `${import.meta.env.VITE_API_URL || 'https://devtech-pro-api-production.up.railway.app'}/api/contact`
 
 const THEME_OVERRIDE = `
   :root {

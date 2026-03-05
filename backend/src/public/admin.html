@@ -8,188 +8,172 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --navy:    #1c2d3f;
-    --navy2:   #2a3f57;
-    --orange:  #f5a623;
-    --bg:      #f4f6f9;
-    --white:   #ffffff;
-    --muted:   #6b7a8d;
-    --border:  #e2e8f0;
-    --red:     #ef4444;
-    --green:   #22c55e;
+    --navy:   #1c2d3f; --navy2: #2a3f57;
+    --orange: #f5a623; --bg:    #f4f6f9;
+    --white:  #ffffff; --muted: #6b7a8d;
+    --border: #e2e8f0; --red:   #ef4444; --green: #22c55e;
   }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--navy); min-height: 100vh; }
 
   /* ── LOGIN ── */
-  #login-screen {
-    min-height: 100vh; display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #0a1628 0%, var(--navy) 100%);
-  }
-  .login-card {
-    background: var(--white); border-radius: 8px; padding: 2.5rem;
-    width: 100%; max-width: 400px; border-top: 4px solid var(--orange);
-    box-shadow: 0 25px 60px rgba(0,0,0,.35);
-  }
-  .login-logo { text-align: center; margin-bottom: 2rem; }
-  .login-logo h1 { font-size: 2rem; font-weight: 900; color: var(--navy); letter-spacing: .06em; }
-  .login-logo h1 span { color: var(--orange); }
-  .login-logo p { font-size: .7rem; color: var(--muted); letter-spacing: .2em; text-transform: uppercase; margin-top: .3rem; }
-  .form-group { margin-bottom: 1.2rem; }
-  .form-group label { display: block; font-size: .65rem; font-family: monospace; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
-  .form-group input {
-    width: 100%; padding: .75rem 1rem; border: 1px solid var(--border); border-radius: 4px;
-    font-size: .9rem; color: var(--navy); outline: none; transition: border-color .2s, box-shadow .2s;
-  }
-  .form-group input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(245,166,35,.15); }
-  .btn-login {
-    width: 100%; padding: .85rem; background: var(--orange); color: var(--navy);
-    border: 2px solid var(--orange); border-radius: 4px; font-weight: 700;
-    font-size: .95rem; cursor: pointer; transition: all .25s; margin-top: .5rem;
-  }
-  .btn-login:hover { background: transparent; color: var(--orange); }
-  .btn-login:disabled { opacity: .6; cursor: not-allowed; }
-  .login-error { background: #fef2f2; border: 1px solid #fecaca; color: var(--red); padding: .75rem 1rem; border-radius: 4px; font-size: .85rem; margin-top: 1rem; display: none; }
+  #login-screen { min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a1628 0%,var(--navy) 100%); }
+  .login-card { background:var(--white);border-radius:8px;padding:2.5rem;width:100%;max-width:400px;border-top:4px solid var(--orange);box-shadow:0 25px 60px rgba(0,0,0,.35); }
+  .login-logo { text-align:center;margin-bottom:2rem; }
+  .login-logo h1 { font-size:2rem;font-weight:900;color:var(--navy);letter-spacing:.06em; }
+  .login-logo h1 span { color:var(--orange); }
+  .login-logo p { font-size:.7rem;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-top:.3rem; }
+  .form-group { margin-bottom:1.2rem; }
+  .form-group label { display:block;font-size:.65rem;font-family:monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem; }
+  .form-group input { width:100%;padding:.75rem 1rem;border:1px solid var(--border);border-radius:4px;font-size:.9rem;color:var(--navy);outline:none;transition:border-color .2s,box-shadow .2s; }
+  .form-group input:focus { border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,166,35,.15); }
+  .btn-login { width:100%;padding:.85rem;background:var(--orange);color:var(--navy);border:2px solid var(--orange);border-radius:4px;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .25s;margin-top:.5rem; }
+  .btn-login:hover { background:transparent;color:var(--orange); }
+  .btn-login:disabled { opacity:.6;cursor:not-allowed; }
+  .login-error { background:#fef2f2;border:1px solid #fecaca;color:var(--red);padding:.75rem 1rem;border-radius:4px;font-size:.85rem;margin-top:1rem;display:none; }
 
   /* ── DASHBOARD ── */
-  #dashboard-screen { display: none; }
-  .topbar {
-    background: var(--navy); color: var(--white); padding: 0 2rem;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 60px; border-bottom: 3px solid var(--orange); position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 20px rgba(0,0,0,.3);
-  }
-  .topbar-logo { font-size: 1.3rem; font-weight: 900; letter-spacing: .06em; }
-  .topbar-logo span { color: var(--orange); }
-  .topbar-right { display: flex; align-items: center; gap: 1.5rem; }
-  .unread-badge {
-    background: var(--orange); color: var(--navy); font-size: .7rem;
-    font-weight: 800; padding: .2rem .6rem; border-radius: 20px; min-width: 24px; text-align: center;
-  }
-  .btn-logout {
-    background: transparent; color: rgba(255,255,255,.65); border: 1px solid rgba(255,255,255,.2);
-    padding: .4rem 1rem; border-radius: 4px; cursor: pointer; font-size: .82rem;
-    transition: all .2s;
-  }
-  .btn-logout:hover { background: rgba(255,255,255,.1); color: var(--white); }
+  #dashboard-screen { display:none; }
+  .topbar { background:var(--navy);color:var(--white);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;border-bottom:3px solid var(--orange);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.3); }
+  .topbar-logo { font-size:1.3rem;font-weight:900;letter-spacing:.06em; }
+  .topbar-logo span { color:var(--orange); }
+  .topbar-right { display:flex;align-items:center;gap:1.5rem; }
+  .unread-badge { background:var(--orange);color:var(--navy);font-size:.7rem;font-weight:800;padding:.2rem .6rem;border-radius:20px;min-width:24px;text-align:center; }
+  .btn-logout { background:transparent;color:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.2);padding:.4rem 1rem;border-radius:4px;cursor:pointer;font-size:.82rem;transition:all .2s; }
+  .btn-logout:hover { background:rgba(255,255,255,.1);color:var(--white); }
 
-  .main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+  /* ── TABS ── */
+  .tabs { display:flex;gap:0;border-bottom:2px solid var(--border);background:var(--white);padding:0 2rem; }
+  .tab-btn { padding:.9rem 1.5rem;font-size:.82rem;font-weight:600;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;letter-spacing:.04em; }
+  .tab-btn.active { color:var(--orange);border-bottom-color:var(--orange); }
+  .tab-btn:hover:not(.active) { color:var(--navy); }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+
+  .main { max-width:1200px;margin:0 auto;padding:2rem; }
 
   /* ── STATS ── */
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-  .stat-card {
-    background: var(--white); border: 1px solid var(--border); border-radius: 6px;
-    padding: 1.25rem 1.5rem; border-left: 4px solid var(--orange);
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  }
-  .stat-label { font-size: .65rem; font-family: monospace; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
-  .stat-value { font-size: 2rem; font-weight: 900; color: var(--navy); line-height: 1; }
-  .stat-card.orange { border-left-color: var(--orange); }
-  .stat-card.orange .stat-value { color: var(--orange); }
+  .stats-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem; }
+  .stat-card { background:var(--white);border:1px solid var(--border);border-radius:6px;padding:1.25rem 1.5rem;border-left:4px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04); }
+  .stat-card.orange { border-left-color:var(--orange); }
+  .stat-card.orange .stat-value { color:var(--orange); }
+  .stat-label { font-size:.65rem;font-family:monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem; }
+  .stat-value { font-size:2rem;font-weight:900;color:var(--navy);line-height:1; }
 
   /* ── TOOLBAR ── */
-  .toolbar {
-    background: var(--white); border: 1px solid var(--border); border-radius: 6px;
-    padding: 1rem 1.25rem; margin-bottom: 1rem;
-    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  }
-  .filter-tabs { display: flex; gap: .4rem; }
-  .filter-tab {
-    padding: .4rem .9rem; border-radius: 4px; border: 1px solid var(--border);
-    font-size: .8rem; font-weight: 600; cursor: pointer; transition: all .2s;
-    background: transparent; color: var(--muted);
-  }
-  .filter-tab.active { background: var(--orange); color: var(--navy); border-color: var(--orange); }
-  .filter-tab:hover:not(.active) { border-color: var(--navy); color: var(--navy); }
-  .search-input {
-    padding: .4rem .9rem; border: 1px solid var(--border); border-radius: 4px;
-    font-size: .85rem; outline: none; width: 220px; transition: border-color .2s;
-  }
-  .search-input:focus { border-color: var(--orange); }
+  .toolbar { background:var(--white);border:1px solid var(--border);border-radius:6px;padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;box-shadow:0 2px 8px rgba(0,0,0,.04); }
+  .filter-tabs { display:flex;gap:.4rem; }
+  .filter-tab { padding:.4rem .9rem;border-radius:4px;border:1px solid var(--border);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted); }
+  .filter-tab.active { background:var(--orange);color:var(--navy);border-color:var(--orange); }
+  .filter-tab:hover:not(.active) { border-color:var(--navy);color:var(--navy); }
+  .search-input { padding:.4rem .9rem;border:1px solid var(--border);border-radius:4px;font-size:.85rem;outline:none;width:220px;transition:border-color .2s; }
+  .search-input:focus { border-color:var(--orange); }
 
   /* ── MESSAGES ── */
-  .messages-list { display: flex; flex-direction: column; gap: .6rem; }
-  .msg-card {
-    background: var(--white); border: 1px solid var(--border); border-radius: 6px;
-    overflow: hidden; cursor: pointer; transition: all .2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  }
-  .msg-card:hover { border-color: var(--orange); box-shadow: 0 4px 16px rgba(0,0,0,.1); }
-  .msg-card.unread { border-left: 4px solid var(--orange); }
-  .msg-card.unread .msg-name { font-weight: 800; }
-  .msg-header {
-    padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
-  }
-  .msg-avatar {
-    width: 40px; height: 40px; border-radius: 50%; background: var(--navy);
-    display: flex; align-items: center; justify-content: center;
-    font-size: .9rem; font-weight: 700; color: var(--orange); flex-shrink: 0;
-  }
-  .msg-avatar.read { background: var(--bg); color: var(--muted); }
-  .msg-meta { flex: 1; min-width: 0; }
-  .msg-name { font-size: .95rem; color: var(--navy); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .msg-email { font-size: .78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .msg-subject { font-size: .82rem; color: var(--navy); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 1rem; }
-  .msg-time { font-size: .72rem; color: var(--muted); white-space: nowrap; font-family: monospace; }
-  .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
+  .messages-list { display:flex;flex-direction:column;gap:.6rem; }
+  .msg-card { background:var(--white);border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.04); }
+  .msg-card:hover { border-color:var(--orange);box-shadow:0 4px 16px rgba(0,0,0,.1); }
+  .msg-card.unread { border-left:4px solid var(--orange); }
+  .msg-card.unread .msg-name { font-weight:800; }
+  .msg-header { padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap; }
+  .msg-avatar { width:40px;height:40px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;color:var(--orange);flex-shrink:0; }
+  .msg-avatar.read { background:var(--bg);color:var(--muted); }
+  .msg-meta { flex:1;min-width:0; }
+  .msg-name { font-size:.95rem;color:var(--navy);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .msg-email { font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .msg-subject { font-size:.82rem;color:var(--navy);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 1rem; }
+  .msg-time { font-size:.72rem;color:var(--muted);white-space:nowrap;font-family:monospace; }
+  .unread-dot { width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0; }
+  .msg-body { display:none;padding:0 1.25rem 1.25rem;border-top:1px solid var(--border); }
+  .msg-body.open { display:block; }
+  .msg-content { background:var(--bg);border-left:3px solid var(--orange);padding:1rem 1.25rem;border-radius:0 4px 4px 0;font-size:.9rem;line-height:1.8;color:var(--navy);white-space:pre-wrap;margin:1rem 0; }
+  .msg-actions { display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem; }
+  .btn-action { padding:.45rem 1rem;border-radius:4px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid; }
+  .btn-reply-inline { background:var(--orange);color:var(--navy);border-color:var(--orange); }
+  .btn-reply-inline:hover { background:transparent;color:var(--orange); }
+  .btn-read  { background:transparent;color:var(--navy2);border-color:var(--navy2); }
+  .btn-read:hover { background:var(--navy2);color:var(--white); }
+  .btn-delete { background:transparent;color:var(--red);border-color:#fecaca; }
+  .btn-delete:hover { background:var(--red);color:var(--white);border-color:var(--red); }
 
-  /* ── EXPANDED MESSAGE ── */
-  .msg-body { display: none; padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--border); }
-  .msg-body.open { display: block; }
-  .msg-content {
-    background: var(--bg); border-left: 3px solid var(--orange);
-    padding: 1rem 1.25rem; border-radius: 0 4px 4px 0;
-    font-size: .9rem; line-height: 1.8; color: var(--navy);
-    white-space: pre-wrap; margin: 1rem 0;
-  }
-  .msg-actions { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: 1rem; }
-  .btn-action {
-    padding: .45rem 1rem; border-radius: 4px; font-size: .8rem; font-weight: 600;
-    cursor: pointer; transition: all .2s; border: 1px solid;
-  }
-  .btn-reply    { background: var(--orange); color: var(--navy); border-color: var(--orange); text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; }
-  .btn-reply:hover { background: transparent; color: var(--orange); }
-  .btn-read     { background: transparent; color: var(--navy2); border-color: var(--navy2); }
-  .btn-read:hover { background: var(--navy2); color: var(--white); }
-  .btn-delete   { background: transparent; color: var(--red); border-color: #fecaca; }
-  .btn-delete:hover { background: var(--red); color: var(--white); border-color: var(--red); }
+  /* ── REPLY BOX (inline) ── */
+  .reply-box { display:none;margin-top:1rem;border:1px solid var(--border);border-radius:6px;overflow:hidden; }
+  .reply-box.open { display:block; }
+  .reply-box-header { background:var(--bg);padding:.6rem 1rem;font-size:.7rem;font-family:monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border); }
+  .reply-textarea { width:100%;padding:1rem;font-size:.9rem;color:var(--navy);border:none;outline:none;resize:vertical;min-height:120px;font-family:inherit;line-height:1.7; }
+  .reply-footer { display:flex;justify-content:flex-end;gap:.6rem;padding:.75rem 1rem;background:var(--bg);border-top:1px solid var(--border); }
+  .btn-cancel-reply { background:transparent;color:var(--muted);border:1px solid var(--border);padding:.4rem .9rem;border-radius:4px;cursor:pointer;font-size:.8rem; }
+  .btn-send-reply { background:var(--orange);color:var(--navy);border:1px solid var(--orange);padding:.4rem 1.1rem;border-radius:4px;cursor:pointer;font-size:.8rem;font-weight:700; }
+  .btn-send-reply:disabled { opacity:.6;cursor:not-allowed; }
 
-  /* ── EMPTY STATE ── */
-  .empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); }
-  .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
-  .empty-state h3 { font-size: 1.1rem; color: var(--navy); margin-bottom: .5rem; }
+  /* ── PROJECTS TAB ── */
+  .projects-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem; }
+  .btn-add-project { background:var(--orange);color:var(--navy);border:2px solid var(--orange);padding:.55rem 1.25rem;border-radius:4px;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .2s; }
+  .btn-add-project:hover { background:transparent;color:var(--orange); }
+  .projects-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem; }
+  .proj-card { background:var(--white);border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:box-shadow .2s; }
+  .proj-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.1); }
+  .proj-img { width:100%;height:140px;object-fit:cover;background:#e2e8f0; }
+  .proj-img-placeholder { width:100%;height:140px;background:linear-gradient(135deg,#1c2d3f,#2a3f57);display:flex;align-items:center;justify-content:center;font-size:2rem; }
+  .proj-body { padding:1rem 1.25rem; }
+  .proj-category { font-size:.62rem;font-family:monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--orange);font-weight:700;margin-bottom:.4rem; }
+  .proj-title { font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:.5rem; }
+  .proj-tags { display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.75rem; }
+  .proj-tag { font-size:.58rem;font-family:monospace;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .5rem;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:2px;color:var(--navy); }
+  .proj-actions { display:flex;gap:.5rem;padding:.75rem 1.25rem;border-top:1px solid var(--border);background:var(--bg); }
+  .btn-edit-proj { flex:1;background:transparent;color:var(--navy2);border:1px solid var(--navy2);padding:.4rem;border-radius:4px;cursor:pointer;font-size:.8rem;font-weight:600;transition:all .2s; }
+  .btn-edit-proj:hover { background:var(--navy2);color:var(--white); }
+  .btn-del-proj { background:transparent;color:var(--red);border:1px solid #fecaca;padding:.4rem .9rem;border-radius:4px;cursor:pointer;font-size:.8rem;font-weight:600;transition:all .2s; }
+  .btn-del-proj:hover { background:var(--red);color:var(--white);border-color:var(--red); }
+  .proj-hidden-badge { display:inline-block;font-size:.6rem;font-family:monospace;letter-spacing:.1em;text-transform:uppercase;padding:.15rem .5rem;background:#fef2f2;color:var(--red);border:1px solid #fecaca;border-radius:2px;margin-left:.5rem; }
 
-  /* ── LOADING ── */
-  .loading { text-align: center; padding: 3rem; color: var(--muted); }
-  .spinner {
-    width: 32px; height: 32px; border: 3px solid var(--border);
-    border-top-color: var(--orange); border-radius: 50%;
-    animation: spin .8s linear infinite; margin: 0 auto 1rem;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  /* ── MODAL ── */
+  .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem; }
+  .modal-overlay.hidden { display:none; }
+  .modal { background:var(--white);border-radius:8px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;border-top:4px solid var(--orange);box-shadow:0 25px 60px rgba(0,0,0,.3); }
+  .modal-header { padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center; }
+  .modal-header h3 { font-size:1.1rem;font-weight:800;color:var(--navy); }
+  .modal-close { background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted);line-height:1; }
+  .modal-body { padding:1.5rem; }
+  .modal-footer { padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.75rem; }
+  .field-group { margin-bottom:1.1rem; }
+  .field-group label { display:block;font-size:.62rem;font-family:monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem; }
+  .field-input { width:100%;padding:.65rem .9rem;border:1px solid var(--border);border-radius:4px;font-size:.9rem;color:var(--navy);outline:none;transition:border-color .2s;font-family:inherit; }
+  .field-input:focus { border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,166,35,.1); }
+  textarea.field-input { resize:vertical;min-height:80px; }
+  .field-row { display:grid;grid-template-columns:1fr 1fr;gap:1rem; }
+  .btn-save { background:var(--orange);color:var(--navy);border:2px solid var(--orange);padding:.6rem 1.5rem;border-radius:4px;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s; }
+  .btn-save:hover { background:transparent;color:var(--orange); }
+  .btn-save:disabled { opacity:.6;cursor:not-allowed; }
+  .btn-cancel { background:transparent;color:var(--muted);border:1px solid var(--border);padding:.6rem 1.25rem;border-radius:4px;cursor:pointer;font-size:.9rem;transition:all .2s; }
+  .btn-cancel:hover { border-color:var(--navy);color:var(--navy); }
+
+  /* ── EMPTY / LOADING ── */
+  .empty-state { text-align:center;padding:4rem 2rem;color:var(--muted); }
+  .empty-state .icon { font-size:3rem;margin-bottom:1rem; }
+  .empty-state h3 { font-size:1.1rem;color:var(--navy);margin-bottom:.5rem; }
+  .loading { text-align:center;padding:3rem;color:var(--muted); }
+  .spinner { width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem; }
+  @keyframes spin { to { transform:rotate(360deg); } }
 
   /* ── TOAST ── */
-  .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999; display: flex; flex-direction: column; gap: .5rem; }
-  .toast {
-    background: var(--navy); color: var(--white); padding: .75rem 1.25rem;
-    border-radius: 6px; font-size: .85rem; border-left: 4px solid var(--orange);
-    box-shadow: 0 8px 25px rgba(0,0,0,.3); animation: slideIn .3s ease;
-    max-width: 300px;
-  }
-  .toast.error { border-left-color: var(--red); }
-  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  .toast-container { position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;display:flex;flex-direction:column;gap:.5rem; }
+  .toast { background:var(--navy);color:var(--white);padding:.75rem 1.25rem;border-radius:6px;font-size:.85rem;border-left:4px solid var(--orange);box-shadow:0 8px 25px rgba(0,0,0,.3);animation:slideIn .3s ease;max-width:300px; }
+  .toast.error { border-left-color:var(--red); }
+  .toast.success { border-left-color:var(--green); }
+  @keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
 
-  /* ── RESPONSIVE ── */
-  @media (max-width: 600px) {
-    .main { padding: 1rem; }
-    .msg-subject { display: none; }
-    .topbar { padding: 0 1rem; }
+  @media(max-width:600px){
+    .main{padding:1rem}
+    .msg-subject{display:none}
+    .topbar{padding:0 1rem}
+    .field-row{grid-template-columns:1fr}
+    .projects-grid{grid-template-columns:1fr}
   }
 </style>
 </head>
 <body>
 
-<!-- ─── LOGIN SCREEN ─────────────────────────────────────── -->
+<!-- ─── LOGIN ─────────────────────────────────────────────── -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">
@@ -209,7 +193,7 @@
   </div>
 </div>
 
-<!-- ─── DASHBOARD SCREEN ──────────────────────────────────── -->
+<!-- ─── DASHBOARD ──────────────────────────────────────────── -->
 <div id="dashboard-screen">
   <nav class="topbar">
     <div class="topbar-logo">DEV<span>.</span>TECH <span style="font-size:.75rem;font-weight:400;color:rgba(255,255,255,.4);margin-left:.5rem">Admin</span></div>
@@ -220,59 +204,125 @@
     </div>
   </nav>
 
-  <div class="main">
-    <!-- Stats -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Total Messages</div>
-        <div class="stat-value" id="stat-total">—</div>
-      </div>
-      <div class="stat-card orange">
-        <div class="stat-label">Unread</div>
-        <div class="stat-value" id="stat-unread">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Today</div>
-        <div class="stat-value" id="stat-today">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">This Week</div>
-        <div class="stat-value" id="stat-week">—</div>
-      </div>
-    </div>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="messages">📬 Messages</button>
+    <button class="tab-btn" data-tab="projects">🗂️ Portfolio</button>
+  </div>
 
-    <!-- Toolbar -->
-    <div class="toolbar">
-      <div class="filter-tabs">
-        <button class="filter-tab active" data-filter="all">All</button>
-        <button class="filter-tab" data-filter="unread">Unread</button>
-        <button class="filter-tab" data-filter="read">Read</button>
+  <!-- ── MESSAGES TAB ── -->
+  <div id="tab-messages" class="tab-panel active">
+    <div class="main">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total Messages</div><div class="stat-value" id="stat-total">—</div></div>
+        <div class="stat-card orange"><div class="stat-label">Unread</div><div class="stat-value" id="stat-unread">—</div></div>
+        <div class="stat-card"><div class="stat-label">Today</div><div class="stat-value" id="stat-today">—</div></div>
+        <div class="stat-card"><div class="stat-label">This Week</div><div class="stat-value" id="stat-week">—</div></div>
       </div>
-      <input class="search-input" id="search-input" placeholder="🔍  Search messages..." type="text"/>
+      <div class="toolbar">
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-filter="all">All</button>
+          <button class="filter-tab" data-filter="unread">Unread</button>
+          <button class="filter-tab" data-filter="read">Read</button>
+        </div>
+        <input class="search-input" id="search-input" placeholder="🔍  Search messages..." type="text"/>
+      </div>
+      <div id="messages-container"><div class="loading"><div class="spinner"></div>Loading messages…</div></div>
     </div>
+  </div>
 
-    <!-- Messages -->
-    <div id="messages-container">
-      <div class="loading">
-        <div class="spinner"></div>
-        Loading messages…
+  <!-- ── PROJECTS TAB ── -->
+  <div id="tab-projects" class="tab-panel">
+    <div class="main">
+      <div class="projects-header">
+        <div>
+          <h2 style="font-size:1.3rem;font-weight:800;color:var(--navy)">Portfolio Projects</h2>
+          <p style="font-size:.82rem;color:var(--muted);margin-top:.3rem">Manage projects shown on the public portfolio page</p>
+        </div>
+        <button class="btn-add-project" id="btn-add-project">+ Add Project</button>
       </div>
+      <div id="projects-container"><div class="loading"><div class="spinner"></div>Loading projects…</div></div>
     </div>
   </div>
 </div>
 
-<!-- Toasts -->
+<!-- ── PROJECT MODAL ── -->
+<div class="modal-overlay hidden" id="project-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Add Project</h3>
+      <button class="modal-close" id="modal-close">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="proj-id"/>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Category *</label>
+          <select class="field-input" id="proj-category">
+            <option value="">Select category</option>
+            <option>Software Dev</option>
+            <option>Web Dev</option>
+            <option>Networking</option>
+            <option>IT Support</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Year</label>
+          <input class="field-input" id="proj-year" placeholder="2024"/>
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Title *</label>
+        <input class="field-input" id="proj-title" placeholder="Project name"/>
+      </div>
+      <div class="field-group">
+        <label>Description *</label>
+        <textarea class="field-input" id="proj-desc" placeholder="What was built, what problem it solved..."></textarea>
+      </div>
+      <div class="field-group">
+        <label>Image URL</label>
+        <input class="field-input" id="proj-img" placeholder="https://images.unsplash.com/..."/>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Tags (comma separated)</label>
+          <input class="field-input" id="proj-tags" placeholder="React, Node.js, MySQL"/>
+        </div>
+        <div class="field-group">
+          <label>Duration</label>
+          <input class="field-input" id="proj-duration" placeholder="4 weeks"/>
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Outcome</label>
+        <input class="field-input" id="proj-outcome" placeholder="e.g. Reduced costs by 40%"/>
+      </div>
+      <div class="field-group" style="display:flex;align-items:center;gap:.75rem">
+        <input type="checkbox" id="proj-visible" checked style="width:16px;height:16px;accent-color:var(--orange)"/>
+        <label for="proj-visible" style="font-size:.85rem;color:var(--navy);text-transform:none;letter-spacing:0;cursor:pointer">Visible on portfolio page</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="modal-cancel">Cancel</button>
+      <button class="btn-save" id="modal-save">Save Project</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-  const API = window.location.origin + '/api/admin'
+  const API   = window.location.origin + '/api/admin'
+  const PAPI  = window.location.origin + '/api/projects'
   let token     = localStorage.getItem('admin_token')
   let allMsgs   = []
+  let allProjs  = []
   let curFilter = 'all'
   let curSearch = ''
   let openId    = null
+  let openReply = null
+  let editingProjId = null
 
-  // ── INIT ───────────────────────────────────────────────────
   if (token) showDashboard()
 
   // ── LOGIN ──────────────────────────────────────────────────
@@ -284,57 +334,39 @@
     const password = document.getElementById('login-password').value
     const btn      = document.getElementById('btn-login')
     const errEl    = document.getElementById('login-error')
-
-    if (!email || !password) { showError('Please enter email and password.'); return }
-
-    btn.disabled = true
-    btn.textContent = 'Signing in…'
-    errEl.style.display = 'none'
-
+    if (!email || !password) { showLoginError('Please enter email and password.'); return }
+    btn.disabled = true; btn.textContent = 'Signing in…'; errEl.style.display = 'none'
     try {
-      const res  = await fetch(`${API}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
+      const res  = await fetch(`${API}/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) })
       const data = await res.json()
-
-      if (res.ok && data.token) {
-        token = data.token
-        localStorage.setItem('admin_token', token)
-        showDashboard()
-      } else {
-        showError(data.message || 'Invalid credentials.')
-      }
-    } catch (err) {
-      showError('Connection failed. Check your network.')
-    } finally {
-      btn.disabled = false
-      btn.textContent = 'Sign In →'
-    }
+      if (res.ok && data.token) { token = data.token; localStorage.setItem('admin_token', token); showDashboard() }
+      else showLoginError(data.message || 'Invalid credentials.')
+    } catch (err) { showLoginError('Connection failed. Check your network.') }
+    finally { btn.disabled = false; btn.textContent = 'Sign In →' }
   }
+  function showLoginError(msg) { const el = document.getElementById('login-error'); el.textContent = msg; el.style.display = 'block' }
 
-  function showError(msg) {
-    const el = document.getElementById('login-error')
-    el.textContent = msg
-    el.style.display = 'block'
-  }
-
-  // ── DASHBOARD ──────────────────────────────────────────────
   function showDashboard() {
     document.getElementById('login-screen').style.display    = 'none'
     document.getElementById('dashboard-screen').style.display = 'block'
-    loadStats()
-    loadMessages()
+    loadStats(); loadMessages(); loadProjects()
   }
 
   document.getElementById('btn-logout').addEventListener('click', () => {
-    localStorage.removeItem('admin_token')
-    token = null
+    localStorage.removeItem('admin_token'); token = null
     document.getElementById('login-screen').style.display    = 'flex'
     document.getElementById('dashboard-screen').style.display = 'none'
-    document.getElementById('login-email').value    = ''
-    document.getElementById('login-password').value = ''
+    document.getElementById('login-email').value = ''; document.getElementById('login-password').value = ''
+  })
+
+  // ── TABS ───────────────────────────────────────────────────
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'))
+      btn.classList.add('active')
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active')
+    })
   })
 
   // ── STATS ──────────────────────────────────────────────────
@@ -349,137 +381,134 @@
         document.getElementById('stat-week').textContent   = data.stats.thisWeek
         document.getElementById('unread-badge').textContent = data.stats.unread
       }
-    } catch (err) { console.error('Stats error:', err) }
+    } catch(e) {}
   }
 
   // ── MESSAGES ───────────────────────────────────────────────
   async function loadMessages() {
-    document.getElementById('messages-container').innerHTML = `
-      <div class="loading"><div class="spinner"></div>Loading messages…</div>`
-
+    document.getElementById('messages-container').innerHTML = '<div class="loading"><div class="spinner"></div>Loading messages…</div>'
     try {
       const res  = await authFetch('/messages?limit=100')
-      if (res.status === 403 || res.status === 401) { handleUnauth(); return }
+      if (res.status === 401 || res.status === 403) { handleUnauth(); return }
       const data = await res.json()
       if (data.success) { allMsgs = data.messages; renderMessages() }
-    } catch (err) {
-      document.getElementById('messages-container').innerHTML =
-        `<div class="empty-state"><div class="icon">⚠️</div><h3>Failed to load messages</h3><p>${err.message}</p></div>`
+    } catch(err) {
+      document.getElementById('messages-container').innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Failed to load</h3><p>${err.message}</p></div>`
     }
   }
 
   function renderMessages() {
     let msgs = [...allMsgs]
-
-    // Filter
     if (curFilter === 'unread') msgs = msgs.filter(m => !m.read)
     if (curFilter === 'read')   msgs = msgs.filter(m => m.read)
-
-    // Search
     if (curSearch) {
       const q = curSearch.toLowerCase()
-      msgs = msgs.filter(m =>
-        m.name.toLowerCase().includes(q) ||
-        m.email.toLowerCase().includes(q) ||
-        (m.subject || '').toLowerCase().includes(q) ||
-        m.message.toLowerCase().includes(q)
-      )
+      msgs = msgs.filter(m => m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q) || (m.subject||'').toLowerCase().includes(q) || m.message.toLowerCase().includes(q))
     }
-
     const container = document.getElementById('messages-container')
-
-    if (msgs.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="icon">📭</div>
-          <h3>No messages found</h3>
-          <p>${curSearch ? 'Try a different search term.' : 'Nothing here yet.'}</p>
-        </div>`
+    if (!msgs.length) {
+      container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No messages found</h3><p>${curSearch?'Try a different search.':'Nothing here yet.'}</p></div>`
       return
     }
-
     container.innerHTML = `<div class="messages-list">${msgs.map(msgCard).join('')}</div>`
-
-    // Attach events
     msgs.forEach(m => {
-      document.getElementById(`msg-${m._id}`).addEventListener('click', (e) => {
-        if (e.target.closest('.btn-action')) return
-        toggleMessage(m._id)
-      })
+      document.getElementById(`msg-${m._id}`).addEventListener('click', e => { if (e.target.closest('.btn-action,.reply-box')) return; toggleMessage(m._id) })
     })
   }
 
   function msgCard(m) {
-    const initials = m.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase()
-    const date     = new Date(m.createdAt)
-    const now      = new Date()
-    const isToday  = date.toDateString() === now.toDateString()
-    const timeStr  = isToday
-      ? date.toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' })
-      : date.toLocaleDateString('en-KE', { day: 'numeric', month: 'short' })
-
-    const isOpen = openId === m._id
-
+    const initials = m.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
+    const date  = new Date(m.createdAt), now = new Date()
+    const isToday = date.toDateString() === now.toDateString()
+    const timeStr = isToday ? date.toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'}) : date.toLocaleDateString('en-KE',{day:'numeric',month:'short'})
+    const isOpen  = openId === m._id
+    const replyOpen = openReply === m._id
     return `
-      <div class="msg-card ${m.read ? '' : 'unread'}" id="msg-${m._id}">
+      <div class="msg-card ${m.read?'':'unread'}" id="msg-${m._id}">
         <div class="msg-header">
-          ${!m.read ? '<div class="unread-dot"></div>' : '<div style="width:8px"></div>'}
-          <div class="msg-avatar ${m.read ? 'read' : ''}">${initials}</div>
-          <div class="msg-meta">
-            <div class="msg-name">${escHtml(m.name)}</div>
-            <div class="msg-email">${escHtml(m.email)}</div>
-          </div>
-          <div class="msg-subject">${escHtml(m.subject || '(no subject)')}</div>
+          ${!m.read?'<div class="unread-dot"></div>':'<div style="width:8px"></div>'}
+          <div class="msg-avatar ${m.read?'read':''}">${initials}</div>
+          <div class="msg-meta"><div class="msg-name">${escHtml(m.name)}</div><div class="msg-email">${escHtml(m.email)}</div></div>
+          <div class="msg-subject">${escHtml(m.subject||'(no subject)')}</div>
           <div class="msg-time">${timeStr}</div>
           <div style="color:var(--muted);font-size:.8rem;transition:transform .2s;${isOpen?'transform:rotate(180deg)':''}">▾</div>
         </div>
-        <div class="msg-body ${isOpen ? 'open' : ''}">
+        <div class="msg-body ${isOpen?'open':''}" id="body-${m._id}">
           <div style="font-size:.7rem;font-family:monospace;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-top:1rem">
             From: ${escHtml(m.name)} &lt;${escHtml(m.email)}&gt; · ${new Date(m.createdAt).toLocaleString('en-KE')}
           </div>
           <div class="msg-content">${escHtml(m.message)}</div>
           <div class="msg-actions">
-            <a class="btn-action btn-reply" href="mailto:${escHtml(m.email)}?subject=Re: ${escHtml(m.subject || 'Your message')}">
-              ✉️ Reply
-            </a>
-            <button class="btn-action btn-read" onclick="toggleRead('${m._id}', ${m.read})">
-              ${m.read ? '📩 Mark Unread' : '✅ Mark Read'}
-            </button>
-            <button class="btn-action btn-delete" onclick="confirmDelete('${m._id}')">
-              🗑️ Delete
-            </button>
+            <button class="btn-action btn-reply-inline" onclick="toggleReply('${m._id}')">✉️ Reply</button>
+            <button class="btn-action btn-read" onclick="toggleRead('${m._id}',${m.read})">${m.read?'📩 Mark Unread':'✅ Mark Read'}</button>
+            <button class="btn-action btn-delete" onclick="confirmDelete('${m._id}')">🗑️ Delete</button>
+          </div>
+          <!-- Inline reply box -->
+          <div class="reply-box ${replyOpen?'open':''}" id="reply-${m._id}">
+            <div class="reply-box-header">Reply to ${escHtml(m.name)} &lt;${escHtml(m.email)}&gt;</div>
+            <textarea class="reply-textarea" id="reply-text-${m._id}" placeholder="Type your reply here..."></textarea>
+            <div class="reply-footer">
+              <button class="btn-cancel-reply" onclick="toggleReply('${m._id}')">Cancel</button>
+              <button class="btn-send-reply" id="send-btn-${m._id}" onclick="sendReply('${m._id}')">Send Reply →</button>
+            </div>
           </div>
         </div>
       </div>`
   }
 
   function toggleMessage(id) {
-    openId = openId === id ? null : id
-    // Auto mark as read when opened
+    openId    = openId === id ? null : id
+    openReply = null
     const msg = allMsgs.find(m => m._id === id)
     if (msg && !msg.read && openId === id) doMarkRead(id, false)
     else renderMessages()
   }
 
-  // ── ACTIONS ────────────────────────────────────────────────
+  function toggleReply(id) {
+    event.stopPropagation()
+    openReply = openReply === id ? null : id
+    renderMessages()
+    if (openReply === id) setTimeout(() => document.getElementById(`reply-text-${id}`)?.focus(), 50)
+  }
+
+  async function sendReply(id) {
+    event.stopPropagation()
+    const text = document.getElementById(`reply-text-${id}`)?.value?.trim()
+    if (!text) { toast('Please type a reply first.', true); return }
+    const btn = document.getElementById(`send-btn-${id}`)
+    btn.disabled = true; btn.textContent = 'Sending…'
+    try {
+      const res  = await authFetch(`/messages/${id}/reply`, { method:'POST', body:JSON.stringify({ replyText: text }) })
+      const data = await res.json()
+      if (data.success) {
+        toast('✅ Reply sent successfully!', false, true)
+        openReply = null
+        const idx = allMsgs.findIndex(m => m._id === id)
+        if (idx !== -1) allMsgs[idx].read = true
+        renderMessages()
+      } else {
+        toast(data.message || 'Failed to send reply.', true)
+        btn.disabled = false; btn.textContent = 'Send Reply →'
+      }
+    } catch(err) {
+      toast('Network error. Try again.', true)
+      btn.disabled = false; btn.textContent = 'Send Reply →'
+    }
+  }
+
+  function toggleRead(id, isRead) { event.stopPropagation(); doMarkRead(id, isRead) }
+
   async function doMarkRead(id, unread) {
     try {
-      const endpoint = unread ? `/messages/${id}/unread` : `/messages/${id}/read`
-      const res  = await authFetch(endpoint, { method: 'PATCH' })
+      const res  = await authFetch(`/messages/${id}/${unread?'unread':'read'}`, { method:'PATCH' })
       const data = await res.json()
       if (data.success) {
         const idx = allMsgs.findIndex(m => m._id === id)
         if (idx !== -1) allMsgs[idx] = data.message
-        loadStats()
-        renderMessages()
+        loadStats(); renderMessages()
         toast(unread ? 'Marked as unread' : 'Marked as read')
       }
-    } catch (err) { toast('Action failed', true) }
-  }
-
-  function toggleRead(id, isRead) {
-    event.stopPropagation()
-    doMarkRead(id, isRead)
+    } catch(e) { toast('Action failed', true) }
   }
 
   function confirmDelete(id) {
@@ -490,71 +519,192 @@
 
   async function doDelete(id) {
     try {
-      const res = await authFetch(`/messages/${id}`, { method: 'DELETE' })
+      const res  = await authFetch(`/messages/${id}`, { method:'DELETE' })
       const data = await res.json()
       if (data.success) {
         allMsgs = allMsgs.filter(m => m._id !== id)
         if (openId === id) openId = null
-        loadStats()
-        renderMessages()
+        loadStats(); renderMessages()
         toast('Message deleted')
       }
-    } catch (err) { toast('Delete failed', true) }
+    } catch(e) { toast('Delete failed', true) }
   }
 
-  // ── FILTERS ────────────────────────────────────────────────
   document.querySelectorAll('.filter-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'))
-      btn.classList.add('active')
-      curFilter = btn.dataset.filter
-      openId = null
-      renderMessages()
+      btn.classList.add('active'); curFilter = btn.dataset.filter; openId = null; renderMessages()
     })
   })
+  document.getElementById('search-input').addEventListener('input', e => { curSearch = e.target.value.trim(); openId = null; renderMessages() })
 
-  document.getElementById('search-input').addEventListener('input', e => {
-    curSearch = e.target.value.trim()
-    openId = null
-    renderMessages()
-  })
+  // ── PROJECTS ───────────────────────────────────────────────
+  async function loadProjects() {
+    document.getElementById('projects-container').innerHTML = '<div class="loading"><div class="spinner"></div>Loading projects…</div>'
+    try {
+      const res  = await authFetch2('/all')
+      const data = await res.json()
+      if (data.success) { allProjs = data.projects; renderProjects() }
+    } catch(err) {
+      document.getElementById('projects-container').innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Failed to load projects</h3><p>${err.message}</p></div>`
+    }
+  }
+
+  function renderProjects() {
+    const container = document.getElementById('projects-container')
+    if (!allProjs.length) {
+      container.innerHTML = '<div class="empty-state"><div class="icon">🗂️</div><h3>No projects yet</h3><p>Click "+ Add Project" to add your first project.</p></div>'
+      return
+    }
+    container.innerHTML = `<div class="projects-grid">${allProjs.map(projCard).join('')}</div>`
+  }
+
+  function projCard(p) {
+    return `
+      <div class="proj-card">
+        ${p.img ? `<img class="proj-img" src="${escHtml(p.img)}" alt="${escHtml(p.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div class="proj-img-placeholder" style="display:none">🖼️</div>`
+        : `<div class="proj-img-placeholder">🖼️</div>`}
+        <div class="proj-body">
+          <div class="proj-category">${escHtml(p.category)} ${!p.visible?'<span class="proj-hidden-badge">Hidden</span>':''}</div>
+          <div class="proj-title">${escHtml(p.title)}</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:.6rem;line-height:1.5">${escHtml(p.desc.slice(0,90))}${p.desc.length>90?'…':''}</div>
+          <div class="proj-tags">${(p.tags||[]).slice(0,4).map(t=>`<span class="proj-tag">${escHtml(t)}</span>`).join('')}</div>
+        </div>
+        <div class="proj-actions">
+          <button class="btn-edit-proj" onclick="openEditModal('${p._id}')">✏️ Edit</button>
+          <button class="btn-del-proj" onclick="deleteProject('${p._id}')">🗑️</button>
+        </div>
+      </div>`
+  }
+
+  // ── PROJECT MODAL ──────────────────────────────────────────
+  document.getElementById('btn-add-project').addEventListener('click', () => openAddModal())
+  document.getElementById('modal-close').addEventListener('click', closeModal)
+  document.getElementById('modal-cancel').addEventListener('click', closeModal)
+  document.getElementById('modal-save').addEventListener('click', saveProject)
+  document.getElementById('project-modal').addEventListener('click', e => { if (e.target.id === 'project-modal') closeModal() })
+
+  function openAddModal() {
+    editingProjId = null
+    document.getElementById('modal-title').textContent = 'Add Project'
+    document.getElementById('modal-save').textContent  = 'Add Project'
+    clearModal()
+    document.getElementById('project-modal').classList.remove('hidden')
+  }
+
+  function openEditModal(id) {
+    editingProjId = id
+    const p = allProjs.find(p => p._id === id)
+    if (!p) return
+    document.getElementById('modal-title').textContent = 'Edit Project'
+    document.getElementById('modal-save').textContent  = 'Save Changes'
+    document.getElementById('proj-id').value        = p._id
+    document.getElementById('proj-category').value  = p.category
+    document.getElementById('proj-title').value     = p.title
+    document.getElementById('proj-desc').value      = p.desc
+    document.getElementById('proj-img').value       = p.img || ''
+    document.getElementById('proj-tags').value      = (p.tags||[]).join(', ')
+    document.getElementById('proj-year').value      = p.year || ''
+    document.getElementById('proj-duration').value  = p.duration || ''
+    document.getElementById('proj-outcome').value   = p.outcome || ''
+    document.getElementById('proj-visible').checked = p.visible !== false
+    document.getElementById('project-modal').classList.remove('hidden')
+  }
+
+  function closeModal() { document.getElementById('project-modal').classList.add('hidden') }
+
+  function clearModal() {
+    ['proj-id','proj-title','proj-desc','proj-img','proj-tags','proj-year','proj-duration','proj-outcome'].forEach(id => {
+      document.getElementById(id).value = ''
+    })
+    document.getElementById('proj-category').value  = ''
+    document.getElementById('proj-visible').checked = true
+  }
+
+  async function saveProject() {
+    const category = document.getElementById('proj-category').value
+    const title    = document.getElementById('proj-title').value.trim()
+    const desc     = document.getElementById('proj-desc').value.trim()
+    if (!category || !title || !desc) { toast('Category, title and description are required.', true); return }
+
+    const btn = document.getElementById('modal-save')
+    btn.disabled = true; btn.textContent = 'Saving…'
+
+    const body = {
+      category, title, desc,
+      img:      document.getElementById('proj-img').value.trim(),
+      tags:     document.getElementById('proj-tags').value,
+      year:     document.getElementById('proj-year').value.trim(),
+      duration: document.getElementById('proj-duration').value.trim(),
+      outcome:  document.getElementById('proj-outcome').value.trim(),
+      visible:  document.getElementById('proj-visible').checked,
+    }
+
+    try {
+      const res = editingProjId
+        ? await authFetch2('', { method:'PUT', id: editingProjId, body:JSON.stringify(body) }, true)
+        : await authFetch2('', { method:'POST', body:JSON.stringify(body) })
+
+      const data = await res.json()
+      if (data.success) {
+        if (editingProjId) {
+          const idx = allProjs.findIndex(p => p._id === editingProjId)
+          if (idx !== -1) allProjs[idx] = data.project
+        } else {
+          allProjs.unshift(data.project)
+        }
+        renderProjects()
+        closeModal()
+        toast(editingProjId ? '✅ Project updated!' : '✅ Project added!', false, true)
+      } else {
+        toast(data.message || 'Save failed.', true)
+      }
+    } catch(err) { toast('Network error.', true) }
+    finally { btn.disabled = false; btn.textContent = editingProjId ? 'Save Changes' : 'Add Project' }
+  }
+
+  async function deleteProject(id) {
+    if (!confirm('Delete this project? This cannot be undone.')) return
+    try {
+      const res  = await fetch(`${PAPI}/${id}`, { method:'DELETE', headers:{ Authorization:`Bearer ${token}`, 'Content-Type':'application/json' } })
+      const data = await res.json()
+      if (data.success) { allProjs = allProjs.filter(p => p._id !== id); renderProjects(); toast('Project deleted') }
+      else toast(data.message || 'Delete failed.', true)
+    } catch(e) { toast('Delete failed.', true) }
+  }
 
   // ── HELPERS ────────────────────────────────────────────────
   function authFetch(path, opts = {}) {
-    return fetch(`${API}${path}`, {
-      ...opts,
-      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers || {}) },
-    })
+    return fetch(`${API}${path}`, { ...opts, headers:{ Authorization:`Bearer ${token}`, 'Content-Type':'application/json', ...(opts.headers||{}) } })
+  }
+
+  function authFetch2(path, opts = {}, useId = false) {
+    const url = useId ? `${PAPI}/${opts.id||''}` : `${PAPI}${path}`
+    return fetch(url, { ...opts, headers:{ Authorization:`Bearer ${token}`, 'Content-Type':'application/json', ...(opts.headers||{}) } })
   }
 
   function handleUnauth() {
-    localStorage.removeItem('admin_token')
-    token = null
+    localStorage.removeItem('admin_token'); token = null
     document.getElementById('login-screen').style.display    = 'flex'
     document.getElementById('dashboard-screen').style.display = 'none'
     toast('Session expired. Please login again.', true)
   }
 
   function escHtml(str) {
-    return String(str || '')
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')
   }
 
-  function toast(msg, isError = false) {
+  function toast(msg, isError=false, isSuccess=false) {
     const el = document.createElement('div')
-    el.className = `toast${isError ? ' error' : ''}`
+    el.className = `toast${isError?' error':isSuccess?' success':''}`
     el.textContent = msg
     document.getElementById('toast-container').appendChild(el)
     setTimeout(() => el.remove(), 3500)
   }
 
-  // Auto-refresh every 60 seconds
   setInterval(() => {
-    if (token && document.getElementById('dashboard-screen').style.display !== 'none') {
-      loadStats()
-      loadMessages()
-    }
+    if (token && document.getElementById('dashboard-screen').style.display !== 'none') { loadStats() }
   }, 60000)
 </script>
 </body>

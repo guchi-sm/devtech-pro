@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 
-const API = 'https://devtech-pro-api-production.up.railway.app/api/chat'
+const API = `${import.meta.env.VITE_API_URL || 'https://devtech-pro-api-production.up.railway.app'}/api/chat`
 
 const QUICK_REPLIES = [
   'What services do you offer?',

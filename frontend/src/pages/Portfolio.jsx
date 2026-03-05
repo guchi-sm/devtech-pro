@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks/useScrollReveal'
@@ -29,6 +29,8 @@ function Reveal({ children, delay = 0, className = '' }) {
     </motion.div>
   )
 }
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://devtech-pro-api-production.up.railway.app'
 
 const PROJECTS = [
   { id: 1, index: '001', category: 'Software Dev', title: 'Inventory Management System',
@@ -100,10 +102,31 @@ function ProjectCard({ proj, delay }) {
 export default function Portfolio() {
   const [activeFilter, setActiveFilter] = useState('All')
   const [query, setQuery] = useState('')
-  const filtered = PROJECTS.filter(p => {
+  const [projects, setProjects] = useState(PROJECTS)   // fallback to hardcoded while loading
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/projects`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.projects.length > 0) {
+          // Normalise DB shape to match component expectations
+          setProjects(data.projects.map((p, i) => ({
+            ...p,
+            id: p._id,
+            index: p.index || String(i + 1).padStart(3, '0'),
+          })))
+        }
+      })
+      .catch(() => setError('Could not load latest projects.'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const filtered = projects.filter(p => {
     const matchCat = activeFilter === 'All' || p.category === activeFilter
     const q = query.toLowerCase()
-    return matchCat && (!q || p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q) || p.tags.some(t => t.toLowerCase().includes(q)))
+    return matchCat && (!q || p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q) || (p.tags||[]).some(t => t.toLowerCase().includes(q)))
   })
 
   return (
@@ -160,8 +183,18 @@ export default function Portfolio() {
       {/* ─── PROJECTS GRID ────────────────────────────────────── */}
       <section className="py-10 pb-24" style={{ background: '#f4f6f9' }}>
         <div className="max-w-[1280px] mx-auto px-8 md:px-10">
+          {error && (
+            <div style={{ background: '#fef9ec', border: '1px solid #f5a623', borderRadius: 4, padding: '0.75rem 1rem', marginBottom: '1rem', fontSize: '0.8rem', color: '#1c2d3f', fontFamily: 'monospace' }}>
+              ⚠️ {error} Showing cached projects.
+            </div>
+          )}
+          {loading && (
+            <div style={{ textAlign: 'center', padding: '2rem', fontFamily: 'monospace', fontSize: '0.75rem', color: '#6b7a8d', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+              Loading projects…
+            </div>
+          )}
           <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.length === 0 && (
+            {filtered.length === 0 && !loading && (
               <div className="col-span-3 py-24 text-center font-mono text-[0.72rem] tracking-widest uppercase" style={{ color: 'var(--text-muted)', background: 'var(--bg-card)' }}>
                 No projects found for "{query}" — try a different search.
               </div>

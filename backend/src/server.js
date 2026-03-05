@@ -8,8 +8,10 @@ const rateLimit  = require('express-rate-limit')
 const mongoose   = require('mongoose')
 const path       = require('path')
 
-const contactRouter = require('./routes/contact')
-const adminRouter   = require('./routes/admin')
+const contactRouter  = require('./routes/contact')
+const adminRouter    = require('./routes/admin')
+const chatRouter     = require('./routes/chat')       // ✅ FIX: was missing
+const projectRouter  = require('./routes/projects')   // ✅ NEW: portfolio CRUD
 
 const app  = express()
 const PORT = process.env.PORT || 5000
@@ -23,7 +25,7 @@ mongoose.connect(process.env.MONGODB_URI)
   .catch(err => console.error('❌  MongoDB error:', err.message))
 
 // ─── SECURITY ──────────────────────────────────────────────────
-app.use(helmet({ contentSecurityPolicy: false })) // disabled for admin HTML
+app.use(helmet({ contentSecurityPolicy: false }))
 
 app.use(cors({
   origin: [
@@ -32,7 +34,7 @@ app.use(cors({
     process.env.CLIENT_ORIGIN,
     /\.vercel\.app$/,
   ].filter(Boolean),
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }))
@@ -70,8 +72,10 @@ app.get('/api/health', (_req, res) => {
 })
 
 // ─── API ROUTES ────────────────────────────────────────────────
-app.use('/api/contact', contactLimiter, contactRouter)
-app.use('/api/admin',   adminRouter)
+app.use('/api/contact',  contactLimiter, contactRouter)
+app.use('/api/admin',    adminRouter)
+app.use('/api/chat',     chatRouter)       // ✅ FIX: now mounted
+app.use('/api/projects', projectRouter)    // ✅ NEW: portfolio CRUD
 
 // ─── ADMIN DASHBOARD (serve HTML) ─────────────────────────────
 app.use('/admin', express.static(path.join(__dirname, 'public')))
@@ -104,4 +108,3 @@ app.listen(PORT, () => {
 })
 
 module.exports = app
-
