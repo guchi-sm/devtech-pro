@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import Footer from '../components/Footer'
 
-// ─── xtratheme corporate palette (matches Home.jsx) ────────────
+// ─── xtratheme corporate palette ───────────────────────────────
 const THEME_OVERRIDE = `
   :root {
     --bg:          #ffffff;
@@ -129,27 +129,82 @@ const TIMELINE = [
 export default function About() {
   return (
     <>
-      {/* Inject matching color palette */}
       <style>{THEME_OVERRIDE}</style>
 
-      {/* ─── HERO ─────────────────────────────────────────────── */}
-      <section className="pt-[68px]" style={{ background: 'var(--bg)' }}>
+      {/* ─── HERO with tech background image + overlay ─────────── */}
+      <section
+        style={{
+          position: 'relative',
+          paddingTop: '70px',
+          minHeight: '420px',
+          display: 'flex',
+          alignItems: 'center',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Background Image */}
         <div
-          className="max-w-[1280px] mx-auto px-8 md:px-10 py-20 border-b"
-          style={{ borderColor: 'var(--border)' }}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: 'url(https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&q=80&fit=crop)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+          }}
+        />
+
+        {/* Dark navy overlay — same vibe as your reference */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(135deg, rgba(10,17,40,0.92) 0%, rgba(28,45,63,0.85) 60%, rgba(245,166,35,0.15) 100%)',
+          }}
+        />
+
+        {/* Content */}
+        <div
+          className="max-w-[1280px] mx-auto px-8 md:px-10 py-24 w-full"
+          style={{ position: 'relative', zIndex: 1 }}
         >
-          {/* Orange top accent line — matches xtratheme section headers */}
-          <div style={{
-            width: 48, height: 4, background: '#f5a623',
-            borderRadius: 2, marginBottom: '1.2rem',
-          }} />
+          <div style={{ width: 48, height: 4, background: '#f5a623', borderRadius: 2, marginBottom: '1.2rem' }} />
           <motion.div {...fadeUp(0.1)}>
-            <div className="section-label">Who I Am</div>
+            <div
+              className="font-mono text-xs tracking-[0.2em] uppercase flex items-center gap-3 mb-4"
+              style={{ color: '#f5a623' }}
+            >
+              <span style={{ display: 'block', height: '1px', width: 32, background: '#f5a623' }} />
+              Who I Am
+            </div>
           </motion.div>
           <motion.div {...fadeUp(0.2)}>
-            <div className="text-display-lg font-display" style={{ color: 'var(--text)' }}>
-              Building <span style={{ color: 'var(--accent)' }}>reliable</span><br />tech systems
+            <div className="text-display-lg font-display" style={{ color: '#ffffff' }}>
+              Building <span style={{ color: '#f5a623' }}>reliable</span><br />tech systems
             </div>
+          </motion.div>
+          <motion.div {...fadeUp(0.3)}>
+            <p className="mt-5 text-sm max-w-lg leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
+              ICT Technician & Software Developer helping businesses build secure, scalable technology — from network infrastructure to custom software solutions.
+            </p>
+          </motion.div>
+          <motion.div {...fadeUp(0.4)} style={{ marginTop: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <Link to="/contact" style={{
+              background: '#f5a623', color: '#1c2d3f',
+              fontWeight: 700, fontSize: '.85rem', padding: '.75rem 2rem',
+              borderRadius: 2, textDecoration: 'none', border: '2px solid #f5a623',
+              transition: 'all .25s', whiteSpace: 'nowrap',
+            }}>
+              Work With Me →
+            </Link>
+            <Link to="/portfolio" style={{
+              background: 'transparent', color: '#fff',
+              fontWeight: 600, fontSize: '.85rem', padding: '.75rem 2rem',
+              borderRadius: 2, textDecoration: 'none', border: '2px solid rgba(255,255,255,0.4)',
+              transition: 'all .25s', whiteSpace: 'nowrap',
+            }}>
+              View My Work
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -173,7 +228,6 @@ export default function About() {
                   style={{ background: 'linear-gradient(135deg, rgba(245,166,35,0.12) 0%, transparent 55%)' }}
                 />
               </div>
-              {/* Badge — navy bg, orange text */}
               <div
                 className="absolute -bottom-4 -right-4 rounded-lg text-center px-5 py-4"
                 style={{ background: '#1c2d3f' }}
@@ -183,8 +237,6 @@ export default function About() {
                   Yrs Exp.
                 </span>
               </div>
-
-              {/* Second accent photo */}
               <div
                 className="absolute -bottom-14 -left-6 w-28 h-28 rounded-lg overflow-hidden border-4"
                 style={{ borderColor: 'var(--bg)' }}
@@ -222,8 +274,6 @@ export default function About() {
                 I believe good technology should be invisible — it just works. Whether it's setting up a secure office network or building a custom inventory system, I ensure everything runs reliably in the background so clients can focus on their business.
               </p>
             </Reveal>
-
-            {/* Mission quote — orange left border */}
             <Reveal delay={0.3}>
               <blockquote
                 className="border-l-[3px] pl-5 my-7 italic text-[1.02rem] leading-relaxed"
@@ -232,7 +282,6 @@ export default function About() {
                 "I help small businesses build reliable IT systems — from basic network setup to custom software solutions."
               </blockquote>
             </Reveal>
-
             <Reveal delay={0.4}>
               <Link to="/contact" className="btn btn-primary">Work With Me →</Link>
             </Reveal>
@@ -257,9 +306,7 @@ export default function About() {
               A full-stack skillset covering development, networking, and IT support.
             </p>
           </Reveal>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* Development */}
             <div>
               <Reveal>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', marginBottom: '1.5rem' }}>
@@ -271,8 +318,6 @@ export default function About() {
                 <SkillBar key={s.name} {...s} color={SKILLS.development.color} delay={i * 0.1} />
               ))}
             </div>
-
-            {/* Networking */}
             <div>
               <Reveal>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', marginBottom: '1.5rem' }}>
@@ -284,8 +329,6 @@ export default function About() {
                 <SkillBar key={s.name} {...s} color={SKILLS.networking.color} delay={i * 0.1} />
               ))}
             </div>
-
-            {/* IT Support */}
             <div>
               <Reveal>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', marginBottom: '1.5rem' }}>
@@ -302,35 +345,62 @@ export default function About() {
       </section>
 
       {/* ─── TIMELINE ─────────────────────────────────────────── */}
-      <section className="py-20 border-b" style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
-        <div className="max-w-[1280px] mx-auto px-8 md:px-10">
+      <section
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          padding: '5rem 0',
+          borderBottom: '1px solid var(--border)',
+        }}
+      >
+        {/* Tech background image + overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: 'url(https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1600&q=80&fit=crop)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(135deg, rgba(7,8,8,0.93) 0%, rgba(10,17,40,0.88) 100%)',
+          }}
+        />
+
+        <div className="max-w-[1280px] mx-auto px-8 md:px-10" style={{ position: 'relative', zIndex: 1 }}>
           <Reveal>
             <div style={{ width: 36, height: 3, background: '#f5a623', borderRadius: 2, marginBottom: '1rem' }} />
-            <div className="section-label">Experience</div>
+            <div
+              className="font-mono text-xs tracking-[0.2em] uppercase flex items-center gap-3 mb-4"
+              style={{ color: '#f5a623' }}
+            >
+              <span style={{ display: 'block', height: '1px', width: 32, background: '#f5a623' }} />
+              Experience
+            </div>
           </Reveal>
           <Reveal delay={0.1}>
-            <div className="text-display-md font-display mb-14" style={{ color: 'var(--text)' }}>Career Path</div>
+            <div className="text-display-md font-display mb-14" style={{ color: '#ffffff' }}>Career Path</div>
           </Reveal>
 
-          <div className="relative border-l-2 pl-10 space-y-10" style={{ borderColor: '#e2e8f0' }}>
+          <div className="relative border-l-2 pl-10 space-y-10" style={{ borderColor: 'rgba(245,166,35,0.4)' }}>
             {TIMELINE.map((item, i) => (
               <Reveal key={item.year} delay={i * 0.12}>
                 <div className="relative">
-                  {/* Dot — orange fill, navy border */}
                   <div
                     className="absolute -left-[2.85rem] w-4 h-4 rounded-full border-2"
-                    style={{ background: '#f5a623', borderColor: '#1c2d3f' }}
+                    style={{ background: '#f5a623', borderColor: '#0a1128' }}
                   />
-                  <div
-                    className="font-mono text-[0.65rem] tracking-[0.2em] uppercase mb-1"
-                    style={{ color: '#f5a623' }}
-                  >
+                  <div className="font-mono text-[0.65rem] tracking-[0.2em] uppercase mb-1" style={{ color: '#f5a623' }}>
                     {item.year}
                   </div>
-                  <div className="font-display text-2xl tracking-wide mb-1" style={{ color: 'var(--text)' }}>
+                  <div className="font-display text-2xl tracking-wide mb-1" style={{ color: '#ffffff' }}>
                     {item.role}
                   </div>
-                  <div className="text-sm" style={{ color: 'var(--text-muted)' }}>{item.place}</div>
+                  <div className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>{item.place}</div>
                 </div>
               </Reveal>
             ))}
@@ -372,9 +442,31 @@ export default function About() {
         </div>
       </section>
 
-      {/* ─── CTA BAND ─────────────────────────────────────────── */}
-      <section style={{ background: '#1c2d3f', padding: '3.5rem 0' }}>
-        <div className="max-w-[1280px] mx-auto px-8 md:px-10 flex flex-col md:flex-row items-center justify-between gap-6">
+      {/* ─── CTA BAND with background image + overlay ─────────── */}
+      <section style={{ position: 'relative', padding: '5rem 0', overflow: 'hidden' }}>
+        {/* Background image */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: 'url(https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1600&q=80&fit=crop)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+        {/* Orange-tinted dark overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(135deg, rgba(28,45,63,0.95) 0%, rgba(10,17,40,0.90) 60%, rgba(245,166,35,0.2) 100%)',
+          }}
+        />
+
+        <div
+          className="max-w-[1280px] mx-auto px-8 md:px-10 flex flex-col md:flex-row items-center justify-between gap-6"
+          style={{ position: 'relative', zIndex: 1 }}
+        >
           <Reveal>
             <div>
               <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#fff', marginBottom: '.4rem' }}>
@@ -386,12 +478,14 @@ export default function About() {
             </div>
           </Reveal>
           <Reveal delay={0.15}>
-            <Link to="/contact" style={{
-              background: '#f5a623', color: '#1c2d3f',
-              fontWeight: 700, fontSize: '.9rem', padding: '.85rem 2.2rem',
-              borderRadius: 2, textDecoration: 'none', border: '2px solid #f5a623',
-              transition: 'all .25s', whiteSpace: 'nowrap',
-            }}
+            <Link
+              to="/contact"
+              style={{
+                background: '#f5a623', color: '#1c2d3f',
+                fontWeight: 700, fontSize: '.9rem', padding: '.85rem 2.2rem',
+                borderRadius: 2, textDecoration: 'none', border: '2px solid #f5a623',
+                transition: 'all .25s', whiteSpace: 'nowrap',
+              }}
               onMouseEnter={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#fff' }}
               onMouseLeave={e => { e.currentTarget.style.background = '#f5a623'; e.currentTarget.style.color = '#1c2d3f' }}
             >
