@@ -26,7 +26,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const navHeight = scrolled ? '54px' : '66px'
+  const navHeight = scrolled ? '54px' : '70px'
 
   return (
     <>
@@ -49,8 +49,8 @@ export default function Navbar() {
             <img
               src={logo}
               alt="DevTech"
-             style={{
-  height: '100px',           // force large, ignore scroll
+style={{
+  height: scrolled ? '40px' : '52px',   // was 54px / 72px — too big
   width: 'auto',
   objectFit: 'contain',
   transition: 'height 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
