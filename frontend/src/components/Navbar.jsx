@@ -26,51 +26,53 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const navHeight = scrolled ? '54px' : '70px'
+  const navHeight = scrolled ? '58px' : '72px'
 
   return (
     <>
       <nav
         className="fixed top-0 left-0 right-0 z-[1000] border-b transition-all duration-300"
         style={{
-          background: 'var(--bg-nav)',
+          background: '#0a1128',
           backdropFilter: 'blur(20px) saturate(180%)',
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          borderColor: 'var(--border)',
+          borderColor: 'rgba(255,255,255,0.08)',
           height: navHeight,
         }}
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="max-w-[1400px] mx-auto px-5 md:px-8 h-full flex items-center justify-between gap-6">
+        <div className="max-w-[1400px] mx-auto px-5 md:px-8 h-full flex items-center justify-between gap-4">
 
           {/* ── Logo ── */}
           <NavLink to="/" aria-label="DevTech Home" className="flex-shrink-0">
             <img
               src={logo}
               alt="DevTech"
-style={{
-  height: scrolled ? '40px' : '52px',   // was 54px / 72px — too big
-  width: 'auto',
-  objectFit: 'contain',
-  transition: 'height 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-}}
+              style={{
+                height: scrolled ? '42px' : '54px',
+                width: 'auto',
+                objectFit: 'contain',
+                transition: 'height 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
             />
           </NavLink>
 
-          {/* ── Desktop Nav Links ── */}
-          <ul className="hidden lg:flex items-center gap-0.5 list-none flex-1 justify-center">
+          {/* ── Desktop Nav Links (show from md=768px) ── */}
+          <ul className="hidden md:flex items-center gap-0 list-none flex-1 justify-center">
             {NAV_LINKS.map(({ to, label }) => (
               <li key={to}>
                 <NavLink
                   to={to}
                   end={to === '/'}
                   className={({ isActive }) =>
-                    `relative font-mono text-[0.75rem] tracking-[0.12em] uppercase px-3.5 py-2 rounded transition-colors duration-200 whitespace-nowrap ` +
-                    (isActive ? '' : 'text-muted-custom hover:text-custom')
+                    `relative font-mono text-[0.72rem] tracking-[0.12em] uppercase px-3 py-2 rounded transition-colors duration-200 whitespace-nowrap ` +
+                    (isActive ? '' : 'hover:text-white')
                   }
                   style={({ isActive }) =>
-                    isActive ? { color: 'var(--accent)' } : {}
+                    isActive
+                      ? { color: '#f5a623' }
+                      : { color: 'rgba(255,255,255,0.65)' }
                   }
                 >
                   {({ isActive }) => (
@@ -79,8 +81,8 @@ style={{
                       {isActive && (
                         <motion.span
                           layoutId="nav-underline"
-                          className="absolute bottom-0 left-3.5 right-3.5 h-px"
-                          style={{ background: 'var(--accent)' }}
+                          className="absolute bottom-0 left-3 right-3 h-px"
+                          style={{ background: '#f5a623' }}
                           transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                         />
                       )}
@@ -92,36 +94,51 @@ style={{
           </ul>
 
           {/* ── Desktop Right: Theme + CTA ── */}
-          <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
+          <div className="hidden md:flex items-center gap-3 flex-shrink-0">
             <ThemeToggle />
             <NavLink
               to="/contact"
-              className="btn btn-primary !text-[0.68rem] !py-2 !px-4"
+              style={{
+                background: '#f5a623',
+                color: '#1c2d3f',
+                fontWeight: 700,
+                fontSize: '0.68rem',
+                padding: '0.5rem 1.1rem',
+                borderRadius: 4,
+                textDecoration: 'none',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#e09510' }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#f5a623' }}
             >
               Hire Me →
             </NavLink>
           </div>
 
           {/* ── Mobile Controls ── */}
-          <div className="flex lg:hidden items-center gap-3">
+          <div className="flex md:hidden items-center gap-3">
             <ThemeToggle showLabel={false} />
             <button
               onClick={() => setMenuOpen(p => !p)}
-              className="flex flex-col gap-1.5 p-1.5 rounded"
+              className="flex flex-col gap-1.5 p-2 rounded"
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={menuOpen}
+              style={{ background: 'rgba(255,255,255,0.08)' }}
             >
               <span
-                className={`block w-6 h-px transition-transform duration-300 ${menuOpen ? 'translate-y-[7px] rotate-45' : ''}`}
-                style={{ background: 'var(--text)' }}
+                className={`block w-5 h-0.5 transition-transform duration-300 ${menuOpen ? 'translate-y-[7px] rotate-45' : ''}`}
+                style={{ background: '#ffffff' }}
               />
               <span
-                className={`block w-6 h-px transition-opacity duration-300 ${menuOpen ? 'opacity-0' : ''}`}
-                style={{ background: 'var(--text)' }}
+                className={`block w-5 h-0.5 transition-opacity duration-300 ${menuOpen ? 'opacity-0' : ''}`}
+                style={{ background: '#ffffff' }}
               />
               <span
-                className={`block w-6 h-px transition-transform duration-300 ${menuOpen ? '-translate-y-[7px] -rotate-45' : ''}`}
-                style={{ background: 'var(--text)' }}
+                className={`block w-5 h-0.5 transition-transform duration-300 ${menuOpen ? '-translate-y-[7px] -rotate-45' : ''}`}
+                style={{ background: '#ffffff' }}
               />
             </button>
           </div>
@@ -137,12 +154,12 @@ style={{
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed left-0 right-0 z-[999] flex flex-col py-4 px-6 border-b lg:hidden"
+            className="fixed left-0 right-0 z-[999] flex flex-col py-4 px-6 border-b md:hidden"
             style={{
               top: navHeight,
-              background: 'var(--bg-nav)',
+              background: '#0a1128',
               backdropFilter: 'blur(20px)',
-              borderColor: 'var(--border)',
+              borderColor: 'rgba(255,255,255,0.08)',
             }}
           >
             {NAV_LINKS.map(({ to, label }, i) => (
@@ -155,15 +172,11 @@ style={{
                 <NavLink
                   to={to}
                   end={to === '/'}
-                  className={({ isActive }) =>
-                    `block font-mono text-[0.75rem] tracking-[0.14em] uppercase py-3 border-b transition-colors ` +
-                    (isActive ? '' : 'text-muted-custom hover:text-custom')
-                  }
-                  style={({ isActive }) =>
-                    isActive
-                      ? { color: 'var(--accent)', borderColor: 'var(--border)' }
-                      : { borderColor: 'var(--border)' }
-                  }
+                  className="block font-mono text-[0.75rem] tracking-[0.14em] uppercase py-3.5 border-b transition-colors"
+                  style={({ isActive }) => ({
+                    color: isActive ? '#f5a623' : 'rgba(255,255,255,0.7)',
+                    borderColor: 'rgba(255,255,255,0.08)',
+                  })}
                 >
                   {label}
                 </NavLink>
@@ -178,7 +191,19 @@ style={{
             >
               <NavLink
                 to="/contact"
-                className="btn btn-primary w-full justify-center !text-[0.72rem]"
+                style={{
+                  display: 'block',
+                  textAlign: 'center',
+                  background: '#f5a623',
+                  color: '#1c2d3f',
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  padding: '0.85rem',
+                  borderRadius: 4,
+                  textDecoration: 'none',
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                }}
               >
                 Hire Me →
               </NavLink>
