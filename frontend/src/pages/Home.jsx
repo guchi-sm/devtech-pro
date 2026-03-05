@@ -5,6 +5,7 @@ import { useScrollReveal } from '../hooks/useScrollReveal'
 import { useInView } from 'react-intersection-observer'
 import { useCountUp } from '../hooks/useCountUp'
 import Footer from '../components/Footer'
+import TechMarquee from '../components/TechMarquee'
 import { useTypewriter } from '../hooks/useAnimations'
 
 // ─── THEME: xtratheme corporate color override ─────────────────
@@ -468,6 +469,9 @@ export default function Home() {
 
       {/* ─── HERO CAROUSEL ────────────────────────────────────── */}
       <HeroCarousel />
+
+      {/* ─── TECH MARQUEE ────────────────────────────────────── */}
+      <TechMarquee />
 
       {/* ─── SERVICES PREVIEW ─────────────────────────────────── */}
       <section style={{ background: 'var(--bg-2)', borderTop: '1px solid var(--border)' }} className="py-24">

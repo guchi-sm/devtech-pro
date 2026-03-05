@@ -1,11 +1,12 @@
 import AIChatbox from './components/AIChatbox'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Navbar from './components/Navbar'
 import CustomCursor from './components/CustomCursor'
 import ScrollProgress from './components/ScrollProgress'
 import Preloader from './components/Preloader'
+import WhatsAppButton from './components/WhatsAppButton'
 import Home from './pages/Home'
 import About from './pages/About'
 import Services from './pages/Services'
@@ -43,7 +44,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* ── Main App (renders behind preloader, shows after) ── */}
+      {/* ── Main App ── */}
       <div
         className="noise-overlay min-h-screen"
         style={{
@@ -56,6 +57,7 @@ export default function App() {
         <CustomCursor />
         <ScrollProgress />
         <Navbar />
+
         <main className="relative z-10">
           <AnimatePresence mode="wait" initial={false}>
             <Routes location={location} key={location.pathname}>
@@ -70,9 +72,7 @@ export default function App() {
                   <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)', paddingTop: '72px' }}>
                     <div className="text-center">
                       <div className="font-display text-[12rem] leading-none" style={{ color: 'var(--border)' }}>404</div>
-                      <p className="font-mono text-xs tracking-[0.2em] uppercase mb-8" style={{ color: 'var(--text-muted)' }}>
-                        Page not found
-                      </p>
+                      <p className="font-mono text-xs tracking-[0.2em] uppercase mb-8" style={{ color: 'var(--text-muted)' }}>Page not found</p>
                       <a href="/" className="btn btn-primary">Back Home →</a>
                     </div>
                   </div>
@@ -81,7 +81,9 @@ export default function App() {
             </Routes>
           </AnimatePresence>
         </main>
+
         <ScrollToTop />
+        <WhatsAppButton />
         <AIChatbox />
       </div>
     </>
