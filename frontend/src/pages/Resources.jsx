@@ -4,7 +4,9 @@ import { useScrollReveal } from '../hooks/useScrollReveal'
 import Footer from '../components/Footer'
 import toast, { Toaster } from 'react-hot-toast'
 
-const API_URL = `${import.meta.env.VITE_API_URL || 'https://devtech-pro-api-production.up.railway.app'}/api/resources`
+const API_BASE = import.meta.env.VITE_API_URL || 'https://devtech-pro-api-production.up.railway.app'
+const API_URL = `${API_BASE}/api/resources`
+console.log('[Resources] Fetching from:', API_URL)
 
 const fadeUp = (d = 0) => ({ initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: d } })
 
@@ -288,11 +290,23 @@ export default function Resources() {
 
   useEffect(() => {
     fetch(API_URL)
-      .then(r => r.json())
-      .then(data => {
-        setResources(data.data?.length > 0 ? data.data : DEMO_RESOURCES)
+      .then(r => {
+        if (!r.ok) throw new Error(`API error ${r.status}`)
+        return r.json()
       })
-      .catch(() => setResources(DEMO_RESOURCES))
+      .then(data => {
+        // Use real API data — show empty state if none uploaded yet
+        setResources(Array.isArray(data.data) ? data.data : [])
+      })
+      .catch(err => {
+        console.error('Resources fetch error:', err)
+        // Only fall back to demo if explicitly in development
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          setResources(DEMO_RESOURCES)
+        } else {
+          setResources([])
+        }
+      })
       .finally(() => setLoading(false))
   }, [])
 
