@@ -5,13 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import ThemeToggle from './ThemeToggle'
 
 const NAV_LINKS = [
-  { to: '/',          label: 'Home' },
-  { to: '/about',     label: 'About' },
-  { to: '/services',  label: 'Services' },
-  { to: '/portfolio', label: 'Portfolio' },
-  { to: '/demo',      label: 'Demo ⬡' },
-  { to: '/contact',   label: 'Contact' },
-  { to: '/blog',      label: 'Blog' },
+  { to: '/',           label: 'Home' },
+  { to: '/about',      label: 'About' },
+  { to: '/services',   label: 'Services' },
+  { to: '/portfolio',  label: 'Portfolio' },
+  { to: '/resources',  label: 'Resources' },
+  { to: '/blog',       label: 'Blog' },
+  { to: '/demo',       label: 'Demo ⬡' },
+  { to: '/contact',    label: 'Contact' },
 ]
 
 export default function Navbar() {

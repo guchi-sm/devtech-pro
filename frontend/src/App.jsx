@@ -15,6 +15,7 @@ import Portfolio from './pages/Portfolio'
 import Contact from './pages/Contact'
 import Demo from './pages/Demo'
 import Blog from './pages/Blog'
+import Resources from './pages/Resources'
 import ScrollToTop from './components/ScrollToTop'
 import { useReveal } from './hooks/useAnimations'
 import './styles/animations.css'
@@ -70,6 +71,7 @@ export default function App() {
               <Route path="/contact"   element={<PageTransition><Contact /></PageTransition>} />
               <Route path="/demo"      element={<PageTransition><Demo /></PageTransition>} />
               <Route path="/blog"      element={<PageTransition><Blog /></PageTransition>} />
+              <Route path="/resources"  element={<PageTransition><Resources /></PageTransition>} />
               <Route path="*" element={
                 <PageTransition>
                   <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)', paddingTop: '72px' }}>
