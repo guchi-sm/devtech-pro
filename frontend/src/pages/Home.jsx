@@ -389,7 +389,7 @@ function ServiceCard({ item, delay }) {
   return (
     <Reveal delay={delay}>
       <div
-        className="group relative overflow-hidden border cursor-pointer"
+        className="group relative overflow-hidden border cursor-pointer flex flex-col h-full"
         style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
       >
         {/* Photo */}
@@ -406,7 +406,7 @@ function ServiceCard({ item, delay }) {
         {/* Bottom accent line */}
         <div className="absolute bottom-0 left-0 h-[3px] w-0 group-hover:w-full transition-all duration-500" style={{ background: 'var(--accent)' }} />
         {/* Content */}
-        <div className="p-7">
+        <div className="p-7 flex flex-col flex-1">
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
             style={{ background: 'var(--accent-glow)', border: '1px solid rgba(245,166,35,0.25)', color: 'var(--accent)' }}
@@ -414,7 +414,7 @@ function ServiceCard({ item, delay }) {
             {item.icon}
           </div>
           <h3 className="font-display text-2xl tracking-wide mb-2.5" style={{ color: 'var(--text)' }}>{item.title}</h3>
-          <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>{item.desc}</p>
+          <p className="text-sm leading-relaxed flex-1" style={{ color: 'var(--text-muted)' }}>{item.desc}</p>
         </div>
       </div>
     </Reveal>
@@ -485,7 +485,7 @@ export default function Home() {
               <Link to="/services" className="btn btn-outline self-start">All Services →</Link>
             </Reveal>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px" style={{ background: 'var(--border)' }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px items-stretch" style={{ background: 'var(--border)' }}>
             {SERVICES_DATA.map((item, i) => (
               <ServiceCard key={item.num} item={item} delay={i * 0.12} />
             ))}
