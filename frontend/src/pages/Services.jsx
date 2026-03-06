@@ -46,10 +46,10 @@ function NetworkCanvas() {
 }
 
 const THEME_OVERRIDE = `
-  :root {
-    --bg: #ffffff; --bg-2: #f4f6f9; --bg-card: #ffffff;
+  html:not(.dark) {
+    --bg: #f8f9fb; --bg-2: #f0f2f7; --bg-card: #ffffff;
     --accent: #f5a623; --accent-glow: rgba(245,166,35,0.12);
-    --text: #1c2d3f; --text-muted: #6b7a8d; --border: #e2e8f0;
+    --text: #1c2d3f; --text-muted: #6b7a8d; --border: rgba(28,45,63,0.1);
   }
 `
 const fadeUp = (delay = 0) => ({ initial: { opacity: 0, y: 36 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1], delay } })
@@ -124,7 +124,7 @@ function ServiceBlock({ service, isOpen, onToggle }) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-px" style={{ background: 'var(--border)' }}>
                 {service.items.map((item) => (
                   <div key={item.title} className="p-6 transition-colors duration-200" style={{ background: 'var(--bg-card)' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = '#f4f6f9'; e.currentTarget.style.borderLeft = '3px solid #f5a623' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-2)'; e.currentTarget.style.borderLeft = '3px solid #f5a623' }}
                     onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-card)'; e.currentTarget.style.borderLeft = 'none' }}>
                     <div className="flex items-start gap-4">
                       <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-2" style={{ background: '#f5a623' }} />
@@ -154,6 +154,8 @@ export default function Services() {
       {/* ─── HERO with tech background overlay ────────────────── */}
       <section style={{ position: 'relative', paddingTop: '70px', minHeight: '380px', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&q=80&fit=crop)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }} />
+        <div className="grid-overlay" style={{ zIndex: 3 }} />
+        <div style={{ position: 'absolute', top: '20%', right: '15%', width: 300, height: 300, background: 'rgba(245,166,35,0.07)', borderRadius: '50%', filter: 'blur(80px)', zIndex: 2 }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(10,17,40,0.92) 0%, rgba(28,45,63,0.85) 60%, rgba(245,166,35,0.15) 100%)' }} />
         <div className="max-w-[1280px] mx-auto px-8 md:px-10 py-20 w-full" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ width: 48, height: 4, background: '#f5a623', borderRadius: 2, marginBottom: '1.2rem' }} />

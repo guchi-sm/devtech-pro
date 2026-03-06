@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { to: '/portfolio', label: 'Portfolio' },
   { to: '/demo',      label: 'Demo ⬡' },
   { to: '/contact',   label: 'Contact' },
+  { to: '/blog',      label: 'Blog' },
 ]
 
 export default function Navbar() {

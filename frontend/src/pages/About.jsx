@@ -88,7 +88,7 @@ function SkillBar({ name, pct, icon = '⚙️', color = 'var(--accent)', delay =
 
 const SKILLS = {
   development: {
-    color: '#1c2d3f',
+    color: 'var(--text)',
     items: [
       { name: 'HTML / CSS',  pct: 92, icon: '🎨' },
       { name: 'JavaScript',  pct: 80, icon: '🟨' },
@@ -190,7 +190,7 @@ export default function About() {
           </motion.div>
           <motion.div {...fadeUp(0.4)} style={{ marginTop: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link to="/contact" style={{
-              background: '#f5a623', color: '#1c2d3f',
+              background: '#f5a623', color: 'var(--text)',
               fontWeight: 700, fontSize: '.85rem', padding: '.75rem 2rem',
               borderRadius: 2, textDecoration: 'none', border: '2px solid #f5a623',
               transition: 'all .25s', whiteSpace: 'nowrap',
@@ -481,7 +481,7 @@ export default function About() {
             <Link
               to="/contact"
               style={{
-                background: '#f5a623', color: '#1c2d3f',
+                background: '#f5a623', color: 'var(--text)',
                 fontWeight: 700, fontSize: '.9rem', padding: '.85rem 2.2rem',
                 borderRadius: 2, textDecoration: 'none', border: '2px solid #f5a623',
                 transition: 'all .25s', whiteSpace: 'nowrap',

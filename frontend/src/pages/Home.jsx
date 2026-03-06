@@ -389,7 +389,7 @@ function ServiceCard({ item, delay }) {
   return (
     <Reveal delay={delay}>
       <div
-        className="group relative overflow-hidden border cursor-pointer flex flex-col h-full"
+        className="group relative overflow-hidden border cursor-pointer"
         style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
       >
         {/* Photo */}
@@ -406,7 +406,7 @@ function ServiceCard({ item, delay }) {
         {/* Bottom accent line */}
         <div className="absolute bottom-0 left-0 h-[3px] w-0 group-hover:w-full transition-all duration-500" style={{ background: 'var(--accent)' }} />
         {/* Content */}
-        <div className="p-7 flex flex-col flex-1">
+        <div className="p-7">
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
             style={{ background: 'var(--accent-glow)', border: '1px solid rgba(245,166,35,0.25)', color: 'var(--accent)' }}
@@ -414,7 +414,7 @@ function ServiceCard({ item, delay }) {
             {item.icon}
           </div>
           <h3 className="font-display text-2xl tracking-wide mb-2.5" style={{ color: 'var(--text)' }}>{item.title}</h3>
-          <p className="text-sm leading-relaxed flex-1" style={{ color: 'var(--text-muted)' }}>{item.desc}</p>
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>{item.desc}</p>
         </div>
       </div>
     </Reveal>
@@ -435,6 +435,7 @@ function StatCounter({ target, suffix, label, delay }) {
   return (
     <motion.div
       ref={inViewRef}
+      className="stat-card-glass"
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay }}
@@ -485,7 +486,7 @@ export default function Home() {
               <Link to="/services" className="btn btn-outline self-start">All Services →</Link>
             </Reveal>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px items-stretch" style={{ background: 'var(--border)' }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px" style={{ background: 'var(--border)' }}>
             {SERVICES_DATA.map((item, i) => (
               <ServiceCard key={item.num} item={item} delay={i * 0.12} />
             ))}
@@ -546,13 +547,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── STATS ────────────────────────────────────────────── */}
-      <section
-        className="py-16"
-        style={{ background: '#1c2d3f', borderTop: '1px solid rgba(255,255,255,.08)' }}
-      >
-        <div className="max-w-[1280px] mx-auto px-8 md:px-10">
-          <div className="flex flex-wrap gap-0 justify-center">
+      {/* ─── STATS — glassmorphism bar ─────────────────────────── */}
+      <section style={{ position: 'relative', overflow: 'hidden', padding: '4rem 0' }}>
+        {/* Dark gradient background */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #070c14 0%, #0c1a2e 100%)' }} />
+        <div className="grid-overlay" />
+        {/* Glow */}
+        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 600, height: 200, background: 'rgba(245,166,35,0.05)', filter: 'blur(80px)', borderRadius: '50%' }} />
+        <div className="max-w-[1280px] mx-auto px-8 md:px-10" style={{ position: 'relative', zIndex: 2 }}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {STATS.map((s, i) => (
               <StatCounter
                 key={s.label}
