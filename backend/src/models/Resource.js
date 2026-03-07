@@ -13,6 +13,8 @@ const resourceSchema = new mongoose.Schema({
   visible:       { type: Boolean, default: true },
   downloadCount: { type: Number, default: 0 },
   order:         { type: Number, default: 0 },
+  isPremium:     { type: Boolean, default: false },   // premium = requires access code
+  accessCode:    { type: String, trim: true, default: '' }, // code admin sets for premium
 }, { timestamps: true })
 
 module.exports = mongoose.model('Resource', resourceSchema)

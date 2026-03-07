@@ -18,16 +18,15 @@ async function getResources(req, res) {
   }
 }
 
-// ─── PUBLIC: Unlock a resource (email gate) ────────────────────
+// ─── PUBLIC: Unlock a resource (email gate + optional premium code) ──
 async function unlockResource(req, res) {
   try {
     const { id } = req.params
-    const { name, email } = req.body
+    const { name, email, accessCode } = req.body
 
     if (!name || !email) {
       return res.status(400).json({ success: false, message: 'Name and email are required.' })
     }
-
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ success: false, message: 'Please enter a valid email address.' })
     }
@@ -37,7 +36,17 @@ async function unlockResource(req, res) {
       return res.status(404).json({ success: false, message: 'Resource not found.' })
     }
 
-    // Save lead (allow duplicates — useful for tracking frequency)
+    // Premium check — must provide correct access code
+    if (resource.isPremium) {
+      if (!accessCode) {
+        return res.status(403).json({ success: false, message: 'This is a premium resource. Please enter your access code.', requiresCode: true })
+      }
+      if (accessCode.trim() !== resource.accessCode.trim()) {
+        return res.status(403).json({ success: false, message: 'Invalid access code. Please check your code and try again.', requiresCode: true })
+      }
+    }
+
+    // Save lead
     await ResourceLead.create({
       name: name.trim(),
       email: email.trim().toLowerCase(),
@@ -49,12 +58,7 @@ async function unlockResource(req, res) {
     // Increment download counter
     await Resource.findByIdAndUpdate(id, { $inc: { downloadCount: 1 } })
 
-    // Return the actual file URL
-    res.json({
-      success: true,
-      fileUrl: resource.fileUrl,
-      title: resource.title,
-    })
+    res.json({ success: true, fileUrl: resource.fileUrl, title: resource.title })
   } catch (err) {
     res.status(500).json({ success: false, message: err.message })
   }

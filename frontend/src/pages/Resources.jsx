@@ -49,15 +49,18 @@ const DEMO_RESOURCES = [
 
 // ─── EMAIL GATE MODAL ──────────────────────────────────────────
 function UnlockModal({ resource, onClose, onUnlocked }) {
-  const [name, setName]   = useState('')
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [name, setName]         = useState('')
+  const [email, setEmail]       = useState('')
+  const [accessCode, setCode]   = useState('')
+  const [needsCode, setNeedsCode] = useState(resource.isPremium || false)
+  const [loading, setLoading]   = useState(false)
   const meta = CAT_META[resource.category] || CAT_META.PDF
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!name.trim() || !email.trim()) { toast.error('Please fill in both fields.'); return }
+    if (!name.trim() || !email.trim()) { toast.error('Please fill in all fields.'); return }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast.error('Please enter a valid email.'); return }
+    if (needsCode && !accessCode.trim()) { toast.error('Please enter your access code.'); return }
 
     setLoading(true)
     try {
@@ -72,11 +75,19 @@ function UnlockModal({ resource, onClose, onUnlocked }) {
       const res = await fetch(`${API_URL}/${resource._id}/unlock`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), accessCode: accessCode.trim() }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Failed to unlock.')
 
+      // Backend says: needs code
+      if (res.status === 403 && data.requiresCode) {
+        setNeedsCode(true)
+        toast.error(data.message || 'Access code required.')
+        setLoading(false)
+        return
+      }
+
+      if (!res.ok) throw new Error(data.message || 'Failed to unlock.')
       toast.success('Access granted! Your download is starting.')
       onUnlocked(data.fileUrl)
     } catch (err) {
@@ -201,6 +212,17 @@ function ResourceCard({ resource, onUnlock, delay }) {
           }
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%)' }} />
 
+          {/* Premium badge */}
+          {resource.isPremium && (
+            <div style={{
+              position:'absolute', top:'10px', left:'10px', zIndex:2,
+              background:'linear-gradient(135deg,#f5a623,#e8940f)',
+              color:'#1c2d3f', fontSize:'.58rem', fontFamily:'monospace',
+              fontWeight:800, padding:'.25rem .6rem', borderRadius:'4px',
+              letterSpacing:'.1em', textTransform:'uppercase',
+              boxShadow:'0 2px 8px rgba(245,166,35,.5)',
+            }}>👑 PREMIUM</div>
+          )}
           {/* Category badge */}
           <div style={{ position: 'absolute', top: 10, left: 10, background: meta.color, color: '#fff', fontSize: '0.58rem', fontFamily: 'monospace', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 700, padding: '0.25rem 0.65rem', borderRadius: 3, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
             {meta.icon} {resource.category}
@@ -268,7 +290,7 @@ function ResourceCard({ resource, onUnlock, delay }) {
                 transition: 'all 0.2s',
               }}
             >
-              🔓 Unlock Free
+              {resource.isPremium ? '🔑 Premium Access' : '🔓 Unlock Free'}
             </button>
           </div>
         </div>

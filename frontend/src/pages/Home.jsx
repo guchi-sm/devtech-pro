@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
@@ -5,6 +6,7 @@ import { useScrollReveal } from '../hooks/useScrollReveal'
 import { useInView } from 'react-intersection-observer'
 import { useCountUp } from '../hooks/useCountUp'
 import Footer from '../components/Footer'
+import Testimonials from '../components/Testimonials'
 import TechMarquee from '../components/TechMarquee'
 import { useTypewriter } from '../hooks/useAnimations'
 
@@ -594,6 +596,9 @@ export default function Home() {
           </Reveal>
         </div>
       </section>
+
+      {/* ─── TESTIMONIALS ─────────────────────────────────────── */}
+      <Testimonials />
 
       <Footer />
     </>

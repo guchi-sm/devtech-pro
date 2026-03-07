@@ -8,6 +8,8 @@ import ScrollProgress from './components/ScrollProgress'
 import Preloader from './components/Preloader'
 import WhatsAppButton from './components/WhatsAppButton'
 import MobileCTA from './components/MobileCTA'
+import CookieBanner from './components/CookieBanner'
+import PushNotification from './components/PushNotification'
 import Home from './pages/Home'
 import About from './pages/About'
 import Services from './pages/Services'
@@ -18,6 +20,7 @@ import Blog from './pages/Blog'
 import Resources from './pages/Resources'
 import ScrollToTop from './components/ScrollToTop'
 import { useReveal } from './hooks/useAnimations'
+import { useAnalytics } from './hooks/useAnalytics'
 import './styles/animations.css'
 
 function PageTransition({ children }) {
@@ -33,6 +36,12 @@ function PageTransition({ children }) {
   )
 }
 
+// Lives inside Router so useLocation works
+function Analytics() {
+  useAnalytics()
+  return null
+}
+
 export default function App() {
   const location = useLocation()
   const [loading, setLoading] = useState(true)
@@ -40,12 +49,10 @@ export default function App() {
 
   return (
     <>
-      {/* ── Preloader ── */}
       <AnimatePresence>
         {loading && <Preloader onComplete={() => setLoading(false)} />}
       </AnimatePresence>
 
-      {/* ── Main App ── */}
       <div
         className="noise-overlay min-h-screen"
         style={{
@@ -53,10 +60,11 @@ export default function App() {
           overflow: 'visible',
           opacity: loading ? 0 : 1,
           transition: 'opacity 0.4s ease',
-          /* Extra bottom padding on mobile so content isn't hidden behind sticky CTA bar */
-          paddingBottom: 0,
         }}
       >
+        {/* Auto-tracks every page navigation */}
+        <Analytics />
+
         <CustomCursor />
         <ScrollProgress />
         <Navbar />
@@ -71,7 +79,7 @@ export default function App() {
               <Route path="/contact"   element={<PageTransition><Contact /></PageTransition>} />
               <Route path="/demo"      element={<PageTransition><Demo /></PageTransition>} />
               <Route path="/blog"      element={<PageTransition><Blog /></PageTransition>} />
-              <Route path="/resources"  element={<PageTransition><Resources /></PageTransition>} />
+              <Route path="/resources" element={<PageTransition><Resources /></PageTransition>} />
               <Route path="*" element={
                 <PageTransition>
                   <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)', paddingTop: '72px' }}>
@@ -90,9 +98,13 @@ export default function App() {
         <ScrollToTop />
         <WhatsAppButton />
         <AIChatbox />
-
-        {/* ── Mobile sticky CTA (WhatsApp + Get Quote) ── */}
         <MobileCTA />
+
+        {/* ── Cookie consent (slides up after 2s) ── */}
+        <CookieBanner />
+
+        {/* ── Push notification opt-in (slides in after 15s) ── */}
+        <PushNotification />
       </div>
     </>
   )

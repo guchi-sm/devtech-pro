@@ -206,6 +206,8 @@
     <button class="page-tab active" data-tab="messages">✉️ Messages</button>
     <button class="page-tab" data-tab="resources">📦 Resources</button>
     <button class="page-tab" data-tab="leads">📧 Leads</button>
+    <button class="page-tab" data-tab="analytics">📊 Analytics</button>
+    <button class="page-tab" data-tab="testimonials">⭐ Testimonials</button>
   </div>
 
   <!-- ── MESSAGES ── -->
@@ -249,6 +251,90 @@
         <button class="btn-add" id="btn-add-res">＋ Add Resource</button>
       </div>
       <div id="res-container"><div class="loading"><div class="spin"></div>Loading resources…</div></div>
+    </div>
+  </div>
+
+  <!-- ── ANALYTICS ── -->
+  <div class="tab-content" id="tab-analytics">
+    <div class="main">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+        <div><h2 style="font-size:1.2rem;font-weight:800">Site Analytics</h2>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:.25rem">Visitor data from your live site</p></div>
+        <button class="btn-add" onclick="loadAnalytics()">↺ Refresh</button>
+      </div>
+      <div class="stats-grid" style="margin-bottom:1.5rem">
+        <div class="stat-card orange"><div class="sl">Total Views</div><div class="sv" id="an-total">—</div></div>
+        <div class="stat-card blue"><div class="sl">Unique Visitors</div><div class="sv" id="an-unique">—</div></div>
+        <div class="stat-card"><div class="sl">Today</div><div class="sv" id="an-today">—</div></div>
+        <div class="stat-card green"><div class="sl">This Week</div><div class="sv" id="an-week">—</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem" id="an-grid">
+        <div class="leads-wrap" id="an-pages" style="padding:1.25rem">
+          <div style="font-size:.65rem;font-family:monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">🔗 Top Pages</div>
+          <div id="an-pages-list"><div class="loading"><div class="spin"></div></div></div>
+        </div>
+        <div class="leads-wrap" id="an-countries" style="padding:1.25rem">
+          <div style="font-size:.65rem;font-family:monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">🌍 Top Countries</div>
+          <div id="an-countries-list"><div class="loading"><div class="spin"></div></div></div>
+        </div>
+        <div class="leads-wrap" id="an-devices" style="padding:1.25rem">
+          <div style="font-size:.65rem;font-family:monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">📱 Devices</div>
+          <div id="an-devices-list"><div class="loading"><div class="spin"></div></div></div>
+        </div>
+        <div class="leads-wrap" id="an-browsers" style="padding:1.25rem">
+          <div style="font-size:.65rem;font-family:monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">🌐 Browsers</div>
+          <div id="an-browsers-list"><div class="loading"><div class="spin"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TESTIMONIALS ── -->
+  <div class="tab-content" id="tab-testimonials">
+    <div class="main">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+        <div><h2 style="font-size:1.2rem;font-weight:800">Testimonials</h2>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:.25rem">Client reviews shown on your homepage</p></div>
+        <button class="btn-add" id="btn-add-testi">＋ Add Testimonial</button>
+      </div>
+      <div id="testi-container"><div class="loading"><div class="spin"></div>Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- ── TESTIMONIAL MODAL ── -->
+  <div class="overlay" id="testi-modal">
+    <div class="modal">
+      <div class="mhdr">
+        <h3 id="testi-modal-ttl">Add Testimonial</h3>
+        <button class="mhdr-close" id="testi-modal-x">✕</button>
+      </div>
+      <div class="mbod">
+        <input type="hidden" id="tf-id"/>
+        <div class="frow">
+          <div><label class="flabel">Client Name *</label><input class="finput" id="tf-name" placeholder="James Mwangi"/></div>
+          <div><label class="flabel">Rating (1-5)</label><input class="finput" id="tf-rating" type="number" min="1" max="5" value="5"/></div>
+        </div>
+        <div class="frow">
+          <div><label class="flabel">Role / Title</label><input class="finput" id="tf-role" placeholder="Business Owner"/></div>
+          <div><label class="flabel">Company</label><input class="finput" id="tf-company" placeholder="Mwangi Electronics, Meru"/></div>
+        </div>
+        <div><label class="flabel">Review *</label><textarea class="finput" id="tf-text" rows="4" placeholder="What did they say about your work?" style="resize:vertical"></textarea></div>
+        <div class="frow">
+          <div><label class="flabel">Service Used</label><input class="finput" id="tf-service" placeholder="Network Setup"/></div>
+          <div><label class="flabel">Avatar URL <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input class="finput" id="tf-avatar" placeholder="https://..."/></div>
+        </div>
+        <div class="frow">
+          <div><label class="flabel">Display Order</label><input class="finput" id="tf-order" type="number" value="0" min="0"/></div>
+        </div>
+        <div style="display:flex;gap:2.5rem;padding-top:.25rem">
+          <label class="chk"><input type="checkbox" id="tf-feat"/> ⭐ Featured (show first)</label>
+          <label class="chk"><input type="checkbox" id="tf-vis" checked/> 👁 Visible</label>
+        </div>
+      </div>
+      <div class="mftr">
+        <button class="btn-cancel" id="testi-cancel">Cancel</button>
+        <button class="btn-save" id="btn-save-testi">Save →</button>
+      </div>
     </div>
   </div>
 
@@ -670,6 +756,142 @@ function x(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function toast(msg, type='') { const el=document.createElement('div'); el.className=`toasty${type?' '+type:''}`; el.textContent=msg; document.getElementById('tc').appendChild(el); setTimeout(()=>el.remove(),3500) }
 
 setInterval(()=>{ if(token && document.getElementById('dashboard-screen').style.display!=='none') loadStats() },60000)
+
+// ── ANALYTICS ────────────────────────────────────────────────
+async function loadAnalytics() {
+  try {
+    const res  = await fetch(`${window.location.origin}/api/analytics/dashboard`, { headers:{Authorization:`Bearer ${token}`} })
+    const data = await res.json()
+    if (!data.success) return
+    const d = data.data
+    set('an-total',  d.totals.total)
+    set('an-unique', d.totals.uniqueVisitors)
+    set('an-today',  d.totals.todayCount)
+    set('an-week',   d.totals.week)
+    const tot = d.totals.total || 1
+    document.getElementById('an-pages-list').innerHTML = d.topPages.length
+      ? d.topPages.map(p => `<div style="margin-bottom:.75rem"><div style="display:flex;justify-content:space-between;margin-bottom:.25rem"><span style="font-size:.82rem;color:var(--navy);font-weight:600">${x(p._id)}</span><span style="font-size:.72rem;font-family:monospace;color:var(--muted)">${p.views} views</span></div><div style="height:4px;background:var(--bg);border-radius:2px"><div style="height:100%;background:var(--orange);border-radius:2px;width:${Math.round(p.views/tot*100)}%"></div></div></div>`).join('')
+      : '<p style="color:var(--muted);font-size:.82rem">No data yet. Visit your site to start tracking.</p>'
+    const devIcons = {mobile:'📱',tablet:'📋',desktop:'🖥️'}
+    document.getElementById('an-devices-list').innerHTML = d.devices.length
+      ? d.devices.map(dv => `<div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border)"><span style="font-size:.85rem">${devIcons[dv._id]||'💻'} ${dv._id}</span><strong style="font-size:.8rem;font-family:monospace">${dv.count}</strong></div>`).join('')
+      : '<p style="color:var(--muted);font-size:.82rem">No data yet.</p>'
+    document.getElementById('an-countries-list').innerHTML = d.countries.length
+      ? d.countries.map(co => `<div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border)"><span style="font-size:.82rem">${x(co._id)}</span><strong style="font-size:.8rem;font-family:monospace;color:var(--navy2)">${co.count}</strong></div>`).join('')
+      : '<p style="color:var(--muted);font-size:.82rem">No geo data yet — deploy to production to see countries.</p>'
+    document.getElementById('an-browsers-list').innerHTML = d.browsers.length
+      ? d.browsers.map(b => `<div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border)"><span style="font-size:.85rem">${x(b._id)}</span><strong style="font-size:.8rem;font-family:monospace">${b.count}</strong></div>`).join('')
+      : '<p style="color:var(--muted);font-size:.82rem">No data yet.</p>'
+  } catch(e) { console.error('Analytics load error:', e) }
+}
+
+// ── TESTIMONIALS ─────────────────────────────────────────────
+const TAPI = window.location.origin + '/api/testimonials'
+let testis = [], editTestiId = null
+
+async function loadTestimonials() {
+  set('testi-container','<div class="loading"><div class="spin"></div>Loading…</div>', true)
+  try {
+    const res  = await fetch(`${TAPI}/admin/all`, { headers:{Authorization:`Bearer ${token}`} })
+    const data = await res.json()
+    if (data.success) { testis=data.data; renderTestis() }
+  } catch(e) { set('testi-container',`<div class="empty"><div class="ico">⚠️</div><h3>Failed</h3><p>${e.message}</p></div>`, true) }
+}
+
+function renderTestis() {
+  const el = document.getElementById('testi-container')
+  if (!testis.length) { el.innerHTML='<div class="empty"><div class="ico">⭐</div><h3>No testimonials yet</h3><p>Add your first client review above.</p></div>'; return }
+  el.innerHTML=`<div style="display:flex;flex-direction:column;gap:.75rem">${testis.map(t=>`
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;color:var(--orange);font-weight:800;font-size:.9rem;flex-shrink:0">${x(t.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.35rem">
+          <strong style="font-size:.9rem">${x(t.name)}</strong>
+          <span style="font-size:.72rem;color:var(--muted)">${x(t.role||'')}${t.company?' · '+x(t.company):''}</span>
+          <span style="color:#f5a623;letter-spacing:1px">${'★'.repeat(t.rating||5)}</span>
+          ${t.featured?'<span style="font-size:.58rem;background:rgba(245,166,35,.12);color:var(--orange);padding:.15rem .45rem;border-radius:3px;font-family:monospace;letter-spacing:.1em">⭐ FEATURED</span>':''}
+          ${!t.visible?'<span style="font-size:.58rem;background:#fef2f2;color:var(--red);padding:.15rem .45rem;border-radius:3px;font-family:monospace">HIDDEN</span>':''}
+        </div>
+        <p style="font-size:.83rem;color:var(--muted);line-height:1.6;margin:0">"${x(t.text)}"</p>
+      </div>
+      <div style="display:flex;gap:.4rem;flex-shrink:0">
+        <button class="btn-edit" style="padding:.35rem .7rem;font-size:.72rem" onclick="openTestiModal('${t._id}')">✏️</button>
+        <button class="btn-delr" style="padding:.35rem .7rem;font-size:.72rem" onclick="delTesti('${t._id}')">🗑</button>
+      </div>
+    </div>`).join('')}</div>`
+}
+
+document.getElementById('btn-add-testi').addEventListener('click', () => openTestiModal())
+document.getElementById('testi-modal-x').addEventListener('click',  closeTestiModal)
+document.getElementById('testi-cancel').addEventListener('click',   closeTestiModal)
+document.getElementById('testi-modal').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeTestiModal() })
+
+function openTestiModal(id=null) {
+  const t = id ? testis.find(t=>t._id===id) : null
+  editTestiId = id||null
+  document.getElementById('testi-modal-ttl').textContent = t ? 'Edit Testimonial' : 'Add Testimonial'
+  document.getElementById('tf-id').value      = t?._id||''
+  document.getElementById('tf-name').value    = t?.name||''
+  document.getElementById('tf-rating').value  = t?.rating||5
+  document.getElementById('tf-role').value    = t?.role||''
+  document.getElementById('tf-company').value = t?.company||''
+  document.getElementById('tf-text').value    = t?.text||''
+  document.getElementById('tf-service').value = t?.service||''
+  document.getElementById('tf-avatar').value  = t?.avatar||''
+  document.getElementById('tf-order').value   = t?.order??0
+  document.getElementById('tf-feat').checked  = t?.featured||false
+  document.getElementById('tf-vis').checked   = t?.visible!==false
+  document.getElementById('testi-modal').classList.add('open')
+  setTimeout(()=>document.getElementById('tf-name').focus(),100)
+}
+function closeTestiModal() { document.getElementById('testi-modal').classList.remove('open'); editTestiId=null }
+
+document.getElementById('btn-save-testi').addEventListener('click', async ()=>{
+  const btn  = document.getElementById('btn-save-testi')
+  const name = document.getElementById('tf-name').value.trim()
+  const text = document.getElementById('tf-text').value.trim()
+  if (!name||!text) { toast('Name and review text are required.','err'); return }
+  btn.disabled=true; btn.textContent='Saving…'
+  try {
+    const body = {
+      name, text,
+      rating:   parseInt(document.getElementById('tf-rating').value)||5,
+      role:     document.getElementById('tf-role').value.trim(),
+      company:  document.getElementById('tf-company').value.trim(),
+      service:  document.getElementById('tf-service').value.trim(),
+      avatar:   document.getElementById('tf-avatar').value.trim(),
+      order:    parseInt(document.getElementById('tf-order').value)||0,
+      featured: document.getElementById('tf-feat').checked,
+      visible:  document.getElementById('tf-vis').checked,
+    }
+    const method   = editTestiId ? 'PUT' : 'POST'
+    const endpoint = editTestiId ? `${TAPI}/${editTestiId}` : TAPI
+    const res  = await fetch(endpoint,{method,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)})
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message||'Save failed.')
+    closeTestiModal(); toast(editTestiId?'✅ Updated!':'✅ Added!','ok')
+    await loadTestimonials()
+  } catch(e) { toast(e.message,'err') }
+  finally { btn.disabled=false; btn.textContent='Save →' }
+})
+
+async function delTesti(id) {
+  if (!confirm('Delete this testimonial?')) return
+  try {
+    const res=await fetch(`${TAPI}/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}})
+    const data=await res.json()
+    if (!res.ok) throw new Error(data.message)
+    testis=testis.filter(t=>t._id!==id); renderTestis(); toast('Deleted')
+  } catch(e) { toast(e.message,'err') }
+}
+
+// Load analytics/testimonials when their tabs are clicked
+document.querySelectorAll('.page-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    if (t.dataset.tab==='analytics'    && !(document.getElementById('an-total').textContent.match(/\d/))) loadAnalytics()
+    if (t.dataset.tab==='testimonials' && testis.length===0) loadTestimonials()
+  })
+})
 </script>
 </body>
 </html>
