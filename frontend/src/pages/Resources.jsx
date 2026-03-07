@@ -135,10 +135,14 @@ function UnlockModal({ resource, onClose, onUnlocked }) {
           {/* Body */}
           <div style={{ padding: '1.75rem' }}>
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔓</div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text)', marginBottom: '0.4rem' }}>Free Access — Just Your Email</h3>
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{resource.isPremium ? '👑' : '🔓'}</div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text)', marginBottom: '0.4rem' }}>
+                {resource.isPremium ? 'Premium Resource' : 'Free Access — Just Your Email'}
+              </h3>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                Enter your details below to instantly unlock and download this resource. No spam, ever.
+                {resource.isPremium
+                  ? 'Enter your details and the access code shared with you to unlock this premium resource.'
+                  : 'Enter your details below to instantly unlock and download this resource. No spam, ever.'}
               </p>
             </div>
 
@@ -162,6 +166,26 @@ function UnlockModal({ resource, onClose, onUnlocked }) {
                 />
               </div>
 
+              {/* ── ACCESS CODE FIELD — shown for premium resources ── */}
+              {needsCode && (
+                <div>
+                  <label style={{ display: 'block', fontFamily: 'monospace', fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#f5a623', marginBottom: '0.4rem' }}>
+                    🔑 Access Code
+                  </label>
+                  <input
+                    type="text" value={accessCode} onChange={e => setCode(e.target.value.toUpperCase())}
+                    placeholder="e.g. GUCHI2024"
+                    className="form-input"
+                    style={{ borderRadius: 6, borderColor: 'rgba(245,166,35,0.5)', letterSpacing: '0.1em', fontFamily: 'monospace', fontWeight: 700 }}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                  <p style={{ fontSize: '0.68rem', color: 'rgba(245,166,35,0.7)', marginTop: '0.35rem', lineHeight: 1.4 }}>
+                    This is a premium resource. Enter the access code shared with you via WhatsApp.
+                  </p>
+                </div>
+              )}
+
               <button
                 type="submit" disabled={loading}
                 style={{
@@ -176,7 +200,7 @@ function UnlockModal({ resource, onClose, onUnlocked }) {
               >
                 {loading
                   ? <><svg style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} fill="none" viewBox="0 0 24 24"><circle style={{ opacity: .25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path style={{ opacity: .75 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Unlocking…</>
-                  : '🔓 Unlock & Download'}
+                  : (resource.isPremium ? '🔑 Unlock Premium' : '🔓 Unlock & Download')}
               </button>
 
               <p style={{ textAlign: 'center', fontSize: '0.68rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
