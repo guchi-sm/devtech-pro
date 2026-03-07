@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
@@ -392,7 +391,7 @@ function ServiceCard({ item, delay }) {
     <Reveal delay={delay}>
       <div
         className="group relative overflow-hidden border cursor-pointer"
-        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', borderRadius: '12px', boxShadow: '0 2px 20px rgba(0,0,0,0.06)' }}
       >
         {/* Photo */}
         <div className="relative h-48 overflow-hidden">
@@ -488,7 +487,7 @@ export default function Home() {
               <Link to="/services" className="btn btn-outline self-start">All Services →</Link>
             </Reveal>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px" style={{ background: 'var(--border)' }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SERVICES_DATA.map((item, i) => (
               <ServiceCard key={item.num} item={item} delay={i * 0.12} />
             ))}
