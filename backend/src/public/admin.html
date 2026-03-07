@@ -697,13 +697,15 @@ document.getElementById('btn-save').addEventListener('click', async ()=>{
   try {
     const body = {
       title, description:desc, category:cat, fileUrl:url,
-      thumbnail: document.getElementById('f-thumb').value.trim(),
-      fileSize:  document.getElementById('f-size').value.trim(),
-      duration:  document.getElementById('f-dur').value.trim(),
-      tags:      document.getElementById('f-tags').value.trim(),
-      order:     parseInt(document.getElementById('f-order').value)||0,
-      featured:  document.getElementById('f-feat').checked,
-      visible:   document.getElementById('f-vis').checked,
+      thumbnail:  document.getElementById('f-thumb').value.trim(),
+      fileSize:   document.getElementById('f-size').value.trim(),
+      duration:   document.getElementById('f-dur').value.trim(),
+      tags:       document.getElementById('f-tags').value.trim(),
+      order:      parseInt(document.getElementById('f-order').value)||0,
+      featured:   document.getElementById('f-feat').checked,
+      visible:    document.getElementById('f-vis').checked,
+      isPremium:  document.getElementById('f-premium').checked,
+      accessCode: document.getElementById('f-code').value.trim(),
     }
     const method = editId ? 'PUT' : 'POST'
     const endpoint = editId ? `${RAPI}/${editId}` : RAPI
