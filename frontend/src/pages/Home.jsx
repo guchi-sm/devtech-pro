@@ -349,6 +349,28 @@ function Reveal({ children, delay = 0, className = '' }) {
   )
 }
 
+// ─── RESPONSIVE SERVICES GRID ───────────────────────────────────
+function ResponsiveServicesGrid() {
+  const [cols, setCols] = useState(1)
+  useEffect(() => {
+    const update = () => setCols(window.innerWidth >= 768 ? 3 : 1)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: `repeat(${cols}, 1fr)`,
+      gap: '1.5rem',
+    }}>
+      {SERVICES_DATA.map((item, i) => (
+        <ServiceCard key={item.num} item={item} delay={i * 0.12} />
+      ))}
+    </div>
+  )
+}
+
 // ─── SERVICE CARD ────────────────────────────────────────────────
 const SERVICES_DATA = [
   {
@@ -387,35 +409,60 @@ const SERVICES_DATA = [
 ]
 
 function ServiceCard({ item, delay }) {
+  const [hovered, setHovered] = useState(false)
   return (
     <Reveal delay={delay}>
       <div
-        className="group relative overflow-hidden border cursor-pointer"
-        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', borderRadius: '12px', boxShadow: '0 2px 20px rgba(0,0,0,0.06)' }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          position: 'relative', overflow: 'hidden', cursor: 'pointer',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
+          borderRadius: '12px',
+          boxShadow: hovered ? '0 8px 40px rgba(0,0,0,0.14)' : '0 2px 16px rgba(0,0,0,0.06)',
+          transition: 'box-shadow .3s ease, transform .3s ease',
+          transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
+        }}
       >
         {/* Photo */}
-        <div className="relative h-48 overflow-hidden">
+        <div style={{ position: 'relative', height: '192px', overflow: 'hidden' }}>
           <img
             src={item.img}
             alt={item.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             loading="lazy"
+            style={{
+              width: '100%', height: '100%', objectFit: 'cover',
+              transition: 'transform .7s ease',
+              transform: hovered ? 'scale(1.08)' : 'scale(1)',
+            }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-          <div className="absolute bottom-4 left-5 font-display text-4xl text-white/20 leading-none">{item.num}</div>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.28) 50%, transparent 100%)' }} />
+          <div style={{ position: 'absolute', bottom: '1rem', left: '1.25rem', fontFamily: 'var(--font-display, inherit)', fontSize: '2.5rem', color: 'rgba(255,255,255,0.18)', fontWeight: 900, lineHeight: 1 }}>{item.num}</div>
         </div>
         {/* Bottom accent line */}
-        <div className="absolute bottom-0 left-0 h-[3px] w-0 group-hover:w-full transition-all duration-500" style={{ background: 'var(--accent)' }} />
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, height: '3px',
+          background: 'var(--accent)',
+          width: hovered ? '100%' : '0%',
+          transition: 'width .5s ease',
+        }} />
         {/* Content */}
-        <div className="p-7">
-          <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-            style={{ background: 'var(--accent-glow)', border: '1px solid rgba(245,166,35,0.25)', color: 'var(--accent)' }}
-          >
+        <div style={{ padding: '1.75rem' }}>
+          <div style={{
+            width: '48px', height: '48px', borderRadius: '12px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: '1.25rem',
+            background: 'var(--accent-glow)',
+            border: '1px solid rgba(245,166,35,0.25)',
+            color: 'var(--accent)',
+            transition: 'transform .3s ease',
+            transform: hovered ? 'scale(1.1) rotate(6deg)' : 'scale(1)',
+          }}>
             {item.icon}
           </div>
-          <h3 className="font-display text-2xl tracking-wide mb-2.5" style={{ color: 'var(--text)' }}>{item.title}</h3>
-          <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>{item.desc}</p>
+          <h3 style={{ fontFamily: 'var(--font-display, inherit)', fontSize: '1.35rem', fontWeight: 800, letterSpacing: '.04em', marginBottom: '.6rem', color: 'var(--text)', textTransform: 'uppercase', lineHeight: 1.25 }}>{item.title}</h3>
+          <p style={{ fontSize: '.88rem', lineHeight: 1.65, color: 'var(--text-muted)', margin: 0 }}>{item.desc}</p>
         </div>
       </div>
     </Reveal>
@@ -487,11 +534,7 @@ export default function Home() {
               <Link to="/services" className="btn btn-outline self-start">All Services →</Link>
             </Reveal>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {SERVICES_DATA.map((item, i) => (
-              <ServiceCard key={item.num} item={item} delay={i * 0.12} />
-            ))}
-          </div>
+          <ResponsiveServicesGrid />
         </div>
       </section>
 
