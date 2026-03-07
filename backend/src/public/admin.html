@@ -421,6 +421,13 @@
       <div style="display:flex;gap:2.5rem;padding-top:.25rem">
         <label class="chk"><input type="checkbox" id="f-feat"/> ⭐ Featured</label>
         <label class="chk"><input type="checkbox" id="f-vis" checked/> 👁 Visible to public</label>
+        <label class="chk"><input type="checkbox" id="f-premium" onchange="toggleCodeField()"/> 👑 Premium (requires code)</label>
+      </div>
+      <!-- Premium access code field — shown only when Premium is ticked -->
+      <div id="code-wrap" style="display:none;margin-top:.75rem;padding:1rem;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.3);border-radius:8px;">
+        <label class="flabel" style="color:#c47d00;">🔑 Access Code <span style="font-weight:400;color:var(--muted)">(clients must enter this to unlock)</span></label>
+        <input class="finput" id="f-code" placeholder="e.g. GUCHI2024" style="font-family:monospace;font-weight:700;letter-spacing:.08em;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
+        <p style="font-size:.74rem;color:var(--muted);margin:.4rem 0 0">Share this code with paying clients via WhatsApp. Leave blank to use any code.</p>
       </div>
     </div>
     <div class="mftr">
@@ -616,6 +623,7 @@ function resCard(r) {
       <div class="rcat cat-${r.category}">${ICONS[r.category]||''} ${r.category}</div>
       ${r.featured?'<div class="rfeat">⭐ Featured</div>':''}
       ${!r.visible?'<div class="rhidden">👁 Hidden</div>':''}
+      ${r.isPremium?'<div style="position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#f5a623,#e8940f);color:#1c2d3f;font-size:.6rem;font-weight:800;padding:.2rem .5rem;border-radius:4px;font-family:monospace;letter-spacing:.06em;">👑 PREMIUM</div>':''}
     </div>
     <div class="rbody">
       <div class="rtitle">${x(r.title)}</div>
@@ -658,13 +666,20 @@ function openModal(r=null) {
   document.getElementById('f-dur').value   = r?.duration||''
   document.getElementById('f-tags').value  = (r?.tags||[]).join(', ')
   document.getElementById('f-order').value = r?.order??0
-  document.getElementById('f-feat').checked = r?.featured||false
-  document.getElementById('f-vis').checked  = r?.visible!==false
+  document.getElementById('f-feat').checked    = r?.featured||false
+  document.getElementById('f-vis').checked     = r?.visible!==false
+  document.getElementById('f-premium').checked = r?.isPremium||false
+  document.getElementById('f-code').value      = r?.accessCode||''
+  toggleCodeField()
   prevThumb(r?.thumbnail||'')
   document.getElementById('res-modal').classList.add('open')
   setTimeout(()=>document.getElementById('f-title').focus(),100)
 }
 function openEdit(id) { const r=resources.find(r=>r._id===id); if(r) openModal(r) }
+function toggleCodeField() {
+  const isPremium = document.getElementById('f-premium').checked
+  document.getElementById('code-wrap').style.display = isPremium ? 'block' : 'none'
+}
 function closeModal() { document.getElementById('res-modal').classList.remove('open'); editId=null }
 function prevThumb(url) {
   const img=document.getElementById('thumb-prev')
