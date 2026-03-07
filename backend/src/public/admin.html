@@ -623,7 +623,7 @@ function resCard(r) {
       <div class="rcat cat-${r.category}">${ICONS[r.category]||''} ${r.category}</div>
       ${r.featured?'<div class="rfeat">⭐ Featured</div>':''}
       ${!r.visible?'<div class="rhidden">👁 Hidden</div>':''}
-      ${r.isPremium?'<div style="position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#f5a623,#e8940f);color:#1c2d3f;font-size:.6rem;font-weight:800;padding:.2rem .5rem;border-radius:4px;font-family:monospace;letter-spacing:.06em;">👑 PREMIUM</div>':''}
+      ${r.isPremium ? `<div style="position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#f5a623,#e8940f);color:#1c2d3f;font-size:.6rem;font-weight:800;padding:.2rem .5rem;border-radius:4px;font-family:monospace;letter-spacing:.06em;">👑 PREMIUM</div>` : ''}
     </div>
     <div class="rbody">
       <div class="rtitle">${x(r.title)}</div>
