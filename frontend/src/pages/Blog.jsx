@@ -189,14 +189,13 @@ export default function Blog() {
     <>
       {/* ─── HERO ── */}
       <section style={{ position: 'relative', paddingTop: '70px', minHeight: '360px', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #070c14 0%, #0c1a2e 60%, #1a0a00 100%)' }} />
-        {/* Grid overlay */}
-        <div className="grid-overlay" />
-        {/* Glow orbs */}
-        <div style={{ position: 'absolute', top: '20%', left: '10%', width: 300, height: 300, background: 'rgba(245,166,35,0.08)', borderRadius: '50%', filter: 'blur(80px)', zIndex: 1 }} />
-        <div style={{ position: 'absolute', bottom: '10%', right: '15%', width: 200, height: 200, background: 'rgba(59,130,246,0.06)', borderRadius: '50%', filter: 'blur(60px)', zIndex: 1 }} />
+        {/* Circuit board background — matching Services / About / Portfolio */}
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&q=80&fit=crop)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }} />
+        <div className="grid-overlay" style={{ zIndex: 2 }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(10,17,40,0.93) 0%, rgba(28,45,63,0.87) 60%, rgba(245,166,35,0.14) 100%)', zIndex: 3 }} />
+        <div style={{ position: 'absolute', top: '20%', right: '12%', width: 280, height: 280, background: 'rgba(245,166,35,0.07)', borderRadius: '50%', filter: 'blur(80px)', zIndex: 3 }} />
 
-        <div className="max-w-[1280px] mx-auto px-8 md:px-10 py-20 w-full" style={{ position: 'relative', zIndex: 2 }}>
+        <div className="max-w-[1280px] mx-auto px-8 md:px-10 py-20 w-full" style={{ position: 'relative', zIndex: 10 }}>
           <div style={{ width: 48, height: 4, background: '#f5a623', borderRadius: 2, marginBottom: '1.2rem' }} />
           <motion.div {...fadeUp(0.1)}>
             <div className="font-mono text-xs tracking-[0.2em] uppercase flex items-center gap-3 mb-4" style={{ color: '#f5a623' }}>
