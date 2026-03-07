@@ -41,18 +41,18 @@ async function unlockResource(req, res) {
       if (!accessCode) {
         return res.status(403).json({ success: false, message: 'This is a premium resource. Please enter your access code.', requiresCode: true })
       }
-      if (accessCode.trim() !== resource.accessCode.trim()) {
+      if (accessCode.trim().toUpperCase() !== resource.accessCode.trim().toUpperCase()) {
         return res.status(403).json({ success: false, message: 'Invalid access code. Please check your code and try again.', requiresCode: true })
       }
     }
 
     // Save lead
     await ResourceLead.create({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      resourceId: resource._id,
+      name:          name.trim(),
+      email:         email.trim().toLowerCase(),
+      resourceId:    resource._id,
       resourceTitle: resource.title,
-      ip: req.ip || '',
+      ip:            req.ip || '',
     })
 
     // Increment download counter
@@ -89,7 +89,13 @@ async function getLeads(req, res) {
 // ─── ADMIN: CREATE resource ────────────────────────────────────
 async function createResource(req, res) {
   try {
-    const { title, description, category, fileUrl, thumbnail, fileSize, duration, tags, featured, visible, order } = req.body
+    // ✅ FIX: isPremium and accessCode now included
+    const {
+      title, description, category, fileUrl,
+      thumbnail, fileSize, duration, tags,
+      featured, visible, order,
+      isPremium, accessCode,
+    } = req.body
 
     if (!title || !description || !category || !fileUrl) {
       return res.status(400).json({ success: false, message: 'title, description, category and fileUrl are required.' })
@@ -97,12 +103,14 @@ async function createResource(req, res) {
 
     const resource = await Resource.create({
       title, description, category, fileUrl,
-      thumbnail: thumbnail || '',
-      fileSize: fileSize || '',
-      duration: duration || '',
+      thumbnail:  thumbnail  || '',
+      fileSize:   fileSize   || '',
+      duration:   duration   || '',
       tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : []),
-      featured: featured === true || featured === 'true',
-      visible: visible !== false && visible !== 'false',
+      featured:   featured  === true || featured  === 'true',
+      visible:    visible   !== false && visible  !== 'false',
+      isPremium:  isPremium === true  || isPremium === 'true',   // ✅ FIX
+      accessCode: accessCode || '',                              // ✅ FIX
       order: Number(order) || 0,
     })
 
@@ -121,8 +129,9 @@ async function updateResource(req, res) {
     if (updates.tags && typeof updates.tags === 'string') {
       updates.tags = updates.tags.split(',').map(t => t.trim()).filter(Boolean)
     }
-    if (updates.featured !== undefined) updates.featured = updates.featured === true || updates.featured === 'true'
-    if (updates.visible !== undefined) updates.visible = updates.visible !== false && updates.visible !== 'false'
+    if (updates.featured  !== undefined) updates.featured  = updates.featured  === true || updates.featured  === 'true'
+    if (updates.visible   !== undefined) updates.visible   = updates.visible   !== false && updates.visible  !== 'false'
+    if (updates.isPremium !== undefined) updates.isPremium = updates.isPremium === true  || updates.isPremium === 'true' // ✅ FIX
 
     const resource = await Resource.findByIdAndUpdate(id, updates, { new: true, runValidators: true })
     if (!resource) return res.status(404).json({ success: false, message: 'Resource not found.' })
