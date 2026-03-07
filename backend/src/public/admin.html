@@ -399,11 +399,30 @@
           ☁️ <strong>Cloudinary:</strong> Upload file → copy the direct URL shown after upload.
         </p>
       </div>
+
+      <!-- ── THUMBNAIL WITH CLOUDINARY UPLOAD ── -->
       <div>
-        <label class="flabel">Thumbnail URL <span style="font-weight:400;color:var(--muted)">(preview image — Cloudinary recommended)</span></label>
-        <input class="finput" id="f-thumb" placeholder="https://res.cloudinary.com/..." oninput="prevThumb(this.value)"/>
+        <label class="flabel">Thumbnail <span style="font-weight:400;color:var(--muted)">(preview image — Cloudinary recommended)</span></label>
+        <div style="display:flex;gap:.5rem;align-items:center;">
+          <input class="finput" id="f-thumb" placeholder="https://res.cloudinary.com/... or click ☁️ Upload" oninput="prevThumb(this.value)" style="flex:1"/>
+          <input type="file" id="thumb-file-input" accept="image/*" style="display:none" onchange="uploadThumb(this)"/>
+          <button type="button" id="btn-upload-thumb" onclick="document.getElementById('thumb-file-input').click()"
+            style="padding:.65rem 1rem;background:var(--navy);color:#fff;border:none;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s;flex-shrink:0;"
+            onmouseover="this.style.background='var(--navy2)'" onmouseout="this.style.background='var(--navy)'">
+            ☁️ Upload
+          </button>
+        </div>
+        <!-- Progress bar -->
+        <div id="thumb-progress-wrap" style="display:none;margin-top:.4rem;">
+          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+            <div id="thumb-progress-bar" style="height:100%;background:var(--orange);border-radius:2px;width:0%;transition:width .3s;"></div>
+          </div>
+          <div id="thumb-progress-label" style="font-size:.65rem;color:var(--muted);margin-top:.25rem;">Uploading…</div>
+        </div>
         <img id="thumb-prev" class="thumb-prev" alt="Preview"/>
+        <p class="hint">☁️ Click <strong>Upload</strong> to pick an image from your PC — uploads straight to Cloudinary and fills the URL automatically.</p>
       </div>
+
       <div class="frow">
         <div>
           <label class="flabel">Duration <span style="font-weight:400;color:var(--muted)">(videos only)</span></label>
@@ -423,7 +442,7 @@
         <label class="chk"><input type="checkbox" id="f-vis" checked/> 👁 Visible to public</label>
         <label class="chk"><input type="checkbox" id="f-premium" onchange="toggleCodeField()"/> 👑 Premium (requires code)</label>
       </div>
-      <!-- Premium access code field — shown only when Premium is ticked -->
+      <!-- Premium access code field -->
       <div id="code-wrap" style="display:none;margin-top:.75rem;padding:1rem;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.3);border-radius:8px;">
         <label class="flabel" style="color:#c47d00;">🔑 Access Code <span style="font-weight:400;color:var(--muted)">(clients must enter this to unlock)</span></label>
         <input class="finput" id="f-code" placeholder="e.g. GUCHI2024" style="font-family:monospace;font-weight:700;letter-spacing:.08em;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
@@ -442,6 +461,10 @@
 <script>
 const ADMIN = window.location.origin + '/api/admin'
 const RAPI  = window.location.origin + '/api/resources'
+
+// ── CLOUDINARY CONFIG ────────────────────────────────────────
+const CLOUD_NAME    = 'dtsjd5u2s'          // ← your Cloudinary cloud name
+const UPLOAD_PRESET = 'devtech_resources'  // ← your unsigned upload preset name
 
 let token = localStorage.getItem('admin_token')
 let msgs = [], resources = [], leads = []
@@ -623,7 +646,7 @@ function resCard(r) {
       <div class="rcat cat-${r.category}">${ICONS[r.category]||''} ${r.category}</div>
       ${r.featured?'<div class="rfeat">⭐ Featured</div>':''}
       ${!r.visible?'<div class="rhidden">👁 Hidden</div>':''}
-      ${r.isPremium ? `<div style="position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#f5a623,#e8940f);color:#1c2d3f;font-size:.6rem;font-weight:800;padding:.2rem .5rem;border-radius:4px;font-family:monospace;letter-spacing:.06em;">👑 PREMIUM</div>` : ''}
+      ${r.isPremium?'<div style="position:absolute;bottom:8px;left:8px;background:linear-gradient(135deg,#f5a623,#e8940f);color:#1c2d3f;font-size:.6rem;font-weight:800;padding:.2rem .5rem;border-radius:4px;font-family:monospace;letter-spacing:.06em;">👑 PREMIUM</div>':''}
     </div>
     <div class="rbody">
       <div class="rtitle">${x(r.title)}</div>
@@ -677,13 +700,55 @@ function openModal(r=null) {
 }
 function openEdit(id) { const r=resources.find(r=>r._id===id); if(r) openModal(r) }
 function toggleCodeField() {
-  const isPremium = document.getElementById('f-premium').checked
-  document.getElementById('code-wrap').style.display = isPremium ? 'block' : 'none'
+  document.getElementById('code-wrap').style.display = document.getElementById('f-premium').checked ? 'block' : 'none'
 }
 function closeModal() { document.getElementById('res-modal').classList.remove('open'); editId=null }
 function prevThumb(url) {
   const img=document.getElementById('thumb-prev')
   if(url&&url.startsWith('http')){ img.src=url; img.classList.add('show') } else img.classList.remove('show')
+}
+
+// ── CLOUDINARY UPLOAD ────────────────────────────────────────
+async function uploadThumb(input) {
+  const file = input.files[0]
+  if (!file) return
+  if (!file.type.startsWith('image/'))  { toast('Please select an image file.','err'); return }
+  if (file.size > 5 * 1024 * 1024)     { toast('Image must be under 5 MB.','err'); return }
+
+  const btn   = document.getElementById('btn-upload-thumb')
+  const wrap  = document.getElementById('thumb-progress-wrap')
+  const bar   = document.getElementById('thumb-progress-bar')
+  const label = document.getElementById('thumb-progress-label')
+  btn.disabled = true; btn.textContent = '⏳ Uploading…'
+  wrap.style.display = 'block'; bar.style.width = '10%'; label.textContent = 'Uploading to Cloudinary…'
+
+  try {
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('upload_preset', UPLOAD_PRESET)
+    fd.append('folder', 'devtech-resources')
+
+    const url = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`)
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) { const p=Math.round(e.loaded/e.total*90); bar.style.width=p+'%'; label.textContent=`Uploading… ${p}%` }
+      }
+      xhr.onload  = () => xhr.status===200 ? resolve(JSON.parse(xhr.responseText).secure_url) : reject(new Error('Upload failed — check your CLOUD_NAME and UPLOAD_PRESET.'))
+      xhr.onerror = () => reject(new Error('Network error during upload.'))
+      xhr.send(fd)
+    })
+
+    bar.style.width='100%'; label.textContent='✅ Uploaded!'
+    document.getElementById('f-thumb').value = url
+    prevThumb(url)
+    toast('✅ Image uploaded!','ok')
+    setTimeout(()=>{ wrap.style.display='none'; bar.style.width='0%' }, 2000)
+  } catch(err) {
+    toast(err.message,'err'); wrap.style.display='none'
+  } finally {
+    btn.disabled=false; btn.textContent='☁️ Upload'; input.value=''
+  }
 }
 
 document.getElementById('btn-save').addEventListener('click', async ()=>{
@@ -707,7 +772,7 @@ document.getElementById('btn-save').addEventListener('click', async ()=>{
       isPremium:  document.getElementById('f-premium').checked,
       accessCode: document.getElementById('f-code').value.trim(),
     }
-    const method = editId ? 'PUT' : 'POST'
+    const method   = editId ? 'PUT' : 'POST'
     const endpoint = editId ? `${RAPI}/${editId}` : RAPI
     const res  = await fetch(endpoint,{method,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)})
     const data = await res.json()
