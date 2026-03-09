@@ -74,7 +74,7 @@ export default function Navbar() {
             />
           </NavLink>
 
-          {/* ── Desktop Nav Links — lg and above (1024px+) only ── */}
+          {/* ── Desktop Nav Links ── */}
           <ul className="hidden lg:flex items-center gap-0 list-none flex-1 justify-center">
             {NAV_LINKS.map(({ to, label }) => (
               <li key={to}>
@@ -132,7 +132,7 @@ export default function Navbar() {
             </NavLink>
           </div>
 
-          {/* ── Mobile Controls — below lg (everything under 1024px) ── */}
+          {/* ── Mobile Controls ── */}
           <div className="flex lg:hidden items-center gap-2 flex-shrink-0">
             <ThemeToggle showLabel={false} />
 

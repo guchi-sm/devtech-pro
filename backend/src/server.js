@@ -8,8 +8,8 @@ const rateLimit  = require('express-rate-limit')
 const mongoose   = require('mongoose')
 const path       = require('path')
 
-const contactRouter   = require('./routes/contact')
-const adminRouter     = require('./routes/admin')
+const contactRouter      = require('./routes/contact')
+const adminRouter        = require('./routes/admin')
 const resourceRouter     = require('./routes/resources')
 const analyticsRouter    = require('./routes/analytics')
 const testimonialRouter  = require('./routes/testimonials')
@@ -68,8 +68,8 @@ app.get('/api/health', (_req, res) => {
 })
 
 // ─── ROUTES ────────────────────────────────────────────────────
-app.use('/api/contact',   contactLimiter, contactRouter)
-app.use('/api/admin',     adminRouter)
+app.use('/api/contact',      contactLimiter, contactRouter)
+app.use('/api/admin',        adminRouter)
 app.use('/api/resources',    unlockLimiter, resourceRouter)
 app.use('/api/analytics',    analyticsRouter)
 app.use('/api/testimonials', testimonialRouter)
@@ -78,6 +78,16 @@ app.use('/api/testimonials', testimonialRouter)
 app.use('/admin', express.static(path.join(__dirname, 'public')))
 app.get('/admin', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'))
+})
+
+// ─── CV PDF DOWNLOAD ───────────────────────────────────────────
+app.get('/cv.pdf', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'cv.pdf'), {
+    headers: {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="Stephen_Nguchie_CV.pdf"',
+    },
+  })
 })
 
 app.use((_req, res) => res.status(404).json({ success: false, message: 'Route not found.' }))
@@ -91,7 +101,8 @@ app.use((err, _req, res, _next) => {
 
 app.listen(PORT, () => {
   console.log(`\n✅  DevTech Pro API → http://localhost:${PORT}`)
-  console.log(`   Admin Panel  → http://localhost:${PORT}/admin\n`)
+  console.log(`   Admin Panel  → http://localhost:${PORT}/admin`)
+  console.log(`   CV PDF       → http://localhost:${PORT}/cv.pdf\n`)
 })
 
 module.exports = app
