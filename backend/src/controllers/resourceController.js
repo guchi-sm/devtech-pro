@@ -10,7 +10,7 @@ async function getResources(req, res) {
 
     const resources = await Resource.find(filter)
       .sort({ featured: -1, order: 1, createdAt: -1 })
-      .select('-__v')
+      .select('-__v -accessCode')
 
     res.json({ success: true, data: resources })
   } catch (err) {
