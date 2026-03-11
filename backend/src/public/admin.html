@@ -948,25 +948,43 @@ document.getElementById('btn-csv').addEventListener('click',()=>{
 
 // ── ANALYTICS ─────────────────────────────────────────────────────
 async function loadAnalytics(){
+  // helper to clear a panel with a message
+  const noData=(id,msg)=>{ document.getElementById(id).innerHTML='<p style="color:var(--text3);font-size:.82rem;padding:.5rem 0">'+msg+'</p>' }
+  const errPanel=(id)=>{ document.getElementById(id).innerHTML='<p style="color:var(--red);font-size:.82rem;padding:.5rem 0">⚠️ Failed to load</p>' }
   try{
-    const res=await fetch(`${window.location.origin}/api/analytics/dashboard`,{headers:{Authorization:`Bearer ${token}`}}),data=await res.json()
-    if(!data.success)return
+    const res=await fetch(`${window.location.origin}/api/analytics/dashboard`,{headers:{Authorization:`Bearer ${token}`}})
+    if(!res.ok){
+      // endpoint error — clear all spinners with message
+      ;['an-pages-list','an-countries-list','an-devices-list','an-browsers-list'].forEach(id=>errPanel(id))
+      set('an-total','—');set('an-unique','—');set('an-today','—');set('an-week','—')
+      _loaded.analytics=true;return
+    }
+    const data=await res.json()
+    if(!data.success){
+      ;['an-pages-list','an-countries-list','an-devices-list','an-browsers-list'].forEach(id=>noData(id,'No data yet.'))
+      _loaded.analytics=true;return
+    }
     const d=data.data
-    set('an-total',d.totals.total);set('an-unique',d.totals.uniqueVisitors);set('an-today',d.totals.todayCount);set('an-week',d.totals.week)
-    const tot=d.totals.total||1
+    set('an-total',d.totals?.total??0);set('an-unique',d.totals?.uniqueVisitors??0);set('an-today',d.totals?.todayCount??0);set('an-week',d.totals?.week??0)
+    const tot=d.totals?.total||1
     if(anChart)anChart.destroy()
     const ctx=document.getElementById('an-chart').getContext('2d')
     const grad=ctx.createLinearGradient(0,0,0,270)
     grad.addColorStop(0,'rgba(245,166,35,.3)');grad.addColorStop(1,'rgba(245,166,35,.0)')
-    anChart=new Chart(ctx,{type:'line',data:{labels:d.dailyViews.map(v=>v._id),datasets:[{label:'Views',data:d.dailyViews.map(v=>v.views),borderColor:'#f5a623',backgroundColor:grad,borderWidth:2.5,tension:.4,fill:true,pointBackgroundColor:'#f5a623',pointRadius:4,pointHoverRadius:7,pointBorderColor:'#0d1117',pointBorderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2332',titleColor:'#e8edf3',bodyColor:'#8fa3b8',borderColor:'#1e3048',borderWidth:1}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a7a96',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a7a96',font:{size:11}},beginAtZero:true}}}})
-    const bar=(label,count,t,col)=>`<div class="an-bar-item"><div class="an-bar-label">${label}</div><div class="an-bar-track"><div class="an-bar-fill" style="width:${Math.round(count/t*100)}%;background:${col}"></div></div><div class="an-bar-count">${count}</div></div>`
-    document.getElementById('an-pages-list').innerHTML=d.topPages.length?d.topPages.map(p=>bar(x(p._id),p.views,tot,'var(--orange)')).join(''):'<p style="color:var(--text3);font-size:.82rem">No data yet.</p>'
-    document.getElementById('an-countries-list').innerHTML=d.countries.length?d.countries.map(c=>bar(x(c._id),c.count,tot,'var(--green)')).join(''):'<p style="color:var(--text3);font-size:.82rem">No geo data yet.</p>'
+    anChart=new Chart(ctx,{type:'line',data:{labels:(d.dailyViews||[]).map(v=>v._id),datasets:[{label:'Views',data:(d.dailyViews||[]).map(v=>v.views),borderColor:'#f5a623',backgroundColor:grad,borderWidth:2.5,tension:.4,fill:true,pointBackgroundColor:'#f5a623',pointRadius:4,pointHoverRadius:7,pointBorderColor:'#0d1117',pointBorderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2332',titleColor:'#e8edf3',bodyColor:'#8fa3b8',borderColor:'#1e3048',borderWidth:1}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a7a96',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#5a7a96',font:{size:11}},beginAtZero:true}}}})
+    const bar=(label,count,t,col)=>'<div class="an-bar-item"><div class="an-bar-label">'+label+'</div><div class="an-bar-track"><div class="an-bar-fill" style="width:'+Math.round(count/t*100)+'%;background:'+col+'"></div></div><div class="an-bar-count">'+count+'</div></div>'
+    document.getElementById('an-pages-list').innerHTML=(d.topPages||[]).length?(d.topPages).map(p=>bar(x(p._id),p.views,tot,'var(--orange)')).join(''):noData('an-pages-list','No page data yet.')||''
+    document.getElementById('an-countries-list').innerHTML=(d.countries||[]).length?(d.countries).map(c=>bar(x(c._id),c.count,tot,'var(--green)')).join(''):noData('an-countries-list','No geo data yet.')||''
     const dvi={mobile:'📱',tablet:'📋',desktop:'🖥️'}
-    document.getElementById('an-devices-list').innerHTML=d.devices.length?d.devices.map(dv=>bar(`${dvi[dv._id]||'💻'} ${dv._id}`,dv.count,tot,'var(--blue)')).join(''):'<p style="color:var(--text3);font-size:.82rem">No data yet.</p>'
-    document.getElementById('an-browsers-list').innerHTML=d.browsers.length?d.browsers.map(b=>bar(x(b._id),b.count,tot,'var(--purple)')).join(''):'<p style="color:var(--text3);font-size:.82rem">No data yet.</p>'
-  }catch(e){console.error(e)}
-  _loaded.analytics=true
+    document.getElementById('an-devices-list').innerHTML=(d.devices||[]).length?(d.devices).map(dv=>bar((dvi[dv._id]||'💻')+' '+dv._id,dv.count,tot,'var(--blue)')).join(''):noData('an-devices-list','No device data yet.')||''
+    document.getElementById('an-browsers-list').innerHTML=(d.browsers||[]).length?(d.browsers).map(b=>bar(x(b._id),b.count,tot,'var(--purple)')).join(''):noData('an-browsers-list','No browser data yet.')||''
+  }catch(e){
+    console.error('Analytics error:',e)
+    ;['an-pages-list','an-countries-list','an-devices-list','an-browsers-list'].forEach(id=>errPanel(id))
+    set('an-total','—');set('an-unique','—');set('an-today','—');set('an-week','—')
+  }finally{
+    _loaded.analytics=true
+  }
 }
 
 // ── TESTIMONIALS ──────────────────────────────────────────────────
