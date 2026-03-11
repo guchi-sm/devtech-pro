@@ -44,8 +44,9 @@ app.use(express.json({ limit: '10kb' }))
 app.use(express.urlencoded({ extended: true, limit: '10kb' }))
 
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, max: 200,
+  windowMs: 15 * 60 * 1000, max: 500,
   standardHeaders: true, legacyHeaders: false,
+  skip: (req) => req.path.startsWith('/api/admin') || req.path.startsWith('/api/resources/admin') || req.path.startsWith('/api/analytics') || req.path.startsWith('/api/testimonials/admin'),
   message: { success: false, message: 'Too many requests. Please try again later.' },
 })
 const contactLimiter = rateLimit({
