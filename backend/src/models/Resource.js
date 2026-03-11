@@ -3,18 +3,20 @@ const mongoose = require('mongoose')
 const resourceSchema = new mongoose.Schema({
   title:         { type: String, required: true, trim: true },
   description:   { type: String, required: true, trim: true },
-  category:      { type: String, required: true, enum: ['PDF', 'Video', 'Photo', 'Software'], trim: true },
-  fileUrl:       { type: String, required: true, trim: true },  // Cloudinary or Google Drive direct URL
-  thumbnail:     { type: String, trim: true, default: '' },     // Cloudinary image URL for preview
-  fileSize:      { type: String, trim: true, default: '' },     // e.g. "2.4 MB"
-  duration:      { type: String, trim: true, default: '' },     // for videos e.g. "12:34"
+  category:      { type: String, required: true, enum: ['PDF','Video','Photo','Software'] },
+  fileUrl:       { type: String, required: true, trim: true },
+  thumbnail:     { type: String, trim: true, default: '' },
+  fileSize:      { type: String, trim: true, default: '' },
+  duration:      { type: String, trim: true, default: '' },
   tags:          [{ type: String, trim: true }],
   featured:      { type: Boolean, default: false },
   visible:       { type: Boolean, default: true },
-  downloadCount: { type: Number, default: 0 },
+  isPremium:     { type: Boolean, default: false },
+  accessCode:    { type: String, trim: true, default: '' },
+  price:         { type: Number, default: 0 },          // ✅ price in KES
+  currency:      { type: String, default: 'KES' },      // ✅ currency label
   order:         { type: Number, default: 0 },
-  isPremium:     { type: Boolean, default: false },   // premium = requires access code
-  accessCode:    { type: String, trim: true, default: '' }, // code admin sets for premium
+  downloadCount: { type: Number, default: 0 },
 }, { timestamps: true })
 
 module.exports = mongoose.model('Resource', resourceSchema)

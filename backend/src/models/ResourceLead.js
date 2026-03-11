@@ -1,15 +1,15 @@
 const mongoose = require('mongoose')
 
-// Stores every email that unlocks a resource download (lead capture)
 const resourceLeadSchema = new mongoose.Schema({
-  name:       { type: String, required: true, trim: true },
-  email:      { type: String, required: true, trim: true, lowercase: true },
-  resourceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Resource', required: true },
-  resourceTitle: { type: String, trim: true },
-  ip:         { type: String, trim: true, default: '' },
+  name:            { type: String, required: true, trim: true },
+  email:           { type: String, required: true, trim: true, lowercase: true },
+  phone:           { type: String, trim: true, default: '' },       // ✅ WhatsApp number
+  resourceId:      { type: mongoose.Schema.Types.ObjectId, ref: 'Resource' },
+  resourceTitle:   { type: String, trim: true },
+  accessCodeUsed:  { type: String, trim: true, default: '' },       // filled when they unlock with code
+  status:          { type: String, enum: ['free','pending','sent'], default: 'free' }, // ✅ tracking
+  sentAt:          { type: Date, default: null },                    // ✅ when you clicked Send Code
+  ip:              { type: String, default: '' },
 }, { timestamps: true })
-
-// Prevent same email downloading same resource multiple times from being stored twice
-resourceLeadSchema.index({ email: 1, resourceId: 1 }, { unique: false })
 
 module.exports = mongoose.model('ResourceLead', resourceLeadSchema)
