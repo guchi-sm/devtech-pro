@@ -544,6 +544,11 @@ let token=localStorage.getItem('admin_token')
 let msgs=[],resources=[],leads=[],testis=[]
 let mFilter='all',rFilter='All',lFilter='all',mSearch='',openMsgId=null,editId=null,editTestiId=null,anChart=null
 const BC={overview:'Overview',messages:'Messages',resources:'Resources',leads:'Leads & Requests',analytics:'Analytics',testimonials:'Testimonials'}
+// ── TTL cache (30s) — stops duplicate API hits on every tab switch ─────────
+const _cache={},CACHE_TTL=30000
+function cGet(k){const e=_cache[k];if(e&&Date.now()-e.ts<CACHE_TTL)return e.data;return null}
+function cSet(k,d){_cache[k]={data:d,ts:Date.now()}}
+function cDel(k){delete _cache[k]}
 
 const sidebar=document.getElementById('sidebar')
 document.getElementById('btn-menu').onclick=()=>sidebar.classList.toggle('open')
@@ -605,12 +610,21 @@ async function loadStats(){
 }
 
 async function loadOverview(){
+  // Fire all parallel — no sequential waterfall
+  const [msgR, resR, leadR, testiR] = await Promise.allSettled([
+    af('/messages?limit=5').then(r=>r.json()),
+    fetch(`${RAPI}/admin/all`,{headers:{Authorization:`Bearer ${token}`}}).then(r=>r.json()),
+    fetch(`${RAPI}/admin/leads`,{headers:{Authorization:`Bearer ${token}`}}).then(r=>r.json()),
+    fetch(`${window.location.origin}/api/testimonials/admin/all`,{headers:{Authorization:`Bearer ${token}`}}).then(r=>r.json())
+  ])
   loadStats()
+  const val = r => r.status==='fulfilled' ? r.value : null
+
   // Recent messages
   try{
-    const res=await af('/messages?limit=5'),data=await res.json()
+    const data=val(msgR)
     const el=document.getElementById('ov-msgs')
-    if(data.success&&data.messages.length){
+    if(data?.success&&data.messages.length){
       el.innerHTML=data.messages.slice(0,5).map(m=>`
         <div onclick="switchTab('messages')" style="display:flex;align-items:center;gap:.85rem;padding:.85rem 1.4rem;border-bottom:1px solid var(--border);cursor:pointer" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='none'">
           <div class="mav ${m.read?'read':''}" style="width:36px;height:36px;font-size:.72rem">${m.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
@@ -619,6 +633,7 @@ async function loadOverview(){
         </div>`).join('')
     }else{el.innerHTML='<div class="empty" style="padding:2rem"><div class="ico">📭</div><p>No messages yet</p></div>'}
   }catch{}
+
   // Quick Stats panel
   (function(){
     var row=function(icon,col,label,id){
@@ -636,22 +651,20 @@ async function loadOverview(){
       +'<i class="fa fa-external-link-alt"></i> View Live Site</a>'
       +'</div>';
   })()
+
+  // Populate quick stats from parallel results
   try{
-    const[rRes,lRes,tRes]=await Promise.all([
-      fetch(`${RAPI}/admin/all`,{headers:{Authorization:`Bearer ${token}`}}),
-      fetch(`${RAPI}/admin/leads`,{headers:{Authorization:`Bearer ${token}`}}),
-      fetch(`${window.location.origin}/api/testimonials/admin/all`,{headers:{Authorization:`Bearer ${token}`}})
-    ])
-    const[rd,ld,td]=await Promise.all([rRes.json(),lRes.json(),tRes.json()])
-    if(rd.success)set('ov-res-count',rd.data.length)
-    if(ld.success)set('ov-leads-count',ld.data.length)
-    if(td.success)set('ov-testi-count',td.data.length)
+    const rd=val(resR), ld=val(leadR), td=val(testiR)
+    if(rd?.success) set('ov-res-count',rd.data.length)
+    if(ld?.success) set('ov-leads-count',ld.data.length)
+    if(td?.success) set('ov-testi-count',td.data.length)
   }catch{}
-  // Pending requests
+
+  // Pending requests panel
   try{
-    const res=await fetch(`${RAPI}/admin/leads`,{headers:{Authorization:`Bearer ${token}`}}),data=await res.json()
+    const data=val(leadR)
     const el=document.getElementById('ov-pending')
-    if(data.success){
+    if(data?.success){
       const pending=data.data.filter(l=>l.status==='pending')
       const pb=document.getElementById('sb-pending-badge')
       if(pending.length>0){pb.textContent=pending.length;pb.style.display='inline-flex'}else{pb.style.display='none'}
@@ -659,23 +672,30 @@ async function loadOverview(){
         el.innerHTML=pending.slice(0,4).map(l=>`
           <div style="display:flex;align-items:center;gap:.85rem;padding:.85rem 1.4rem;border-bottom:1px solid var(--border)">
             <div style="width:8px;height:8px;border-radius:50%;background:#ffc107;flex-shrink:0;box-shadow:0 0 6px #ffc107" class="pulse"></div>
-            <div style="flex:1;min-width:0"><div style="font-size:.84rem;font-weight:700;color:var(--text)">${x(l.name)}</div><div style="font-size:.71rem;color:var(--text3)">${x(l.resourceTitle||'—')} · ${x(l.phone||l.email)}</div></div>
-            <button onclick="sendCode('${l._id}')" class="btn btn-sm btn-whatsapp" style="font-size:.68rem"><i class="fab fa-whatsapp"></i> Send</button>
-          </div>`).join('')
-        if(pending.length>4)el.innerHTML+=`<div style="text-align:center;padding:.75rem;font-size:.75rem;color:var(--text3)">${pending.length-4} more pending → <button onclick="switchTab('leads')" style="background:none;border:none;color:var(--orange);cursor:pointer;font-size:.75rem;text-decoration:underline">View all</button></div>`
-      }else{el.innerHTML='<div class="empty" style="padding:2rem"><div class="ico" style="font-size:1.8rem">✅</div><p style="font-size:.8rem">No pending requests</p></div>'}
+            <div style="flex:1;min-width:0">
+              <div style="font-size:.84rem;font-weight:700;color:var(--text)">${x(l.name)}</div>
+              <div style="font-size:.72rem;color:var(--text3)">${x(l.resourceTitle||'Unknown resource')} &bull; ${x(l.phone||l.email)}</div>
+            </div>
+            <div class="send-btns">
+              <button onclick="sendCode('${l._id}','${encodeURIComponent(l.name)}','${encodeURIComponent(l.resourceTitle||'')}','${encodeURIComponent(l.phone||'')}','${encodeURIComponent(l.accessCodeUsed||'')}','${encodeURIComponent(l.email||'')}')" class="btn btn-sm btn-whatsapp"><i class="fa fa-whatsapp"></i> WA</button>
+              <button onclick="sendCodeEmail('${l._id}','${encodeURIComponent(l.name)}','${encodeURIComponent(l.resourceTitle||'')}','${encodeURIComponent(l.accessCodeUsed||'')}','${encodeURIComponent(l.email||'')}')" class="btn btn-sm btn-email-send"><i class="fa fa-envelope"></i></button>
+            </div>
+          </div>`).join('')+
+          (pending.length>4?`<div style="text-align:center;padding:.75rem;font-size:.75rem;color:var(--text3)">+${pending.length-4} more — <span style="color:var(--orange);cursor:pointer" onclick="switchTab('leads')">View All</span></div>`:'')
+      }else{el.innerHTML='<div class="empty" style="padding:1.5rem"><div class="ico" style="font-size:1.8rem">✅</div><p style="font-size:.8rem">No pending requests</p></div>'}
     }
   }catch{}
 }
-
 // ── MESSAGES ──────────────────────────────────────────────────────
 async function loadMessages(){
+  const cached=cGet('msgs')
+  if(cached){msgs=cached;renderMsgs();return}
   set('msg-container','<div class="loading"><div class="spin"></div>Loading…</div>',true)
   try{
     const res=await af('/messages?limit=100')
     if(res.status===401){unauth();return}
     const data=await res.json()
-    if(data.success){msgs=data.messages;renderMsgs()}
+    if(data.success){msgs=data.messages;cSet('msgs',msgs);renderMsgs()}
   }catch(e){set('msg-container',`<div class="empty"><div class="ico">⚠️</div><h3>Failed</h3><p>${e.message}</p></div>`,true)}
 }
 function renderMsgs(){
@@ -724,12 +744,14 @@ document.getElementById('msg-search').addEventListener('input',e=>{mSearch=e.tar
 
 // ── RESOURCES ─────────────────────────────────────────────────────
 async function loadResources(){
+  const cached=cGet('resources')
+  if(cached){resources=cached;renderResources();return}
   set('res-container','<div class="loading"><div class="spin"></div>Loading…</div>',true)
   try{
     const res=await fetch(`${RAPI}/admin/all`,{headers:{Authorization:`Bearer ${token}`}})
     if(res.status===401){unauth();return}
     const data=await res.json()
-    if(data.success){resources=data.data;resStats();renderRes()}
+    if(data.success){resources=data.data;cSet('resources',resources);resStats();renderRes()}
   }catch(e){set('res-container',`<div class="empty"><div class="ico">⚠️</div><h3>Failed</h3><p>${e.message}</p></div>`,true)}
 }
 function resStats(){set('rs-total',resources.length);set('rs-videos',resources.filter(r=>r.category==='Video').length);set('rs-pdfs',resources.filter(r=>r.category==='PDF').length);set('rs-dls',resources.reduce((s,r)=>s+(r.downloadCount||0),0))}
@@ -804,22 +826,25 @@ document.getElementById('btn-save').addEventListener('click',async()=>{
     const res=await fetch(endpoint,{method,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)})
     const data=await res.json()
     if(!res.ok)throw new Error(data.message||'Save failed.')
-    closeModal();toast(editId?'✅ Updated!':'✅ Added!','ok');await loadResources()
+    cDel('resources');closeModal();toast(editId?'✅ Updated!':'✅ Added!','ok');await loadResources()
   }catch(e){toast(e.message,'err')}
   finally{btn.disabled=false;btn.innerHTML='<i class="fa fa-save"></i> Save Resource'}
 })
 async function delRes(id,title){
   if(!confirm(`Delete "${title}"?`))return
-  try{const res=await fetch(`${RAPI}/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}}),data=await res.json();if(!res.ok)throw new Error(data.message);resources=resources.filter(r=>r._id!==id);resStats();renderRes();toast('Deleted')}catch(e){toast(e.message,'err')}
+  try{const res=await fetch(`${RAPI}/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}}),data=await res.json();if(!res.ok)throw new Error(data.message);cDel('resources');resources=resources.filter(r=>r._id!==id);resStats();renderRes();toast('Deleted')}catch(e){toast(e.message,'err')}
 }
 
 // ── LEADS ─────────────────────────────────────────────────────────
 async function loadLeads(){
+  const cached=cGet('leads')
+  if(cached){leads=cached;leadStats();renderLeads();return}
   set('lead-container','<div class="loading"><div class="spin"></div>Loading…</div>',true)
   try{
     const res=await fetch(`${RAPI}/admin/leads`,{headers:{Authorization:`Bearer ${token}`}}),data=await res.json()
-    if(data.success){leads=data.data;renderLeads();updateLeadStats()}
+    if(data.success){leads=data.data;cSet('leads',leads);renderLeads();updateLeadStats()}
   }catch(e){set('lead-container',`<div class="empty"><div class="ico">⚠️</div><h3>Failed</h3><p>${e.message}</p></div>`,true)}
+  _loaded.leads=true
 }
 function updateLeadStats(){
   const pending=leads.filter(l=>l.status==='pending').length
@@ -907,7 +932,7 @@ async function markSent(leadId){
     const data=await res.json()
     if(data.success){
       const i=leads.findIndex(l=>l._id===leadId);if(i!==-1)leads[i].status='sent'
-      updateLeadStats();renderLeads();toast('✅ Marked as Sent!','ok')
+      cDel('leads');updateLeadStats();renderLeads();toast('✅ Marked as Sent!','ok')
     }
   }catch{toast('Could not mark as sent','err')}
 }
@@ -941,13 +966,17 @@ async function loadAnalytics(){
     document.getElementById('an-devices-list').innerHTML=d.devices.length?d.devices.map(dv=>bar(`${dvi[dv._id]||'💻'} ${dv._id}`,dv.count,tot,'var(--blue)')).join(''):'<p style="color:var(--text3);font-size:.82rem">No data yet.</p>'
     document.getElementById('an-browsers-list').innerHTML=d.browsers.length?d.browsers.map(b=>bar(x(b._id),b.count,tot,'var(--purple)')).join(''):'<p style="color:var(--text3);font-size:.82rem">No data yet.</p>'
   }catch(e){console.error(e)}
+  _loaded.analytics=true
 }
 
 // ── TESTIMONIALS ──────────────────────────────────────────────────
 const TAPI=window.location.origin+'/api/testimonials'
 async function loadTestimonials(){
+  const cached=cGet('testis')
+  if(cached){testis=cached;renderTestis();return}
   set('testi-container','<div class="loading"><div class="spin"></div>Loading…</div>',true)
-  try{const res=await fetch(`${TAPI}/admin/all`,{headers:{Authorization:`Bearer ${token}`}}),data=await res.json();if(data.success){testis=data.data;renderTestis()}}catch(e){set('testi-container',`<div class="empty"><div class="ico">⚠️</div><h3>Failed</h3></div>`,true)}
+  try{const res=await fetch(`${TAPI}/admin/all`,{headers:{Authorization:`Bearer ${token}`}}),data=await res.json();if(data.success){testis=data.data;cSet('testis',testis);renderTestis()}}catch(e){set('testi-container',`<div class="empty"><div class="ico">⚠️</div><h3>Failed</h3></div>`,true)}
+  _loaded.testimonials=true
 }
 function renderTestis(){
   const el=document.getElementById('testi-container')
@@ -1012,7 +1041,13 @@ async function delTesti(id){
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────
-function af(path,opts={}){return fetch(`${ADMIN}${path}`,{...opts,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(opts.headers||{})}})}
+function af(path,opts={}){
+  const now=Date.now(),isGET=!opts.method||opts.method==='GET'
+  if(isGET&&_cache[path]&&now-_cache[path].t<30000)
+    return Promise.resolve({ok:true,json:()=>Promise.resolve(_cache[path].d)})
+  return fetch(`${ADMIN}${path}`,{...opts,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(opts.headers||{})}})
+    .then(r=>{if(r.ok&&isGET)r.clone().json().then(d=>{_cache[path]={d,t:now}}).catch(()=>{});return r})
+}
 function unauth(){localStorage.removeItem('admin_token');token=null;document.getElementById('login-screen').style.display='flex';document.getElementById('dashboard-screen').style.display='none';toast('Session expired.','err')}
 function set(id,val,html=false){const el=document.getElementById(id);if(el){if(html)el.innerHTML=val;else el.textContent=val}}
 function x(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
