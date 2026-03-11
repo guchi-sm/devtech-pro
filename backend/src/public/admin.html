@@ -1064,7 +1064,11 @@ function af(path,opts={}){
   if(isGET&&_cache[path]&&now-_cache[path].t<30000)
     return Promise.resolve({ok:true,json:()=>Promise.resolve(_cache[path].d)})
   return fetch(`${ADMIN}${path}`,{...opts,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',...(opts.headers||{})}})
-    .then(r=>{if(r.ok&&isGET)r.clone().json().then(d=>{_cache[path]={d,t:now}}).catch(()=>{});return r})
+    .then(r=>{
+      if(r.status===401||r.status===403){toast('Session expired — please log in again','err');setTimeout(unauth,1500);return r}
+      if(r.ok&&isGET)r.clone().json().then(d=>{_cache[path]={d,t:now}}).catch(()=>{})
+      return r
+    })
 }
 function unauth(){localStorage.removeItem('admin_token');token=null;document.getElementById('login-screen').style.display='flex';document.getElementById('dashboard-screen').style.display='none';toast('Session expired.','err')}
 function set(id,val,html=false){const el=document.getElementById(id);if(el){if(html)el.innerHTML=val;else el.textContent=val}}

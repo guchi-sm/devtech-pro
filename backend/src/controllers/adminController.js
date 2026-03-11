@@ -33,7 +33,7 @@ async function login(req, res) {
   const token = jwt.sign(
     { email: adminEmail, role: 'admin' },
     process.env.JWT_SECRET,
-    { expiresIn: '24h' }
+    { expiresIn: '7d' }
   )
   return res.json({ success: true, token, expiresIn: '24h' })
 }

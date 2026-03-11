@@ -13,8 +13,6 @@ const adminRouter        = require('./routes/admin')
 const resourceRouter     = require('./routes/resources')
 const analyticsRouter    = require('./routes/analytics')
 const testimonialRouter  = require('./routes/testimonials')
-const chatRouter         = require('./routes/chat')
-const projectsRouter     = require('./routes/projects')
 
 const app  = express()
 const PORT = process.env.PORT || 5000
@@ -75,11 +73,14 @@ app.get('/api/health', (_req, res) => {
 // ─── ROUTES ────────────────────────────────────────────────────
 app.use('/api/contact',      contactLimiter, contactRouter)
 app.use('/api/admin',        adminRouter)
-app.use('/api/resources',    unlockLimiter, resourceRouter)
+app.use('/api/resources',    resourceRouter)  // unlockLimiter moved to route-level
 app.use('/api/analytics',    analyticsRouter)
 app.use('/api/testimonials', testimonialRouter)
-app.use('/api/chat',         chatRouter)
-app.use('/api/projects',     projectsRouter)
+const chatRouter     = require('./routes/chat')
+const projectsRouter = require('./routes/projects')
+
+app.use('/api/chat',     chatRouter)
+app.use('/api/projects', projectsRouter)
 
 // ─── ADMIN PANEL ───────────────────────────────────────────────
 app.use('/admin', express.static(path.join(__dirname, 'public')))
