@@ -638,9 +638,9 @@ async function loadOverview(){
     </div>`
   try{
     const[rRes,lRes,tRes]=await Promise.all([
-      fetch(\`\${RAPI}/admin/all\`,{headers:{Authorization:\`Bearer \${token}\`}}),
-      fetch(\`\${RAPI}/admin/leads\`,{headers:{Authorization:\`Bearer \${token}\`}}),
-      fetch(\`\${window.location.origin}/api/testimonials/admin/all\`,{headers:{Authorization:\`Bearer \${token}\`}})
+      fetch(`${RAPI}/admin/all`,{headers:{Authorization:`Bearer ${token}`}}),
+      fetch(`${RAPI}/admin/leads`,{headers:{Authorization:`Bearer ${token}`}}),
+      fetch(`${window.location.origin}/api/testimonials/admin/all`,{headers:{Authorization:`Bearer ${token}`}})
     ])
     const[rd,ld,td]=await Promise.all([rRes.json(),lRes.json(),tRes.json()])
     if(rd.success)set('ov-res-count',rd.data.length)
