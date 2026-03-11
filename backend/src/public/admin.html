@@ -620,22 +620,22 @@ async function loadOverview(){
     }else{el.innerHTML='<div class="empty" style="padding:2rem"><div class="ico">📭</div><p>No messages yet</p></div>'}
   }catch{}
   // Quick Stats panel
-  document.getElementById('ov-quick').innerHTML=`
-    <div style="display:flex;flex-direction:column;gap:.85rem">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:.8rem 1rem;background:var(--bg);border-radius:10px;border:1px solid var(--border)">
-        <span style="font-size:.84rem;color:var(--text2)"><i class="fa fa-box-open" style="color:var(--orange);margin-right:.5rem"></i>Resources</span>
-        <span id="ov-res-count" style="font-weight:800;font-size:.9rem;color:var(--text)">—</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:.8rem 1rem;background:var(--bg);border-radius:10px;border:1px solid var(--border)">
-        <span style="font-size:.84rem;color:var(--text2)"><i class="fa fa-users" style="color:var(--blue);margin-right:.5rem"></i>Leads</span>
-        <span id="ov-leads-count" style="font-weight:800;font-size:.9rem;color:var(--text)">—</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:.8rem 1rem;background:var(--bg);border-radius:10px;border:1px solid var(--border)">
-        <span style="font-size:.84rem;color:var(--text2)"><i class="fa fa-star" style="color:var(--orange);margin-right:.5rem"></i>Testimonials</span>
-        <span id="ov-testi-count" style="font-weight:800;font-size:.9rem;color:var(--text)">—</span>
-      </div>
-      <a href="https://devtech-pro.vercel.app" target="_blank" class="btn btn-outline" style="justify-content:center;text-decoration:none"><i class="fa fa-external-link-alt"></i> View Live Site</a>
-    </div>`
+  (function(){
+    var row=function(icon,col,label,id){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:.8rem 1rem;background:var(--bg);border-radius:10px;border:1px solid var(--border);margin-bottom:.65rem">'
+        +'<span style="font-size:.84rem;color:var(--text2)"><i class="fa '+icon+'" style="color:'+col+';margin-right:.5rem"></i>'+label+'</span>'
+        +'<span id="'+id+'" style="font-weight:800;font-size:.9rem;color:var(--text)">--</span>'
+        +'</div>';
+    };
+    document.getElementById('ov-quick').innerHTML=
+      '<div style="display:flex;flex-direction:column;gap:0">'
+      +row('fa-box-open','var(--orange)','Resources','ov-res-count')
+      +row('fa-users','var(--blue)','Leads','ov-leads-count')
+      +row('fa-star','var(--orange)','Testimonials','ov-testi-count')
+      +'<a href="https://devtech-pro.vercel.app" target="_blank" class="btn btn-outline" style="justify-content:center;text-decoration:none">'
+      +'<i class="fa fa-external-link-alt"></i> View Live Site</a>'
+      +'</div>';
+  })()
   try{
     const[rRes,lRes,tRes]=await Promise.all([
       fetch(`${RAPI}/admin/all`,{headers:{Authorization:`Bearer ${token}`}}),
