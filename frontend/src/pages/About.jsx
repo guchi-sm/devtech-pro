@@ -120,10 +120,10 @@ const SKILLS = {
 }
 
 const TIMELINE = [
-  { year: '2024', role: 'Senior IT Consultant', place: 'Freelance — Nairobi' },
-  { year: '2022', role: 'Systems Developer',    place: 'TechSolutions Ltd.' },
-  { year: '2020', role: 'IT Support Engineer',  place: 'NetConnect Africa' },
-  { year: '2019', role: 'Diploma — ICT',        place: 'K Technical training Institute (KTTI)' },
+  { year: '2026', role: 'Senior IT Consultant', place: 'Freelance — Nairobi' },
+  { year: '2025', role: 'Systems Developer',    place: 'TechSolutions Ltd.' },
+  { year: '2025', role: 'IT Support Engineer',  place: 'NetConnect Africa' },
+  { year: '2022', role: 'Diploma — ICT',        place: 'K Technical training Institute (KTTI)' },
 ]
 
 
