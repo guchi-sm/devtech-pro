@@ -8,8 +8,8 @@ const API_BASE = import.meta.env.VITE_API_URL || 'https://devtech-pro-api-produc
 const API_URL  = `${API_BASE}/api/resources`
 
 // ── Your M-Pesa details ──────────────────────────────────────────
-const MPESA_NUMBER = '0712 345 678'   // ← your Safaricom number
-const MPESA_NAME   = 'Guchi Brown'    // ← your M-Pesa name
+const MPESA_NUMBER = '0790078363'   // ← your Safaricom number
+const MPESA_NAME   = 'STEPHEN NGUCHIE'    // ← your M-Pesa name
 // ────────────────────────────────────────────────────────────────
 
 const fadeUp = (d = 0) => ({ initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: d } })
