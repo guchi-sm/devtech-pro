@@ -301,6 +301,7 @@ tr.lead-pending{border-left:3px solid #ffc107}
       <button class="nav-item" data-tab="messages"><i class="fa fa-envelope"></i><span class="nl">Messages</span><span class="nb" id="sb-badge">0</span></button>
       <div class="sb-sec">Content</div>
       <button class="nav-item" data-tab="resources"><i class="fa fa-box-open"></i><span class="nl">Resources</span></button>
+      <button class="nav-item" data-tab="projects"><i class="fa fa-briefcase"></i><span class="nl">Projects</span></button>
       <button class="nav-item" data-tab="leads"><i class="fa fa-users"></i><span class="nl">Leads</span><span class="nb" id="sb-pending-badge" style="display:none;background:#ffc107">0</span></button>
       <button class="nav-item" data-tab="testimonials"><i class="fa fa-star"></i><span class="nl">Testimonials</span></button>
       <div class="sb-sec">Insights</div>
@@ -444,6 +445,14 @@ tr.lead-pending{border-left:3px solid #ffc107}
       </div>
 
       <!-- TESTIMONIALS -->
+      <div class="tab-pane" id="tab-projects">
+        <div class="ph-row">
+          <div class="ph" style="margin:0"><h1><i class="fa fa-briefcase"></i> Portfolio Projects</h1><p>Manage the projects shown on your portfolio page</p></div>
+          <button class="btn btn-primary" id="btn-add-proj"><i class="fa fa-plus"></i> Add Project</button>
+        </div>
+        <div id="proj-container" style="margin-top:1.5rem"><div class="loading"><div class="spin"></div>Loading...</div></div>
+      </div>
+
       <div class="tab-pane" id="tab-testimonials">
         <div class="ph-row">
           <div class="ph" style="margin:0"><h1><i class="fa fa-star"></i> Testimonials</h1><p>Client reviews shown on your homepage</p></div>
@@ -512,6 +521,35 @@ tr.lead-pending{border-left:3px solid #ffc107}
 </div>
 
 <!-- TESTI MODAL -->
+<div class="overlay" id="proj-modal">
+  <div class="modal">
+    <div class="mhdr"><h3 id="proj-modal-ttl">Add Project</h3><button class="mhdr-x" id="proj-modal-x">&#x2715;</button></div>
+    <div class="mbod">
+      <input type="hidden" id="pf-id"/>
+      <div><label class="flabel">Title *</label><input class="finput" id="pf-title" placeholder="e.g. Inventory Management System"/></div>
+      <div><label class="flabel">Description *</label><textarea class="finput" id="pf-desc" rows="3" style="resize:vertical" placeholder="What was built and what it does..."></textarea></div>
+      <div class="frow">
+        <div><label class="flabel">Category *</label><select class="finput" id="pf-cat"><option value="">Select...</option><option value="Software Dev">Software Dev</option><option value="Web Dev">Web Dev</option><option value="Networking">Networking</option><option value="IT Support">IT Support</option><option value="Cloud">Cloud</option><option value="Other">Other</option></select></div>
+        <div><label class="flabel">Year</label><input class="finput" id="pf-year" placeholder="2024"/></div>
+      </div>
+      <div class="frow">
+        <div><label class="flabel">Duration</label><input class="finput" id="pf-duration" placeholder="8 weeks"/></div>
+        <div><label class="flabel">Display Order</label><input class="finput" id="pf-order" type="number" placeholder="0" min="0"/></div>
+      </div>
+      <div><label class="flabel">Outcome / Result</label><input class="finput" id="pf-outcome" placeholder="e.g. Reduced stockout incidents by 60%"/></div>
+      <div><label class="flabel">Thumbnail Image URL</label><input class="finput" id="pf-img" placeholder="https://res.cloudinary.com/..." oninput="prevProjThumb(this.value)"/><img id="pf-img-prev" style="display:none;width:100%;height:80px;object-fit:cover;border-radius:6px;margin-top:.4rem;border:1px solid var(--border)" alt="Preview"/></div>
+      <div><label class="flabel">Tags (comma separated)</label><input class="finput" id="pf-tags" placeholder="React, Node.js, MongoDB"/></div>
+      <div><label class="flabel">Live URL (optional)</label><input class="finput" id="pf-live" placeholder="https://..."/></div>
+      <div><label class="flabel">GitHub URL (optional)</label><input class="finput" id="pf-github" placeholder="https://github.com/..."/></div>
+      <div style="display:flex;gap:1.75rem;flex-wrap:wrap;padding-top:.25rem">
+        <label class="chk"><input type="checkbox" id="pf-feat"/> Featured</label>
+        <label class="chk"><input type="checkbox" id="pf-vis" checked/> Visible</label>
+      </div>
+    </div>
+    <div class="mftr"><button class="btn btn-ghost" id="proj-cancel">Cancel</button><button class="btn btn-primary" id="btn-save-proj"><i class="fa fa-save"></i> Save Project</button></div>
+  </div>
+</div>
+
 <div class="overlay" id="testi-modal">
   <div class="modal">
     <div class="mhdr"><h3 id="testi-modal-ttl">Add Testimonial</h3><button class="mhdr-x" id="testi-modal-x">✕</button></div>
@@ -543,9 +581,10 @@ const SITE_URL='https://devtech-pro.vercel.app/resources'
 let token=localStorage.getItem('admin_token')
 let msgs=[],resources=[],leads=[],testis=[]
 let mFilter='all',rFilter='All',lFilter='all',mSearch='',openMsgId=null,editId=null,editTestiId=null,anChart=null
-const BC={overview:'Overview',messages:'Messages',resources:'Resources',leads:'Leads & Requests',analytics:'Analytics',testimonials:'Testimonials'}
+const BC={overview:'Overview',messages:'Messages',resources:'Resources',leads:'Leads & Requests',analytics:'Analytics',testimonials:'Testimonials',projects:'Portfolio Projects'}
 // ── TTL cache (30s) — stops duplicate API hits on every tab switch ─────────
 const _cache={},CACHE_TTL=30000
+const _loaded={leads:false,analytics:false,testimonials:false,projects:false}
 function cGet(k){const e=_cache[k];if(e&&Date.now()-e.ts<CACHE_TTL)return e.data;return null}
 function cSet(k,d){_cache[k]={data:d,ts:Date.now()}}
 function cDel(k){delete _cache[k]}
@@ -591,6 +630,7 @@ function switchTab(tab){
   if(tab==='leads')loadLeads()
   if(tab==='analytics')loadAnalytics()
   if(tab==='testimonials'&&testis.length===0)loadTestimonials()
+  if(tab==='projects'&&!_loaded.projects)loadProjects()
 }
 document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>switchTab(n.dataset.tab)))
 
@@ -989,6 +1029,8 @@ async function loadAnalytics(){
 
 // ── TESTIMONIALS ──────────────────────────────────────────────────
 const TAPI=window.location.origin+'/api/testimonials'
+const PAPI=window.location.origin+'/api/projects'
+
 async function loadTestimonials(){
   const cached=cGet('testis')
   if(cached){testis=cached;renderTestis();return}
@@ -1075,6 +1117,112 @@ function set(id,val,html=false){const el=document.getElementById(id);if(el){if(h
 function x(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function toast(msg,type=''){const el=document.createElement('div');el.className=`toasty${type?' '+type:''}`;el.innerHTML=`<span>${type==='ok'?'✅':type==='err'?'❌':'💬'}</span><span>${msg}</span>`;document.getElementById('tc').appendChild(el);setTimeout(()=>el.remove(),3500)}
 setInterval(()=>{if(token&&document.getElementById('dashboard-screen').style.display!=='none'){loadStats();loadOverview()}},60000)
+// ── PROJECTS ──────────────────────────────────────────────────
+let projs=[]
+let editProjId=null
+
+async function loadProjects(){
+  document.getElementById('proj-container').innerHTML='<div class="loading"><div class="spin"></div>Loading...</div>'
+  try{
+    const res=await fetch(`${PAPI}/all`,{headers:{Authorization:`Bearer ${token}`}}),data=await res.json()
+    if(data.success){projs=data.projects;renderProjects()}
+    else document.getElementById('proj-container').innerHTML='<div class="empty"><div class="ico">⚠️</div><h3>Failed to load</h3></div>'
+  }catch(e){document.getElementById('proj-container').innerHTML=`<div class="empty"><div class="ico">⚠️</div><h3>Error</h3><p>${e.message}</p></div>`}
+  _loaded.projects=true
+}
+
+function renderProjects(){
+  const el=document.getElementById('proj-container')
+  if(!projs.length){el.innerHTML='<div class="empty"><div class="ico">📁</div><h3>No projects yet</h3><p>Click Add Project to create your first one</p></div>';return}
+  el.innerHTML='<div class="tbl-wrap"><table class="dt"><thead><tr><th>Project</th><th>Category</th><th>Year</th><th>Outcome</th><th>Status</th><th>Actions</th></tr></thead><tbody>'+
+  projs.map(p=>`<tr>
+    <td><div style="font-weight:700;color:var(--text);margin-bottom:.2rem">${x(p.title)}</div><div style="font-size:.72rem;color:var(--text3)">${(p.tags||[]).slice(0,3).join(', ')}</div></td>
+    <td><span class="badge badge-or">${x(p.category||'')}</span></td>
+    <td><span style="font-family:monospace;font-size:.8rem">${x(p.year||'')}</span></td>
+    <td style="font-size:.78rem;max-width:180px;white-space:normal">${x(p.outcome||'—')}</td>
+    <td>${p.visible?'<span class="badge badge-gr">Visible</span>':'<span class="badge badge-rd">Hidden</span>'}${p.featured?'<span class="badge badge-or" style="margin-left:.3rem">⭐</span>':''}</td>
+    <td><div style="display:flex;gap:.4rem">
+      <button class="btn btn-sm btn-ghost" onclick="openProjModal('${p._id}')"><i class="fa fa-edit"></i></button>
+      <button class="btn btn-sm btn-danger" onclick="delProj('${p._id}')"><i class="fa fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('')+'</tbody></table></div>'
+}
+
+function openProjModal(id=null){
+  const p=id?projs.find(p=>p._id===id):null;editProjId=id||null
+  document.getElementById('proj-modal-ttl').textContent=p?'Edit Project':'Add Project'
+  document.getElementById('pf-id').value=p?._id||''
+  document.getElementById('pf-title').value=p?.title||''
+  document.getElementById('pf-desc').value=p?.description||p?.desc||''
+  document.getElementById('pf-cat').value=p?.category||''
+  document.getElementById('pf-year').value=p?.year||new Date().getFullYear()
+  document.getElementById('pf-duration').value=p?.duration||''
+  document.getElementById('pf-outcome').value=p?.outcome||''
+  document.getElementById('pf-img').value=p?.image||p?.img||''
+  document.getElementById('pf-tags').value=(p?.tags||[]).join(', ')
+  document.getElementById('pf-live').value=p?.liveUrl||''
+  document.getElementById('pf-github').value=p?.githubUrl||''
+  document.getElementById('pf-feat').checked=p?.featured||false
+  document.getElementById('pf-vis').checked=p?.visible!==false
+  document.getElementById('pf-order').value=p?.order||0
+  const prev=document.getElementById('pf-img-prev')
+  if(p?.image||p?.img){prev.src=p.image||p.img;prev.style.display='block'}else{prev.style.display='none'}
+  document.getElementById('proj-modal').classList.add('open')
+}
+
+function prevProjThumb(url){
+  const prev=document.getElementById('pf-img-prev')
+  if(url){prev.src=url;prev.style.display='block'}else{prev.style.display='none'}
+}
+
+function closeProjModal(){document.getElementById('proj-modal').classList.remove('open');editProjId=null}
+
+document.getElementById('btn-add-proj').addEventListener('click',()=>openProjModal())
+document.getElementById('proj-modal-x').addEventListener('click',closeProjModal)
+document.getElementById('proj-cancel').addEventListener('click',closeProjModal)
+document.getElementById('proj-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeProjModal()})
+
+document.getElementById('btn-save-proj').addEventListener('click',async()=>{
+  const title=document.getElementById('pf-title').value.trim()
+  const desc=document.getElementById('pf-desc').value.trim()
+  const category=document.getElementById('pf-cat').value
+  if(!title||!desc||!category){toast('Title, description and category are required','err');return}
+  const btn=document.getElementById('btn-save-proj');btn.disabled=true;btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> Saving...'
+  const body={
+    title,desc,description:desc,category,
+    year:document.getElementById('pf-year').value,
+    duration:document.getElementById('pf-duration').value,
+    outcome:document.getElementById('pf-outcome').value,
+    img:document.getElementById('pf-img').value,
+    image:document.getElementById('pf-img').value,
+    tags:document.getElementById('pf-tags').value,
+    liveUrl:document.getElementById('pf-live').value,
+    githubUrl:document.getElementById('pf-github').value,
+    featured:document.getElementById('pf-feat').checked,
+    visible:document.getElementById('pf-vis').checked,
+    order:Number(document.getElementById('pf-order').value)||0,
+  }
+  try{
+    const url=editProjId?`${PAPI}/${editProjId}`:PAPI
+    const method=editProjId?'PUT':'POST'
+    const res=await fetch(url,{method,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)})
+    const data=await res.json()
+    if(data.success){toast(editProjId?'Project updated ✅':'Project created ✅','ok');closeProjModal();_loaded.projects=false;loadProjects()}
+    else toast(data.message||'Save failed','err')
+  }catch(e){toast('Network error','err')}
+  btn.disabled=false;btn.innerHTML='<i class="fa fa-save"></i> Save Project'
+})
+
+async function delProj(id){
+  if(!confirm('Delete this project?'))return
+  try{
+    const res=await fetch(`${PAPI}/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}})
+    const data=await res.json()
+    if(data.success){toast('Project deleted','ok');projs=projs.filter(p=>p._id!==id);renderProjects()}
+    else toast(data.message||'Delete failed','err')
+  }catch(e){toast('Network error','err')}
+}
+
 </script>
 </body>
 </html>

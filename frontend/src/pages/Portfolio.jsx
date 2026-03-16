@@ -117,7 +117,7 @@ const CATEGORIES = ['All', 'Software Dev', 'Web Dev', 'Networking', 'IT Support'
 
 // ─── PROFILE SECTION ─────────────────────────────────────────
 // 👇 Replace PHOTO_URL with your actual Cloudinary photo URL
-const PHOTO_URL = 'https://images.unsplash.com/photo-1607705703571-c5a8695f18f6?w=400&q=85&fit=crop&crop=face'
+const PHOTO_URL = 'https://res.cloudinary.com/dtsjd5u2s/image/upload/v1773658635/devtech-resources/t9ricu2eipoj3pba3fz9.png'
 // To use your own photo:
 // 1. Upload to Cloudinary (cloud name: dtsjd5u2s, preset: devtech_resources)
 // 2. Replace the URL above with your Cloudinary URL
