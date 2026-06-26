@@ -1,9 +1,8 @@
 const { Resend  } = require('resend')
 const Message     = require('../models/Message')
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 async function sendContactEmail(req, res, next) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const { name, email, subject, message } = req.body
 
   try {

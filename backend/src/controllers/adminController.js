@@ -3,39 +3,42 @@ const bcrypt   = require('bcryptjs')
 const { Resend } = require('resend')
 const Message  = require('../models/Message')
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 // ─── LOGIN ─────────────────────────────────────────────────────
 async function login(req, res) {
-  const { email, password } = req.body
-  if (!email || !password)
-    return res.status(400).json({ success: false, message: 'Email and password required.' })
+  try {
+    const { email, password } = req.body
+    if (!email || !password)
+      return res.status(400).json({ success: false, message: 'Email and password required.' })
 
-  const adminEmail    = process.env.ADMIN_EMAIL
-  const adminPassword = process.env.ADMIN_PASSWORD
+    const adminEmail    = process.env.ADMIN_EMAIL
+    const adminPassword = process.env.ADMIN_PASSWORD
 
-  if (!adminEmail || !adminPassword)
-    return res.status(500).json({ success: false, message: 'Admin credentials not configured.' })
+    if (!adminEmail || !adminPassword)
+      return res.status(500).json({ success: false, message: 'Admin credentials not configured.' })
 
-  if (email.toLowerCase() !== adminEmail.toLowerCase())
-    return res.status(401).json({ success: false, message: 'Invalid credentials.' })
+    if (email.toLowerCase() !== adminEmail.toLowerCase())
+      return res.status(401).json({ success: false, message: 'Invalid credentials.' })
 
-  let passwordValid = false
-  if (adminPassword.startsWith('$2')) {
-    passwordValid = await bcrypt.compare(password, adminPassword)
-  } else {
-    passwordValid = password === adminPassword
+    let passwordValid = false
+    if (adminPassword.startsWith('$2')) {
+      passwordValid = await bcrypt.compare(password, adminPassword)
+    } else {
+      passwordValid = password === adminPassword
+    }
+
+    if (!passwordValid)
+      return res.status(401).json({ success: false, message: 'Invalid credentials.' })
+
+    const token = jwt.sign(
+      { email: adminEmail, role: 'admin' },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    )
+    return res.json({ success: true, token, expiresIn: '24h' })
+  } catch (err) {
+    console.error('❌ Login error:', err.message)
+    return res.status(500).json({ success: false, message: 'Server error.' })
   }
-
-  if (!passwordValid)
-    return res.status(401).json({ success: false, message: 'Invalid credentials.' })
-
-  const token = jwt.sign(
-    { email: adminEmail, role: 'admin' },
-    process.env.JWT_SECRET,
-    { expiresIn: '7d' }
-  )
-  return res.json({ success: true, token, expiresIn: '24h' })
 }
 
 // ─── GET ALL MESSAGES ──────────────────────────────────────────
@@ -120,6 +123,7 @@ async function deleteMessage(req, res) {
 // ─── REPLY TO MESSAGE (via Resend) ─────────────────────────────
 async function replyMessage(req, res) {
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY)
     const { replyText } = req.body
     if (!replyText || !replyText.trim())
       return res.status(400).json({ success: false, message: 'Reply text is required.' })
