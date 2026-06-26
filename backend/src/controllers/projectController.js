@@ -4,11 +4,10 @@ const Project = require('../models/Project')
 async function getProjects(req, res) {
   try {
     const raw = await Project.find({ visible: true }).sort({ order: 1, createdAt: -1 })
-    // Normalize: send both field name variants so any frontend version works
     const projects = raw.map(p => ({
       ...p.toObject(),
-      desc: p.description,   // alias for frontend
-      img:  p.image,         // alias for frontend
+      desc: p.description,
+      img:  p.image,
     }))
     return res.json({ success: true, projects })
   } catch (err) {
@@ -16,7 +15,7 @@ async function getProjects(req, res) {
   }
 }
 
-// ─── ADMIN: GET all projects (including hidden) ────────────────
+// ─── ADMIN: GET all projects ───────────────────────────────────
 async function getAllProjects(req, res) {
   try {
     const raw = await Project.find().sort({ order: 1, createdAt: -1 })
@@ -34,24 +33,41 @@ async function getAllProjects(req, res) {
 // ─── ADMIN: CREATE project ─────────────────────────────────────
 async function createProject(req, res) {
   try {
-    const { index, category, title, desc, description, img, image, tags, year, duration, outcome, visible, order } = req.body
+    const {
+      index, category, title, desc, description, img, image,
+      tags, year, duration, outcome, visible, order,
+      client, challenge, solution, results,
+      githubUrl, liveUrl, featured,
+    } = req.body
+
     const _desc = desc || description
     const _img  = img  || image || ''
+
     if (!category || !title || !_desc) {
       return res.status(400).json({ success: false, message: 'category, title and description are required.' })
     }
+
     const count = await Project.countDocuments()
     const project = await Project.create({
-      index: index || String(count + 1).padStart(3, '0'),
-      category, title, description: _desc,
-      image: _img,
-      tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()) : []),
-      year: year || new Date().getFullYear().toString(),
-      duration: duration || '',
-      outcome: outcome || '',
-      visible: visible !== false,
-      order: order || count,
+      index:       index || String(count + 1).padStart(3, '0'),
+      category, title,
+      description: _desc,
+      image:       _img,
+      tags:        Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()) : []),
+      year:        year || new Date().getFullYear().toString(),
+      duration:    duration || '',
+      outcome:     outcome || '',
+      client:      client || '',
+      challenge:   challenge || '',
+      solution:    solution || '',
+      results:     Array.isArray(results) ? results : (results ? results.split('\n').map(r => r.trim()).filter(Boolean) : []),
+      githubUrl:   githubUrl || '',
+      liveUrl:     liveUrl || '',
+      featured:    featured === true || featured === 'true',
+      visible:     visible !== false && visible !== 'false',
+      order:       order || count,
     })
+
     return res.status(201).json({ success: true, project })
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message })
@@ -61,13 +77,13 @@ async function createProject(req, res) {
 // ─── ADMIN: UPDATE project ─────────────────────────────────────
 async function updateProject(req, res) {
   try {
-    const { tags, desc, img, ...rest } = req.body
+    const { tags, desc, img, results, ...rest } = req.body
     const update = { ...rest }
-    if (desc  !== undefined) update.description = desc
-    if (img   !== undefined) update.image = img
-    if (tags  !== undefined) {
-      update.tags = Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim())
-    }
+    if (desc    !== undefined) update.description = desc
+    if (img     !== undefined) update.image = img
+    if (tags    !== undefined) update.tags = Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim())
+    if (results !== undefined) update.results = Array.isArray(results) ? results : results.split('\n').map(r => r.trim()).filter(Boolean)
+
     const project = await Project.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true })
     if (!project) return res.status(404).json({ success: false, message: 'Project not found.' })
     return res.json({ success: true, project })
