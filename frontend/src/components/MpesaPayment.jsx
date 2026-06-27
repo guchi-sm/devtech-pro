@@ -112,7 +112,13 @@ export default function MpesaPayment({ resource, onClose, onSuccess }) {
                 placeholder="e.g. 0712345678"
                 value={phone}
                 onChange={e => { setPhone(e.target.value); setError('') }}
-                style={{ width:'100%', padding:'0.75rem 1rem', borderRadius:8, marginBottom:'0.5rem', border:`1.5px solid ${error ? '#ef4444' : '#e2e8f0'}`, fontSize:'1rem', outline:'none', boxSizing:'border-box' }}
+                style={{
+  width:'100%', padding:'0.75rem 1rem', borderRadius:8, marginBottom:'0.5rem',
+  border:`1.5px solid ${error ? '#ef4444' : '#e2e8f0'}`,
+  fontSize:'1rem', outline:'none', boxSizing:'border-box',
+  color: '#1c2d3f',        // ← add this
+  background: '#ffffff',   // ← add this
+}}
                 onKeyDown={e => e.key === 'Enter' && handlePay()}
               />
               {error && <div style={{ color:'#ef4444', fontSize:'0.78rem', marginBottom:'0.75rem' }}>⚠ {error}</div>}
