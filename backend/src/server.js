@@ -77,8 +77,7 @@ app.use('/api/admin',        adminRouter)
 app.use('/api/resources',    resourceRouter)  // unlockLimiter moved to route-level
 app.use('/api/analytics',    analyticsRouter)
 app.use('/api/testimonials', testimonialRouter)
-// ...
-app.use('/api/mpesa', mpesaRouter)
+
 const chatRouter     = require('./routes/chat')
 const projectsRouter = require('./routes/projects')
 const mpesaRouter = require('./routes/mpesa')
@@ -86,6 +85,7 @@ const mpesaRouter = require('./routes/mpesa')
 
 app.use('/api/chat',     chatRouter)
 app.use('/api/projects', projectsRouter)
+app.use('/api/mpesa', mpesaRouter)
 
 // ─── ADMIN PANEL ───────────────────────────────────────────────
 app.use('/admin', express.static(path.join(__dirname, 'public')))
