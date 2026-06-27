@@ -2,15 +2,11 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import Footer from '../components/Footer'
+import MpesaPayment from '../components/MpesaPayment'
 import toast, { Toaster } from 'react-hot-toast'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://devtech-pro-api-production.up.railway.app'
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 const API_URL  = `${API_BASE}/api/resources`
-
-// ── Your M-Pesa details ──────────────────────────────────────────
-const MPESA_NUMBER = '0790078363'   // ← your Safaricom number
-const MPESA_NAME   = 'STEPHEN NGUCHIE'    // ← your M-Pesa name
-// ────────────────────────────────────────────────────────────────
 
 const fadeUp = (d = 0) => ({ initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: d } })
 
@@ -49,7 +45,7 @@ const inputStyle = {
   transition: 'border-color 0.2s',
 }
 
-// ── FREE MODAL ────────────────────────────────────────────────────
+// ── FREE MODAL ─────────────────────────────────────────────────────
 function FreeModal({ resource, onClose, onUnlocked }) {
   const [name, setName]   = useState('')
   const [email, setEmail] = useState('')
@@ -117,196 +113,7 @@ function FreeModal({ resource, onClose, onUnlocked }) {
   )
 }
 
-// ── PREMIUM MODAL ─────────────────────────────────────────────────
-function PremiumModal({ resource, onClose }) {
-  const [step, setStep]   = useState('request') // 'request' | 'success' | 'unlock'
-  const [name, setName]   = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [code, setCode]   = useState('')
-  const [loading, setLoading] = useState(false)
-
-  const price    = resource.price || 0
-  const currency = resource.currency || 'KES'
-  const priceStr = price > 0 ? `${currency} ${price.toLocaleString()}` : null
-
-  const handleRequest = async (e) => {
-    e.preventDefault()
-    if (!name.trim() || !email.trim() || !phone.trim()) { toast.error('All fields are required.'); return }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast.error('Please enter a valid email.'); return }
-    setLoading(true)
-    try {
-      const res  = await fetch(`${API_URL}/${resource._id}/unlock`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), phone: phone.trim() }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Failed.')
-      setStep('success')
-    } catch (err) { toast.error(err.message || 'Something went wrong.')
-    } finally { setLoading(false) }
-  }
-
-  const handleUnlock = async (e) => {
-    e.preventDefault()
-    if (!code.trim()) { toast.error('Please enter your access code.'); return }
-    setLoading(true)
-    try {
-      const res  = await fetch(`${API_URL}/${resource._id}/unlock`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name || 'Client', email: email || 'client@devtech.co.ke', accessCode: code.trim() }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Invalid code.')
-      toast.success('✅ Access granted! Download starting…')
-      if (data.fileUrl) {
-        const a = document.createElement('a'); a.href = data.fileUrl
-        a.download = resource.title; a.target = '_blank'
-        document.body.appendChild(a); a.click(); document.body.removeChild(a)
-      }
-      onClose()
-    } catch (err) { toast.error(err.message)
-    } finally { setLoading(false) }
-  }
-
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      onClick={onClose}
-      style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', zIndex:2000, display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem', backdropFilter:'blur(6px)' }}>
-      <motion.div initial={{ opacity:0, scale:0.9, y:24 }} animate={{ opacity:1, scale:1, y:0 }}
-        exit={{ opacity:0, scale:0.9, y:24 }} transition={{ duration:0.35, ease:[0.16,1,0.3,1] }}
-        onClick={e => e.stopPropagation()}
-        style={{ background:'#0c1a2e', borderRadius:18, border:'1px solid rgba(245,166,35,0.3)', width:'100%', maxWidth:460, maxHeight:'92vh', overflowY:'auto', boxShadow:'0 40px 80px rgba(0,0,0,0.6)', borderTop:'3px solid #f5a623' }}>
-
-        {/* Header */}
-        <div style={{ background:'linear-gradient(135deg,#0a1020,#121e30)', padding:'1.5rem 1.75rem', borderBottom:'1px solid rgba(255,255,255,0.06)', position:'relative', display:'flex', alignItems:'center', gap:'0.85rem' }}>
-          <button onClick={onClose} style={{ position:'absolute', top:12, right:14, background:'rgba(255,255,255,0.08)', border:'none', borderRadius:'50%', width:28, height:28, cursor:'pointer', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.85rem' }}>✕</button>
-          <div style={{ width:46, height:46, borderRadius:12, background:'rgba(245,166,35,0.15)', border:'1px solid rgba(245,166,35,0.3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.3rem', flexShrink:0 }}>👑</div>
-          <div>
-            <div style={{ fontSize:'0.58rem', letterSpacing:'0.16em', textTransform:'uppercase', color:'#f5a623', marginBottom:'0.25rem', fontFamily:'monospace' }}>Premium Resource</div>
-            <div style={{ fontSize:'0.95rem', fontWeight:800, color:'#fff', lineHeight:1.25 }}>{resource.title}</div>
-          </div>
-        </div>
-
-        <div style={{ padding:'1.75rem' }}>
-
-          {/* ── STEP 1: Payment request ── */}
-          {step === 'request' && (
-            <>
-              {/* Price badge — shown when price is set */}
-              {priceStr && (
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'1rem', background:'rgba(245,166,35,0.07)', border:'1px solid rgba(245,166,35,0.2)', borderRadius:14, padding:'1rem 1.25rem', marginBottom:'1.25rem' }}>
-                  <div style={{ textAlign:'center' }}>
-                    <div style={{ fontSize:'0.55rem', fontFamily:'monospace', letterSpacing:'0.2em', textTransform:'uppercase', color:'rgba(245,166,35,0.65)', marginBottom:'0.3rem' }}>Amount to Pay</div>
-                    <div style={{ fontSize:'2.25rem', fontWeight:900, color:'#f5a623', lineHeight:1, letterSpacing:'-0.02em' }}>{priceStr}</div>
-                  </div>
-                  <div style={{ width:'1px', height:40, background:'rgba(245,166,35,0.2)' }}/>
-                  <div style={{ textAlign:'center' }}>
-                    <div style={{ fontSize:'0.55rem', fontFamily:'monospace', letterSpacing:'0.2em', textTransform:'uppercase', color:'rgba(255,255,255,0.35)', marginBottom:'0.3rem' }}>Send To</div>
-                    <div style={{ fontSize:'0.88rem', fontWeight:800, color:'#fff' }}>{MPESA_NUMBER}</div>
-                    <div style={{ fontSize:'0.7rem', color:'rgba(255,255,255,0.45)', marginTop:'0.15rem' }}>{MPESA_NAME}</div>
-                  </div>
-                </div>
-              )}
-
-              {/* M-Pesa steps */}
-              <div style={{ background:'rgba(0,200,83,0.07)', border:'1px solid rgba(0,200,83,0.2)', borderRadius:12, padding:'1rem 1.1rem', marginBottom:'1.4rem' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.65rem' }}>
-                  <span style={{ fontSize:'1.1rem' }}>📱</span>
-                  <span style={{ fontSize:'0.7rem', fontWeight:800, color:'#00c853', letterSpacing:'0.1em', textTransform:'uppercase', fontFamily:'monospace' }}>M-Pesa Payment Steps</span>
-                </div>
-                <div style={{ display:'flex', flexDirection:'column', gap:'0.4rem' }}>
-                  {[
-                    `Go to M-Pesa → Send Money`,
-                    `Send ${priceStr || 'the required amount'} to ${MPESA_NUMBER} (${MPESA_NAME})`,
-                    `Use your name as the M-Pesa reference`,
-                    `Fill the form below and submit`,
-                    `Receive your access code on WhatsApp & Email`,
-                  ].map((s, i) => (
-                    <div key={i} style={{ display:'flex', gap:'0.6rem', alignItems:'flex-start' }}>
-                      <span style={{ width:18, height:18, borderRadius:'50%', background:'rgba(0,200,83,0.2)', border:'1px solid rgba(0,200,83,0.4)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.55rem', fontWeight:800, color:'#00c853', flexShrink:0, marginTop:2 }}>{i+1}</span>
-                      <span style={{ fontSize:'0.8rem', color:'rgba(255,255,255,0.65)', lineHeight:1.5 }}>{s}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <form onSubmit={handleRequest} style={{ display:'flex', flexDirection:'column', gap:'0.85rem' }}>
-                <div>
-                  <label style={{ display:'block', fontSize:'0.58rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(255,255,255,0.4)', marginBottom:'0.35rem', fontFamily:'monospace' }}>Your Name</label>
-                  <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" autoFocus style={inputStyle} onFocus={e => e.target.style.borderColor='#f5a623'} onBlur={e => e.target.style.borderColor='rgba(255,255,255,0.12)'}/>
-                </div>
-                <div>
-                  <label style={{ display:'block', fontSize:'0.58rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(255,255,255,0.4)', marginBottom:'0.35rem', fontFamily:'monospace' }}>Email Address</label>
-                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" style={inputStyle} onFocus={e => e.target.style.borderColor='#f5a623'} onBlur={e => e.target.style.borderColor='rgba(255,255,255,0.12)'}/>
-                </div>
-                <div>
-                  <label style={{ display:'block', fontSize:'0.58rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(255,255,255,0.4)', marginBottom:'0.35rem', fontFamily:'monospace' }}>WhatsApp Number <span style={{ color:'#f5a623' }}>*</span></label>
-                  <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+254 712 345 678" style={inputStyle} onFocus={e => e.target.style.borderColor='#f5a623'} onBlur={e => e.target.style.borderColor='rgba(255,255,255,0.12)'}/>
-                  <p style={{ fontSize:'0.66rem', color:'rgba(255,255,255,0.3)', marginTop:'0.3rem' }}>Your access code will be sent here after payment is verified.</p>
-                </div>
-                <button type="submit" disabled={loading} style={{ width:'100%', background:'linear-gradient(135deg,#f5a623,#e8940f)', color:'#1c2d3f', border:'none', padding:'0.9rem', borderRadius:8, fontWeight:800, fontSize:'0.88rem', cursor:loading?'not-allowed':'pointer', opacity:loading?0.7:1, marginTop:'0.25rem' }}>
-                  {loading ? '⏳ Submitting…' : '📤 I Have Paid — Submit Request'}
-                </button>
-                <div style={{ borderTop:'1px solid rgba(255,255,255,0.07)', paddingTop:'0.9rem', textAlign:'center' }}>
-                  <button type="button" onClick={() => setStep('unlock')} style={{ background:'none', border:'none', color:'rgba(245,166,35,0.7)', fontSize:'0.75rem', cursor:'pointer', textDecoration:'underline', fontFamily:'monospace' }}>
-                    🔑 Already have a code? Enter it here
-                  </button>
-                </div>
-              </form>
-            </>
-          )}
-
-          {/* ── STEP 2: Success ── */}
-          {step === 'success' && (
-            <div style={{ textAlign:'center', padding:'1rem 0' }}>
-              <div style={{ fontSize:'3.5rem', marginBottom:'1rem' }}>✅</div>
-              <h3 style={{ fontSize:'1.15rem', fontWeight:900, color:'#fff', marginBottom:'0.5rem' }}>Request Received!</h3>
-              <p style={{ fontSize:'0.84rem', color:'rgba(255,255,255,0.55)', lineHeight:1.7, marginBottom:'1.5rem' }}>
-                Your payment request has been submitted.<br/>
-                Once we verify your M-Pesa payment, we'll send your access code to <strong style={{ color:'#f5a623' }}>{phone}</strong> via WhatsApp and to <strong style={{ color:'#f5a623' }}>{email}</strong>.
-              </p>
-              <div style={{ background:'rgba(245,166,35,0.07)', border:'1px solid rgba(245,166,35,0.2)', borderRadius:10, padding:'0.9rem 1rem', marginBottom:'1.4rem', fontSize:'0.78rem', color:'rgba(255,255,255,0.55)', lineHeight:1.6 }}>
-                ⏱ Typical response time: <strong style={{ color:'#f5a623' }}>under 1 hour</strong> during business hours
-              </div>
-              <button onClick={() => setStep('unlock')} style={{ background:'linear-gradient(135deg,#f5a623,#e8940f)', color:'#1c2d3f', border:'none', padding:'0.75rem 2rem', borderRadius:8, fontWeight:800, fontSize:'0.84rem', cursor:'pointer' }}>
-                🔑 Enter Code When Received
-              </button>
-            </div>
-          )}
-
-          {/* ── STEP 3: Enter code ── */}
-          {step === 'unlock' && (
-            <div>
-              <button onClick={() => setStep('request')} style={{ background:'none', border:'none', color:'rgba(255,255,255,0.4)', fontSize:'0.75rem', cursor:'pointer', display:'flex', alignItems:'center', gap:'0.35rem', marginBottom:'1.25rem', fontFamily:'monospace' }}>
-                ← Back
-              </button>
-              <div style={{ textAlign:'center', marginBottom:'1.5rem' }}>
-                <div style={{ fontSize:'2.5rem', marginBottom:'0.5rem' }}>🔑</div>
-                <h3 style={{ fontSize:'1.05rem', fontWeight:800, color:'#fff', marginBottom:'0.3rem' }}>Enter Your Access Code</h3>
-                <p style={{ fontSize:'0.8rem', color:'rgba(255,255,255,0.45)', lineHeight:1.6 }}>Enter the code sent to your WhatsApp to unlock this resource.</p>
-              </div>
-              <form onSubmit={handleUnlock} style={{ display:'flex', flexDirection:'column', gap:'0.85rem' }}>
-                <div>
-                  <label style={{ display:'block', fontSize:'0.58rem', letterSpacing:'0.14em', textTransform:'uppercase', color:'rgba(245,166,35,0.7)', marginBottom:'0.35rem', fontFamily:'monospace' }}>Access Code</label>
-                  <input type="text" value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="e.g. GUCHI2024" autoFocus
-                    style={{ ...inputStyle, borderColor:'rgba(245,166,35,0.4)', fontFamily:'monospace', fontWeight:700, letterSpacing:'0.1em', fontSize:'1.1rem', textAlign:'center' }}
-                    onFocus={e => e.target.style.borderColor='#f5a623'} onBlur={e => e.target.style.borderColor='rgba(245,166,35,0.4)'}
-                    spellCheck={false} autoComplete="off"/>
-                </div>
-                <button type="submit" disabled={loading} style={{ width:'100%', background:'linear-gradient(135deg,#f5a623,#e8940f)', color:'#1c2d3f', border:'none', padding:'0.9rem', borderRadius:8, fontWeight:800, fontSize:'0.9rem', cursor:loading?'not-allowed':'pointer', opacity:loading?0.7:1 }}>
-                  {loading ? '⏳ Verifying…' : '🔓 Unlock & Download'}
-                </button>
-              </form>
-            </div>
-          )}
-        </div>
-      </motion.div>
-    </motion.div>
-  )
-}
-
-// ── RESOURCE CARD ─────────────────────────────────────────────────
+// ── RESOURCE CARD ──────────────────────────────────────────────────
 function ResourceCard({ resource, onUnlock, delay }) {
   const [hovered, setHovered] = useState(false)
   const meta = CAT_META[resource.category] || CAT_META.PDF
@@ -353,7 +160,7 @@ function ResourceCard({ resource, onUnlock, delay }) {
             <button onClick={() => onUnlock(resource)}
               style={{ display:'flex', alignItems:'center', gap:'0.4rem', background:hovered?meta.color:'transparent', color:hovered?'#fff':meta.color, border:`1.5px solid ${meta.color}`, padding:'0.45rem 1rem', borderRadius:6, fontSize:'0.68rem', fontFamily:'monospace', letterSpacing:'0.1em', textTransform:'uppercase', fontWeight:700, cursor:'pointer', transition:'all 0.2s' }}>
               {resource.isPremium
-                ? (price > 0 ? `👑 ${currency} ${price.toLocaleString()}` : '👑 Get Access')
+                ? (price > 0 ? `👑 KES ${price.toLocaleString()}` : '👑 Get Access')
                 : '🔓 Free'}
             </button>
           </div>
@@ -363,13 +170,14 @@ function ResourceCard({ resource, onUnlock, delay }) {
   )
 }
 
-// ── MAIN PAGE ─────────────────────────────────────────────────────
+// ── MAIN PAGE ──────────────────────────────────────────────────────
 export default function Resources() {
   const [resources, setResources]   = useState([])
   const [loading, setLoading]       = useState(true)
   const [activeCategory, setActiveCategory] = useState('All')
   const [search, setSearch]         = useState('')
   const [selected, setSelected]     = useState(null)
+  const [paidResource, setPaidResource] = useState(null)
 
   useEffect(() => {
     fetch(API_URL)
@@ -400,6 +208,14 @@ export default function Resources() {
     a.target = '_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a)
   }
 
+  // After successful M-Pesa payment → trigger download
+  const handlePaymentSuccess = ({ resource }) => {
+    toast.success('✅ Payment confirmed! Accessing resource…')
+    setPaidResource(null)
+    setSelected(null)
+    if (resource?.fileUrl) triggerDownload(resource.fileUrl, resource.title)
+  }
+
   return (
     <>
       <Toaster position="top-right" toastOptions={{ style: { background:'var(--bg-card)', color:'var(--text)', border:'1px solid var(--border)' } }}/>
@@ -414,14 +230,14 @@ export default function Resources() {
           <div style={{ width:48, height:4, background:'#f5a623', borderRadius:2, marginBottom:'1.2rem' }}/>
           <motion.div {...fadeUp(0.1)}>
             <div className="font-mono text-xs tracking-[0.2em] uppercase flex items-center gap-3 mb-4" style={{ color:'#f5a623' }}>
-              <span style={{ display:'block', height:'1px', width:32, background:'#f5a623' }}/>Free Resources
+              <span style={{ display:'block', height:'1px', width:32, background:'#f5a623' }}/>Resources
             </div>
           </motion.div>
           <motion.div {...fadeUp(0.2)}>
             <div className="text-display-lg font-display" style={{ color:'#ffffff' }}>Downloads &<br/><span style={{ color:'#f5a623' }}>Resources</span></div>
           </motion.div>
           <motion.p {...fadeUp(0.3)} style={{ fontSize:'0.95rem', color:'rgba(255,255,255,0.6)', maxWidth:480, marginTop:'1rem', lineHeight:1.75 }}>
-            Free guides, templates and videos. Premium resources available via M-Pesa.
+            Free guides, templates and videos. Premium resources available via M-Pesa — instant STK push to your phone.
           </motion.p>
           <motion.div {...fadeUp(0.4)} style={{ display:'flex', gap:'2rem', flexWrap:'wrap', marginTop:'2.5rem' }}>
             {[{val:stats.total,label:'Resources'},{val:stats.pdf,label:'PDF Guides'},{val:stats.video,label:'Videos'},{val:`${stats.downloads}+`,label:'Downloads'}].map(s => (
@@ -511,7 +327,12 @@ export default function Resources() {
       {/* MODALS */}
       <AnimatePresence>
         {selected && selected.isPremium && (
-          <PremiumModal key="premium" resource={selected} onClose={() => setSelected(null)}/>
+          <MpesaPayment
+            key="mpesa"
+            resource={selected}
+            onClose={() => setSelected(null)}
+            onSuccess={handlePaymentSuccess}
+          />
         )}
         {selected && !selected.isPremium && (
           <FreeModal key="free" resource={selected} onClose={() => setSelected(null)}
