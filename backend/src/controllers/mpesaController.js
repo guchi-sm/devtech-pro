@@ -73,7 +73,7 @@ async function stkPush(req, res) {
       PhoneNumber:       normalizedPhone,
       CallBackURL:       callbackUrl,
       AccountReference:  'DevTechPro',
-      TransactionDesc:   `Payment for ${resource.title}`,
+      TransactionDesc:   'DevTech Payment'.slice(0, 50),
     }
 
     console.log('📤 STK Push payload:', JSON.stringify(payload, null, 2))
