@@ -14,6 +14,7 @@ const resourceRouter     = require('./routes/resources')
 const analyticsRouter    = require('./routes/analytics')
 const testimonialRouter  = require('./routes/testimonials')
 
+
 const app  = express()
 const PORT = process.env.PORT || 5000
 
@@ -80,12 +81,11 @@ app.use('/api/testimonials', testimonialRouter)
 
 const chatRouter     = require('./routes/chat')
 const projectsRouter = require('./routes/projects')
-const mpesaRouter = require('./routes/mpesa')
-
+const paymentsRouter = require('./routes/payments')
 
 app.use('/api/chat',     chatRouter)
 app.use('/api/projects', projectsRouter)
-app.use('/api/mpesa', mpesaRouter)
+app.use('/api/payments', paymentsRouter)
 
 // ─── ADMIN PANEL ───────────────────────────────────────────────
 app.use('/admin', express.static(path.join(__dirname, 'public')))
