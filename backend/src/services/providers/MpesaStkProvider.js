@@ -74,23 +74,29 @@ class MpesaStkProvider extends BasePaymentProvider {
 
     console.log('📤 Tuma STK Push → phone:', normalizedPhone, 'amount:', amount)
 
-    const res = await axios.post(
-      `${this.config.baseUrl}/payment/stk-push`,
-      {
-        amount:       Math.ceil(Number(amount)),
-        phone:        normalizedPhone,
-        callback_url: this.config.callbackUrl,
-        description:  'DevTech Payment',
-      },
-      {
-        headers: {
-          Authorization:  `Bearer ${token}`,
-          'Content-Type': 'application/json',
+    let res
+    try {
+      res = await axios.post(
+        `${this.config.baseUrl}/payment/stk-push`,
+        {
+          amount:       Math.ceil(Number(amount)),
+          phone:        normalizedPhone,
+          callback_url: this.config.callbackUrl,
+          description:  'DevTech Payment',
         },
-      }
-    )
+        {
+          headers: {
+            Authorization:  `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    } catch (axiosErr) {
+      console.error('❌ Tuma STK 400 response:', JSON.stringify(axiosErr.response?.data))
+      throw new Error(axiosErr.response?.data?.message || axiosErr.message)
+    }
 
-    console.log('📥 Tuma STK response:', res.data)
+    console.log('📥 Tuma STK response:', JSON.stringify(res.data))
 
     if (!res.data?.success) {
       throw new Error(res.data?.message || 'STK Push failed.')
