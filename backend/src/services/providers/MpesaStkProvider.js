@@ -48,11 +48,12 @@ class MpesaStkProvider extends BasePaymentProvider {
       { headers: { 'Content-Type': 'application/json' } }
     )
     console.log('🔐 Tuma auth response:', JSON.stringify(res.data))
-    if (!res.data?.success || !res.data?.token) {
+    const token = res.data?.data?.token || res.data?.token
+    if (!res.data?.success || !token) {
       throw new Error(`Tuma auth failed: ${JSON.stringify(res.data)}`)
     }
-    this._token    = res.data.token
-    this._tokenExp = Date.now() + ((res.data.expires_in || 86400) * 1000) - (5 * 60 * 1000)
+    this._token    = token
+    this._tokenExp = Date.now() + ((res.data?.data?.expires_in || res.data?.expires_in || 86400) * 1000) - (5 * 60 * 1000)
     console.log('✅ Tuma token obtained')
     return this._token
   }
