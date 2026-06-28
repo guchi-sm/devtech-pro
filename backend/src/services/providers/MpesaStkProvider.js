@@ -41,13 +41,15 @@ class MpesaStkProvider extends BasePaymentProvider {
     if (this._token && this._tokenExp && Date.now() < this._tokenExp) {
       return this._token
     }
+    console.log('🔐 Tuma auth attempt → email:', this.config.email, 'key:', this.config.apiKey?.slice(0,8) + '...')
     const res = await axios.post(
       `${this.config.baseUrl}/auth/token`,
       { email: this.config.email, api_key: this.config.apiKey },
       { headers: { 'Content-Type': 'application/json' } }
     )
+    console.log('🔐 Tuma auth response:', JSON.stringify(res.data))
     if (!res.data?.success || !res.data?.token) {
-      throw new Error('Failed to obtain Tuma auth token.')
+      throw new Error(`Tuma auth failed: ${JSON.stringify(res.data)}`)
     }
     this._token    = res.data.token
     this._tokenExp = Date.now() + ((res.data.expires_in || 86400) * 1000) - (5 * 60 * 1000)
