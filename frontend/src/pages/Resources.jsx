@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import Footer from '../components/Footer'
-import MpesaPayment from '../components/MpesaPayment'
+import PaymentCheckout from '../components/PaymentCheckout'
 import toast, { Toaster } from 'react-hot-toast'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -326,14 +326,14 @@ export default function Resources() {
 
       {/* MODALS */}
       <AnimatePresence>
-        {selected && selected.isPremium && (
-          <MpesaPayment
-            key="mpesa"
-            resource={selected}
-            onClose={() => setSelected(null)}
-            onSuccess={handlePaymentSuccess}
-          />
-        )}
+   {selected && selected.isPremium && (
+  <PaymentCheckout
+    key="checkout"
+    resource={selected}
+    onClose={() => setSelected(null)}
+    onSuccess={handlePaymentSuccess}
+  />
+)}
         {selected && !selected.isPremium && (
           <FreeModal key="free" resource={selected} onClose={() => setSelected(null)}
             onUnlocked={(url) => { setSelected(null); if(url && url !== '#') triggerDownload(url, selected.title) }}/>
