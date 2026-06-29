@@ -7,7 +7,6 @@ import CustomCursor from './components/CustomCursor'
 import ScrollProgress from './components/ScrollProgress'
 import Preloader from './components/Preloader'
 import WhatsAppButton from './components/WhatsAppButton'
-import MobileCTA from './components/MobileCTA'
 import CookieBanner from './components/CookieBanner'
 import PushNotification from './components/PushNotification'
 import Home from './pages/Home'
@@ -98,8 +97,6 @@ export default function App() {
         <ScrollToTop />
         <WhatsAppButton />
         <AIChatbox />
-        <MobileCTA />
-
         {/* ── Cookie consent (slides up after 2s) ── */}
         <CookieBanner />
 
