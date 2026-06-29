@@ -93,6 +93,9 @@ class MpesaStkProvider extends BasePaymentProvider {
       )
     } catch (axiosErr) {
       console.error('❌ Tuma STK 400 response:', JSON.stringify(axiosErr.response?.data))
+      // Clear cached token so next request gets a fresh one
+      this._token    = null
+      this._tokenExp = null
       throw new Error(axiosErr.response?.data?.message || axiosErr.message)
     }
 

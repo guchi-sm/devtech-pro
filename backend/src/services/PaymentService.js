@@ -10,15 +10,21 @@ const CardPaymentProvider = require('./providers/CardPaymentProvider')
  */
 class PaymentService {
 
-  // ─── Get provider instance by method ───────────────────────
-  getProvider(method) {
-    switch (method) {
-      case 'mpesa_stk': return new MpesaStkProvider()
-      case 'card':      return new CardPaymentProvider()
-      default:          return null
-    }
+  constructor() {
+    this._providers = {}
   }
 
+  // ─── Get provider instance by method (singleton) ───────────
+  getProvider(method) {
+    if (!this._providers[method]) {
+      switch (method) {
+        case 'mpesa_stk': this._providers[method] = new MpesaStkProvider(); break
+        case 'card':      this._providers[method] = new CardPaymentProvider(); break
+        default:          return null
+      }
+    }
+    return this._providers[method]
+  }
   // ─── Validate resource and return it ───────────────────────
   async getResource(resourceId) {
     const resource = await Resource.findById(resourceId)
