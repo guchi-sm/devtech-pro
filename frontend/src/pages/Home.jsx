@@ -395,87 +395,76 @@ function ServiceCard({ item, delay }) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         style={{
-          display: 'flex',
-          alignItems: 'stretch',
-          gap: 0,
+          position: 'relative',
           background: 'var(--bg-card)',
           border: '1px solid var(--border)',
-          borderLeft: `3px solid ${hovered ? '#f5a623' : 'transparent'}`,
-          borderRadius: '10px',
+          borderRadius: 12,
           overflow: 'hidden',
           cursor: 'pointer',
           transition: 'all 0.3s ease',
-          transform: hovered ? 'translateX(4px)' : 'translateX(0)',
-          boxShadow: hovered ? '0 8px 32px rgba(0,0,0,0.12)' : 'none',
+          boxShadow: hovered ? '0 12px 40px rgba(0,0,0,0.15)' : '0 2px 8px rgba(0,0,0,0.05)',
+          transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
         }}
       >
-        {/* Left image strip */}
-        <div style={{
-          width: 100,
-          flexShrink: 0,
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
+        {/* Image */}
+        <div style={{ position: 'relative', height: 160, overflow: 'hidden' }}>
           <img
-            src={item.img}
-            alt={item.title}
-            loading="lazy"
+            src={item.img} alt={item.title} loading="lazy"
             style={{
               width: '100%', height: '100%', objectFit: 'cover',
               transition: 'transform 0.6s ease',
-              transform: hovered ? 'scale(1.1)' : 'scale(1)',
-              filter: 'brightness(0.7)',
+              transform: hovered ? 'scale(1.07)' : 'scale(1)',
+              filter: 'brightness(0.65)',
             }}
           />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)' }}/>
           <div style={{
-            position: 'absolute', inset: 0,
-            background: hovered
-              ? 'linear-gradient(135deg, rgba(245,166,35,0.4), rgba(0,0,0,0.3))'
-              : 'linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.1))',
-            transition: 'background 0.3s',
-          }}/>
-          <div style={{
-            position: 'absolute', bottom: 8, left: 8,
-            fontSize: '1.4rem', fontWeight: 900, color: 'rgba(255,255,255,0.35)',
-            lineHeight: 1, fontFamily: 'monospace',
+            position: 'absolute', bottom: 10, left: 14,
+            fontSize: '2rem', fontWeight: 900, color: 'rgba(255,255,255,0.2)',
+            fontFamily: 'monospace', lineHeight: 1,
           }}>{item.num}</div>
+          {/* Gold tag */}
+          <div style={{
+            position: 'absolute', top: 10, right: 10,
+            background: hovered ? '#f5a623' : 'rgba(245,166,35,0.15)',
+            border: '1px solid rgba(245,166,35,0.4)',
+            borderRadius: 4, padding: '0.2rem 0.5rem',
+            fontSize: '0.55rem', fontFamily: 'monospace',
+            fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+            color: hovered ? '#1c2d3f' : '#f5a623',
+            transition: 'all 0.3s',
+          }}>Service</div>
         </div>
 
-        {/* Right content */}
-        <div style={{ padding: '1.25rem 1.4rem', flex: 1 }}>
+        {/* Gold bottom line */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0,
+          height: 3, background: '#f5a623',
+          width: hovered ? '100%' : '0%',
+          transition: 'width 0.4s ease',
+        }}/>
+
+        {/* Content */}
+        <div style={{ padding: '1.25rem' }}>
           <div style={{
-            display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.6rem',
-          }}>
-            <div style={{
-              width: 34, height: 34, borderRadius: 8, flexShrink: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: hovered ? '#f5a623' : 'rgba(245,166,35,0.1)',
-              color: hovered ? '#1c2d3f' : '#f5a623',
-              border: '1px solid rgba(245,166,35,0.25)',
-              transition: 'all 0.3s',
-            }}>
-              {item.icon}
-            </div>
-            <h3 style={{
-              fontSize: '0.82rem', fontWeight: 800,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
-              color: 'var(--text)', lineHeight: 1.2, margin: 0,
-            }}>{item.title}</h3>
-          </div>
+            width: 40, height: 40, borderRadius: 8,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: hovered ? '#f5a623' : 'rgba(245,166,35,0.1)',
+            color: hovered ? '#1c2d3f' : '#f5a623',
+            border: '1px solid rgba(245,166,35,0.2)',
+            marginBottom: '0.85rem',
+            transition: 'all 0.3s',
+          }}>{item.icon}</div>
+          <h3 style={{
+            fontSize: '0.9rem', fontWeight: 800,
+            letterSpacing: '0.08em', textTransform: 'uppercase',
+            color: 'var(--text)', marginBottom: '0.5rem', lineHeight: 1.3,
+          }}>{item.title}</h3>
           <p style={{
             fontSize: '0.8rem', lineHeight: 1.65,
             color: 'var(--text-muted)', margin: 0,
           }}>{item.desc}</p>
         </div>
-
-        {/* Arrow indicator */}
-        <div style={{
-          display: 'flex', alignItems: 'center', paddingRight: '1rem',
-          color: hovered ? '#f5a623' : 'var(--border)',
-          transition: 'color 0.3s, transform 0.3s',
-          transform: hovered ? 'translateX(3px)' : 'translateX(0)',
-          fontSize: '1rem',
-        }}>→</div>
       </div>
     </Reveal>
   )
