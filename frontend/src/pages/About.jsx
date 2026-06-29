@@ -278,7 +278,17 @@ function CVModal({ onClose }) {
         </div>
 
         {/* Stats strip */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', background: '#162435' }}>
+        <style>{`
+          .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            background: #162435;
+          }
+          @media (max-width: 640px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+          }
+        `}</style>
+        <div className="stats-grid">
           {[['5+','Years Exp.'],['80+','Clients'],['200+','Devices Fixed'],['30+','Networks']].map(([n,l],i) => (
             <div key={l} style={{ padding: '10px 8px', textAlign: 'center', borderRight: i<3?'1px solid rgba(255,255,255,0.07)':'none' }}>
               <div style={{ fontWeight: 900, fontSize: '1.2rem', color: '#f5a623', fontFamily: 'DM Sans, sans-serif' }}>{n}</div>

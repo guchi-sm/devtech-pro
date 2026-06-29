@@ -291,10 +291,18 @@ function HeroCarousel() {
       </div>
 
       {/* ── Thumbnail strip (exactly like xtratheme) ───── */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(4,1fr)',
-        gap: 0, background: '#1c2d3f',
-      }}>
+      <style>{`
+        .thumb-strip {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 0;
+          background: #1c2d3f;
+        }
+        @media (max-width: 480px) {
+          .thumb-strip { grid-template-columns: repeat(2, 1fr); }
+        }
+      `}</style>
+      <div className="thumb-strip">
         {SLIDES.map((s, i) => (
           <button key={i} onClick={() => goTo(i, i > current ? 1 : -1)}
             style={{
@@ -351,23 +359,27 @@ function Reveal({ children, delay = 0, className = '' }) {
 
 // ─── RESPONSIVE SERVICES GRID ───────────────────────────────────
 function ResponsiveServicesGrid() {
-  const [cols, setCols] = useState(1)
-  useEffect(() => {
-    const update = () => setCols(window.innerWidth >= 768 ? 3 : 1)
-    update()
-    window.addEventListener('resize', update)
-    return () => window.removeEventListener('resize', update)
-  }, [])
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: `repeat(${cols}, 1fr)`,
-      gap: '1.5rem',
-    }}>
-      {SERVICES_DATA.map((item, i) => (
-        <ServiceCard key={item.num} item={item} delay={i * 0.12} />
-      ))}
-    </div>
+    <>
+      <style>{`
+        .services-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.5rem;
+        }
+        @media (max-width: 900px) {
+          .services-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 560px) {
+          .services-grid { grid-template-columns: 1fr; }
+        }
+      `}</style>
+      <div className="services-grid">
+        {SERVICES_DATA.map((item, i) => (
+          <ServiceCard key={item.num} item={item} delay={i * 0.12} />
+        ))}
+      </div>
+    </>
   )
 }
 
