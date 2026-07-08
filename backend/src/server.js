@@ -60,6 +60,18 @@ const unlockLimiter = rateLimit({
   standardHeaders: true, legacyHeaders: false,
   message: { success: false, message: 'Too many unlock requests. Try again later.' },
 })
+// Brute-force protection for admin login — 10 attempts per 15 min per IP
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, max: 10,
+  standardHeaders: true, legacyHeaders: false,
+  message: { success: false, message: 'Too many login attempts. Try again in 15 minutes.' },
+})
+// CV bandwidth protection — 20 downloads per hour per IP
+const cvLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, max: 20,
+  standardHeaders: true, legacyHeaders: false,
+  message: { success: false, message: 'Too many CV requests. Try again later.' },
+})
 
 app.use(globalLimiter)
 
@@ -74,6 +86,7 @@ app.get('/api/health', (_req, res) => {
 
 // ─── ROUTES ────────────────────────────────────────────────────
 app.use('/api/contact',      contactLimiter, contactRouter)
+app.post('/api/admin/login', loginLimiter)   // brute-force guard — must come before adminRouter
 app.use('/api/admin',        adminRouter)
 app.use('/api/resources',    resourceRouter)  // unlockLimiter moved to route-level
 app.use('/api/analytics',    analyticsRouter)
@@ -94,7 +107,7 @@ app.get('/admin', (_req, res) => {
 })
 
 // ─── CV PDF DOWNLOAD ───────────────────────────────────────────
-app.get('/cv.pdf', (_req, res) => {
+app.get('/cv.pdf', cvLimiter, (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'cv.pdf'), {
     headers: {
       'Content-Type': 'application/pdf',
