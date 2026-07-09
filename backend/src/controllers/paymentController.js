@@ -11,7 +11,11 @@ async function initiateStkPush(req, res) {
     if (!phone || !resourceId) {
       return res.status(400).json({ success: false, message: 'phone and resourceId are required.' })
     }
-    const result = await PaymentService.initiateStkPush({ phone, resourceId, customerName, customerEmail })
+    // req.user is set by requireUser middleware (optional — guests allowed)
+    const result = await PaymentService.initiateStkPush({
+      phone, resourceId, customerName, customerEmail,
+      userId: req.user?._id || null,
+    })
     return res.json(result)
   } catch (err) {
     console.error('❌ STK Push error:', err.message)
@@ -27,7 +31,9 @@ async function initiateManualPayment(req, res) {
       return res.status(400).json({ success: false, message: 'resourceId, mpesaCode, senderPhone and amount are required.' })
     }
     const result = await PaymentService.initiateManualPayment({
-      resourceId, customerName, customerEmail, customerPhone, mpesaCode, senderPhone, amount,
+      resourceId, customerName, customerEmail, customerPhone,
+      mpesaCode, senderPhone, amount,
+      userId: req.user?._id || null,
     })
     return res.status(201).json(result)
   } catch (err) {
@@ -43,7 +49,10 @@ async function initiateCardPayment(req, res) {
     if (!resourceId || !customerEmail) {
       return res.status(400).json({ success: false, message: 'resourceId and customerEmail are required.' })
     }
-    const result = await PaymentService.initiateCardPayment({ resourceId, customerName, customerEmail, customerPhone })
+    const result = await PaymentService.initiateCardPayment({
+      resourceId, customerName, customerEmail, customerPhone,
+      userId: req.user?._id || null,
+    })
     return res.json(result)
   } catch (err) {
     console.error('❌ Card payment error:', err.message)
@@ -62,14 +71,15 @@ async function getPaymentStatus(req, res) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  WEBHOOKS (called by payment providers)
+//  WEBHOOKS  (called by Tuma / card provider — no JWT auth)
 // ══════════════════════════════════════════════════════════════
 
 // POST /api/payments/webhook/mpesa-stk
 async function stkWebhook(req, res) {
   try {
     console.log('📲 STK Webhook received:', JSON.stringify(req.body, null, 2))
-    await PaymentService.handleStkCallback(req.body)
+    const signature = req.headers['x-tuma-signature'] || ''
+    await PaymentService.handleStkCallback(req.body, req.rawBody || '', signature)
     return res.json({ ResultCode: 0, ResultDesc: 'Accepted' })
   } catch (err) {
     console.error('❌ STK Webhook error:', err.message)
@@ -93,18 +103,20 @@ async function cardWebhook(req, res) {
 //  ADMIN ENDPOINTS
 // ══════════════════════════════════════════════════════════════
 
-// GET /api/payments/admin/list
 async function listPayments(req, res) {
   try {
     const { method, status, search, page, limit } = req.query
-    const result = await PaymentService.listPayments({ method, status, search, page: Number(page) || 1, limit: Number(limit) || 20 })
+    const result = await PaymentService.listPayments({
+      method, status, search,
+      page: Number(page) || 1,
+      limit: Number(limit) || 20,
+    })
     return res.json(result)
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message })
   }
 }
 
-// GET /api/payments/admin/stats
 async function getStats(req, res) {
   try {
     const result = await PaymentService.getPaymentStats()
@@ -114,22 +126,28 @@ async function getStats(req, res) {
   }
 }
 
-// PATCH /api/payments/admin/:id/verify
 async function verifyPayment(req, res) {
   try {
     const { notes } = req.body
-    const result = await PaymentService.verifyManualPayment(req.params.id, req.admin?.email || 'admin', notes)
+    const result = await PaymentService.verifyManualPayment(
+      req.params.id,
+      req.admin?.email || 'admin',
+      notes
+    )
     return res.json(result)
   } catch (err) {
     return res.status(400).json({ success: false, message: err.message })
   }
 }
 
-// PATCH /api/payments/admin/:id/reject
 async function rejectPayment(req, res) {
   try {
     const { reason } = req.body
-    const result = await PaymentService.rejectManualPayment(req.params.id, req.admin?.email || 'admin', reason)
+    const result = await PaymentService.rejectManualPayment(
+      req.params.id,
+      req.admin?.email || 'admin',
+      reason
+    )
     return res.json(result)
   } catch (err) {
     return res.status(400).json({ success: false, message: err.message })
@@ -137,14 +155,7 @@ async function rejectPayment(req, res) {
 }
 
 module.exports = {
-  initiateStkPush,
-  initiateManualPayment,
-  initiateCardPayment,
-  getPaymentStatus,
-  stkWebhook,
-  cardWebhook,
-  listPayments,
-  getStats,
-  verifyPayment,
-  rejectPayment,
+  initiateStkPush, initiateManualPayment, initiateCardPayment,
+  getPaymentStatus, stkWebhook, cardWebhook,
+  listPayments, getStats, verifyPayment, rejectPayment,
 }

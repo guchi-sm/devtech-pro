@@ -9,6 +9,7 @@ const mongoose   = require('mongoose')
 const path       = require('path')
 
 const contactRouter      = require('./routes/contact')
+const authRouter         = require('./routes/auth')
 const adminRouter        = require('./routes/admin')
 const resourceRouter     = require('./routes/resources')
 const analyticsRouter    = require('./routes/analytics')
@@ -41,6 +42,16 @@ app.use(cors({
 }))
 
 if (process.env.NODE_ENV !== 'test') app.use(morgan('dev'))
+// Capture raw body for webhook signature verification (Tuma HMAC)
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/payments/webhook')) {
+    let data = ''
+    req.on('data', chunk => { data += chunk })
+    req.on('end', () => { req.rawBody = data; next() })
+  } else {
+    next()
+  }
+})
 app.use(express.json({ limit: '10kb' }))
 app.use(express.urlencoded({ extended: true, limit: '10kb' }))
 
@@ -85,6 +96,7 @@ app.get('/api/health', (_req, res) => {
 })
 
 // ─── ROUTES ────────────────────────────────────────────────────
+app.use('/api/auth',         authRouter)
 app.use('/api/contact',      contactLimiter, contactRouter)
 app.post('/api/admin/login', loginLimiter)   // brute-force guard — must come before adminRouter
 app.use('/api/admin',        adminRouter)

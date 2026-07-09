@@ -8,7 +8,6 @@ const paymentSchema = new mongoose.Schema({
     required: true,
   },
   paymentProvider: { type: String, default: 'manual' },
-  // Providers: 'tuma' | 'intasend' | 'flutterwave' | 'pesapal' | 'stripe' | 'manual'
 
   paymentStatus: {
     type: String,
@@ -20,6 +19,10 @@ const paymentSchema = new mongoose.Schema({
   transactionReference: { type: String, unique: true, sparse: true }, // internal DTP-XXXX
   externalReference:    { type: String, default: '' },  // M-Pesa code / provider ref
   checkoutRequestId:    { type: String, default: '' },  // STK Push polling ID
+  idempotencyKey:       { type: String, default: '' },  // prevent duplicate charges
+
+  // ─── User (authenticated purchases) ────────────────────────
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
 
   // ─── Customer ──────────────────────────────────────────────
   customerPhone: { type: String, default: '' },
@@ -27,12 +30,17 @@ const paymentSchema = new mongoose.Schema({
   customerEmail: { type: String, default: '' },
 
   // ─── Amount ────────────────────────────────────────────────
-  amount:   { type: Number, required: true },
-  currency: { type: String, default: 'KES' },
+  amount:          { type: Number, required: true },
+  expectedAmount:  { type: Number, required: true }, // validated against resource price
+  currency:        { type: String, default: 'KES' },
 
   // ─── Resource ──────────────────────────────────────────────
   resourceId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Resource' },
   resourceTitle: { type: String, default: '' },
+
+  // ─── Delivery ──────────────────────────────────────────────
+  deliveredAt:   { type: Date, default: null },   // when file was sent
+  deliveryEmail: { type: String, default: '' },   // email used for delivery
 
   // ─── Admin Verification (for manual payments) ──────────────
   verifiedBy:   { type: String, default: '' },
@@ -46,6 +54,9 @@ const paymentSchema = new mongoose.Schema({
   failureReason:  { type: String, default: '' },
   metadata:       { type: mongoose.Schema.Types.Mixed, default: {} },
 
+  // ─── Replay attack prevention ───────────────────────────────
+  callbackProcessedAt: { type: Date, default: null }, // set when callback first processed
+
 }, { timestamps: true })
 
 // ─── Indexes ───────────────────────────────────────────────────
@@ -55,6 +66,8 @@ paymentSchema.index({ customerPhone: 1 })
 paymentSchema.index({ externalReference: 1 })
 paymentSchema.index({ checkoutRequestId: 1 })
 paymentSchema.index({ resourceId: 1 })
+paymentSchema.index({ userId: 1 })
+paymentSchema.index({ idempotencyKey: 1 })
 
 // ─── Auto-generate internal transaction reference ───────────────
 paymentSchema.pre('save', function (next) {

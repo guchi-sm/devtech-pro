@@ -1,3 +1,4 @@
+const axios        = require('axios')
 const Resource     = require('../models/Resource')
 const ResourceLead = require('../models/ResourceLead')
 
@@ -9,14 +10,54 @@ async function getResources(req, res) {
     if (category && category !== 'All') filter.category = category
     const resources = await Resource.find(filter)
       .sort({ featured: -1, order: 1, createdAt: -1 })
-      .select('-__v -accessCode') // ✅ never expose accessCode publicly
+      .select('-__v -accessCode -fileUrl') // never expose fileUrl or accessCode publicly
     res.json({ success: true, data: resources })
   } catch (err) {
     res.status(500).json({ success: false, message: err.message })
   }
 }
 
-// ─── PUBLIC: Unlock / Request a resource ───────────────────────
+// ─── PROTECTED DOWNLOAD  GET /api/resources/:id/download ───────
+// Requires requireUser + requireResourceAccess middleware
+// Streams the file proxied through the backend — never exposes the raw storage URL
+async function downloadResource(req, res) {
+  try {
+    const resource = await Resource.findOne({ _id: req.params.id, visible: true })
+    if (!resource) {
+      return res.status(404).json({ success: false, message: 'Resource not found.' })
+    }
+    if (!resource.isPremium) {
+      // Free resources — just send the URL directly (no auth needed)
+      return res.json({ success: true, fileUrl: resource.fileUrl })
+    }
+
+    // Premium — stream through backend so the real URL is never exposed
+    const upstream = await axios.get(resource.fileUrl, { responseType: 'stream', timeout: 30000 })
+
+    const contentType = upstream.headers['content-type'] || 'application/octet-stream'
+    const safeFilename = resource.title.replace(/[^a-zA-Z0-9\-_.]/g, '_')
+    const ext = resource.fileUrl.split('.').pop()?.split('?')[0] || 'bin'
+
+    res.set({
+      'Content-Type':        contentType,
+      'Content-Disposition': `attachment; filename="${safeFilename}.${ext}"`,
+      'Cache-Control':       'no-store',
+      'X-Content-Type-Options': 'nosniff',
+    })
+
+    upstream.data.pipe(res)
+
+    await Resource.findByIdAndUpdate(req.params.id, { $inc: { downloadCount: 1 } })
+
+  } catch (err) {
+    console.error('downloadResource error:', err.message)
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: 'Download failed. Please try again.' })
+    }
+  }
+}
+
+// ─── PUBLIC: Unlock / Request a resource (legacy free flow) ────
 async function unlockResource(req, res) {
   try {
     const { id } = req.params
@@ -34,35 +75,27 @@ async function unlockResource(req, res) {
       return res.status(404).json({ success: false, message: 'Resource not found.' })
     }
 
-    // ── PREMIUM FLOW ──────────────────────────────────────────────
-    // If user is submitting a payment request (no accessCode) → save as pending
+    // Premium resources: redirect to payment flow
     if (resource.isPremium && !accessCode) {
       if (!phone) {
-        return res.status(400).json({ success: false, message: 'WhatsApp number is required for premium resources.' })
+        return res.status(400).json({ success: false, message: 'Phone number is required for premium resources.' })
       }
-      // Save as pending lead — admin will verify M-Pesa and send code
       await ResourceLead.create({
-        name:          name.trim(),
-        email:         email.trim().toLowerCase(),
-        phone:         phone.trim(),
-        resourceId:    resource._id,
-        resourceTitle: resource.title,
-        status:        'pending',
-        ip:            req.ip || '',
+        name: name.trim(), email: email.trim().toLowerCase(), phone: phone.trim(),
+        resourceId: resource._id, resourceTitle: resource.title,
+        status: 'pending', ip: req.ip || '',
       })
       return res.json({
-        success: true,
-        pending: true,
-        message: `Payment request received! We'll send your access code to WhatsApp ${phone} after verifying your M-Pesa payment.`,
+        success: true, pending: true,
+        message: `Request received. We'll send access to ${phone} after verifying payment.`,
       })
     }
 
-    // ── PREMIUM UNLOCK WITH CODE ──────────────────────────────────
+    // Premium unlock with access code (legacy admin-sent codes)
     if (resource.isPremium && accessCode) {
-      if (accessCode.trim().toUpperCase() !== resource.accessCode.trim().toUpperCase()) {
-        return res.status(403).json({ success: false, message: 'Invalid access code. Please check and try again.', requiresCode: true })
+      if (!resource.accessCode || accessCode.trim().toUpperCase() !== resource.accessCode.trim().toUpperCase()) {
+        return res.status(403).json({ success: false, message: 'Invalid access code.', requiresCode: true })
       }
-      // Mark their pending lead as used if exists, otherwise create a new one
       await ResourceLead.findOneAndUpdate(
         { email: email.trim().toLowerCase(), resourceId: resource._id, status: 'sent' },
         { accessCodeUsed: accessCode.trim().toUpperCase() },
@@ -71,18 +104,15 @@ async function unlockResource(req, res) {
       return res.json({ success: true, fileUrl: resource.fileUrl, title: resource.title })
     }
 
-    // ── FREE RESOURCE FLOW ────────────────────────────────────────
+    // Free resource
     await ResourceLead.create({
-      name:          name.trim(),
-      email:         email.trim().toLowerCase(),
-      phone:         phone?.trim() || '',
-      resourceId:    resource._id,
-      resourceTitle: resource.title,
-      status:        'free',
-      ip:            req.ip || '',
+      name: name.trim(), email: email.trim().toLowerCase(), phone: phone?.trim() || '',
+      resourceId: resource._id, resourceTitle: resource.title,
+      status: 'free', ip: req.ip || '',
     })
     await Resource.findByIdAndUpdate(id, { $inc: { downloadCount: 1 } })
     res.json({ success: true, fileUrl: resource.fileUrl, title: resource.title })
+
   } catch (err) {
     res.status(500).json({ success: false, message: err.message })
   }
@@ -91,9 +121,8 @@ async function unlockResource(req, res) {
 // ─── ADMIN: Mark lead as sent ──────────────────────────────────
 async function markLeadSent(req, res) {
   try {
-    const { id } = req.params
     const lead = await ResourceLead.findByIdAndUpdate(
-      id,
+      req.params.id,
       { status: 'sent', sentAt: new Date() },
       { new: true }
     )
@@ -104,7 +133,7 @@ async function markLeadSent(req, res) {
   }
 }
 
-// ─── ADMIN: GET all resources ──────────────────────────────────
+// ─── ADMIN: GET all resources (includes fileUrl + accessCode) ──
 async function getAllResources(req, res) {
   try {
     const resources = await Resource.find().sort({ order: 1, createdAt: -1 })
@@ -114,7 +143,6 @@ async function getAllResources(req, res) {
   }
 }
 
-// ─── ADMIN: GET all leads ──────────────────────────────────────
 async function getLeads(req, res) {
   try {
     const leads = await ResourceLead.find().sort({ createdAt: -1 }).limit(500)
@@ -124,7 +152,6 @@ async function getLeads(req, res) {
   }
 }
 
-// ─── ADMIN: CREATE resource ────────────────────────────────────
 async function createResource(req, res) {
   try {
     const { title, description, category, fileUrl, thumbnail, fileSize, duration, tags, featured, visible, order, isPremium, accessCode, price, mpesaTill } = req.body
@@ -138,10 +165,8 @@ async function createResource(req, res) {
       featured: featured === true || featured === 'true',
       visible:  visible  !== false && visible !== 'false',
       isPremium: isPremium === true || isPremium === 'true',
-      accessCode: accessCode || '',
-      price: parseFloat(price) || 0,
-      mpesaTill: mpesaTill || '',
-      order: Number(order) || 0,
+      accessCode: accessCode || '', price: parseFloat(price) || 0,
+      mpesaTill: mpesaTill || '', order: Number(order) || 0,
     })
     res.status(201).json({ success: true, data: resource })
   } catch (err) {
@@ -149,10 +174,8 @@ async function createResource(req, res) {
   }
 }
 
-// ─── ADMIN: UPDATE resource ────────────────────────────────────
 async function updateResource(req, res) {
   try {
-    const { id } = req.params
     const updates = { ...req.body }
     if (updates.tags && typeof updates.tags === 'string') {
       updates.tags = updates.tags.split(',').map(t => t.trim()).filter(Boolean)
@@ -160,7 +183,7 @@ async function updateResource(req, res) {
     if (updates.featured  !== undefined) updates.featured  = updates.featured  === true || updates.featured  === 'true'
     if (updates.visible   !== undefined) updates.visible   = updates.visible   !== false && updates.visible  !== 'false'
     if (updates.isPremium !== undefined) updates.isPremium = updates.isPremium === true  || updates.isPremium === 'true'
-    const resource = await Resource.findByIdAndUpdate(id, updates, { new: true, runValidators: true })
+    const resource = await Resource.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true })
     if (!resource) return res.status(404).json({ success: false, message: 'Resource not found.' })
     res.json({ success: true, data: resource })
   } catch (err) {
@@ -168,13 +191,11 @@ async function updateResource(req, res) {
   }
 }
 
-// ─── ADMIN: DELETE resource ────────────────────────────────────
 async function deleteResource(req, res) {
   try {
-    const { id } = req.params
-    const resource = await Resource.findByIdAndDelete(id)
+    const resource = await Resource.findByIdAndDelete(req.params.id)
     if (!resource) return res.status(404).json({ success: false, message: 'Resource not found.' })
-    await ResourceLead.deleteMany({ resourceId: id })
+    await ResourceLead.deleteMany({ resourceId: req.params.id })
     res.json({ success: true, message: 'Resource deleted.' })
   } catch (err) {
     res.status(500).json({ success: false, message: err.message })
@@ -182,7 +203,7 @@ async function deleteResource(req, res) {
 }
 
 module.exports = {
-  getResources, unlockResource, markLeadSent,
+  getResources, downloadResource, unlockResource, markLeadSent,
   getAllResources, getLeads,
   createResource, updateResource, deleteResource,
 }
