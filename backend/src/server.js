@@ -45,7 +45,7 @@ if (process.env.NODE_ENV !== 'test') app.use(morgan('dev'))
 // Capture raw body for webhook signature verification (Tuma HMAC)
 // Skip express.json() on webhook routes — we parse manually
 app.use((req, res, next) => {
-  if (req.path.startsWith('/api/payments/webhook')) {
+  if (req.originalUrl.startsWith('/api/payments/webhook')) {
     let data = Buffer.alloc(0)
     req.on('data', chunk => { data = Buffer.concat([data, chunk]) })
     req.on('end', () => {
@@ -59,7 +59,7 @@ app.use((req, res, next) => {
   }
 })
 app.use((req, res, next) => {
-  if (req.path.startsWith('/api/payments/webhook')) return next()
+  if (req.originalUrl.startsWith('/api/payments/webhook')) return next()
   express.json({ limit: '10kb' })(req, res, next)
 })
 app.use(express.urlencoded({ extended: true, limit: '10kb' }))
