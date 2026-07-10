@@ -41,10 +41,12 @@ class PaymentService {
     const provider = this.getProvider('mpesa_stk')
 
     // ── Idempotency: one charge per user+resource per hour ──
-    const idempotencyKey = makeIdempotencyKey(
-      userId || customerPhone || phone,
-      resourceId
-    )
+    
+      const idempotencyKey = makeIdempotencyKey(
+  userId || phone,
+  resourceId
+)
+    
     const duplicate = await Payment.findOne({
       idempotencyKey,
       paymentStatus: { $in: ['processing', 'successful'] },
