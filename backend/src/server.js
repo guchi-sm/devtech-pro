@@ -15,6 +15,7 @@ const resourceRouter     = require('./routes/resources')
 const analyticsRouter    = require('./routes/analytics')
 const testimonialRouter  = require('./routes/testimonials')
 
+
 const app  = express()
 const PORT = process.env.PORT || 5000
 
@@ -41,27 +42,17 @@ app.use(cors({
 }))
 
 if (process.env.NODE_ENV !== 'test') app.use(morgan('dev'))
-
 // Capture raw body for webhook signature verification (Tuma HMAC)
-// Skip express.json() on webhook routes — we parse manually
 app.use((req, res, next) => {
-  if (req.originalUrl.startsWith('/api/payments/webhook')) {
-    let data = Buffer.alloc(0)
-    req.on('data', chunk => { data = Buffer.concat([data, chunk]) })
-    req.on('end', () => {
-      req.rawBody = data.toString()
-      try { req.body = JSON.parse(req.rawBody || '{}') } catch { req.body = {} }
-      next()
-    })
-    req.on('error', next)
+  if (req.path.startsWith('/api/payments/webhook')) {
+    let data = ''
+    req.on('data', chunk => { data += chunk })
+    req.on('end', () => { req.rawBody = data; next() })
   } else {
     next()
   }
 })
-app.use((req, res, next) => {
-  if (req.originalUrl.startsWith('/api/payments/webhook')) return next()
-  express.json({ limit: '10kb' })(req, res, next)
-})
+app.use(express.json({ limit: '10kb' }))
 app.use(express.urlencoded({ extended: true, limit: '10kb' }))
 
 const globalLimiter = rateLimit({
@@ -75,11 +66,18 @@ const contactLimiter = rateLimit({
   standardHeaders: true, legacyHeaders: false,
   message: { success: false, message: 'Too many contact submissions. Try again in an hour.' },
 })
+const unlockLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, max: 30,
+  standardHeaders: true, legacyHeaders: false,
+  message: { success: false, message: 'Too many unlock requests. Try again later.' },
+})
+// Brute-force protection for admin login — 10 attempts per 15 min per IP
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, max: 10,
   standardHeaders: true, legacyHeaders: false,
   message: { success: false, message: 'Too many login attempts. Try again in 15 minutes.' },
 })
+// CV bandwidth protection — 20 downloads per hour per IP
 const cvLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, max: 20,
   standardHeaders: true, legacyHeaders: false,
@@ -100,9 +98,9 @@ app.get('/api/health', (_req, res) => {
 // ─── ROUTES ────────────────────────────────────────────────────
 app.use('/api/auth',         authRouter)
 app.use('/api/contact',      contactLimiter, contactRouter)
-app.post('/api/admin/login', loginLimiter)
+app.post('/api/admin/login', loginLimiter)   // brute-force guard — must come before adminRouter
 app.use('/api/admin',        adminRouter)
-app.use('/api/resources',    resourceRouter)
+app.use('/api/resources',    resourceRouter)  // unlockLimiter moved to route-level
 app.use('/api/analytics',    analyticsRouter)
 app.use('/api/testimonials', testimonialRouter)
 
